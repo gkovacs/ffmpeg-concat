@@ -1569,7 +1569,6 @@ static int check_same_settings(AVFormatContext **input_format_contexts, int num_
             }
             else if (input_format_contexts[i]->streams[j]->codec->color_table_id != color_table_id) {
                 fprintf(stderr, "Error: different color table for input file %s: %i vs existing %i \n", input_format_contexts[i]->filename, input_format_contexts[i]->streams[j]->codec->color_table_id, color_table_id);
-                fflush(stderr);
                 return -1;
             }
             if (!frame_rate_set) {
@@ -1579,7 +1578,6 @@ static int check_same_settings(AVFormatContext **input_format_contexts, int num_
             }
             else if (input_format_contexts[i]->streams[j]->r_frame_rate.num != frame_rate_num || input_format_contexts[i]->streams[j]->r_frame_rate.den != frame_rate_den) {
                 fprintf(stderr, "Error: different frame rate for input file %s: %i/%i vs existing %i/%i\n", input_format_contexts[i]->filename, input_format_contexts[i]->streams[j]->r_frame_rate.num, input_format_contexts[i]->streams[j]->r_frame_rate.den, frame_rate_num, frame_rate_den);
-                fflush(stderr);
                 return -1;
             }
             if (!width_set) {
@@ -1588,7 +1586,6 @@ static int check_same_settings(AVFormatContext **input_format_contexts, int num_
             }
             else if (input_format_contexts[i]->streams[j]->codec->width != width) {
                 fprintf(stderr, "Error: different width for input file %s: %i vs existing %i\n", input_format_contexts[i]->filename, input_format_contexts[i]->streams[j]->codec->width, width);
-                fflush(stderr);
                 return -1;
             }
             if (!height_set) {
@@ -1597,7 +1594,6 @@ static int check_same_settings(AVFormatContext **input_format_contexts, int num_
             }
             else if (input_format_contexts[i]->streams[j]->codec->height != height) {
                 fprintf(stderr, "Error: different height for input file %s: %i vs existing %i\n", input_format_contexts[i]->filename, input_format_contexts[i]->streams[j]->codec->width, width);
-                fflush(stderr);
                 return -1;
             }
         }
@@ -1657,7 +1653,6 @@ static int setup_output_file(AVFormatContext *output_format_context, AVFormatCon
         }
         if (!output_format_context->streams[i]) {
             fprintf(stderr, "Error: Could not allocate stream %i in file %s\n", i, output_format_context->filename);
-            fflush(stderr);
             return -1;
         }
         output_format_context->streams[i]->id = input_format_context->streams[i]->id;
@@ -1679,13 +1674,11 @@ static int setup_output_file(AVFormatContext *output_format_context, AVFormatCon
         }
         if (avcodec_open(output_format_context->streams[i]->codec, codec) < 0) {
             fprintf(stderr, "Error: Could not open codec for stream %i in file %s\n", i, output_format_context->filename);
-            fflush(stderr);
             return -1;
         }
     }
     if (av_write_header(output_format_context) != 0) {
         fprintf(stderr, "Error: could not write header for %s\n", output_format_context->filename);
-        fflush(stderr);
         return -1;
     }
     return 0;
@@ -1713,7 +1706,6 @@ static int write_frames_to_output(AVFormatContext **input_format_contexts, int n
             packet_pts = packet->pts;
             if (av_write_frame(output_format_context, packet) != 0) {
                 fprintf(stderr, "Error writing frame to %s from input file %s\n", output_format_context->filename, input_format_contexts[i]->filename);
-                fflush(stderr);
                 return -1;
             }
             av_free_packet(packet);
