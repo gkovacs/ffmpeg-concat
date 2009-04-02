@@ -1650,6 +1650,8 @@ static int setup_output_file(AVFormatContext *output_format_context, AVFormatCon
         AVCodec *codec = avcodec_find_encoder(input_format_context->streams[i]->codec->codec_id);
         output_format_context->streams[i]->codec = avcodec_alloc_context();
         output_format_context->streams[i]->codec->sample_aspect_ratio = output_format_context->streams[i]->sample_aspect_ratio;
+        output_format_context->streams[i]->codec->extradata = input_format_context->streams[i]->codec->extradata;
+        output_format_context->streams[i]->codec->extradata_size = input_format_context->streams[i]->codec->extradata_size;
         output_format_context->streams[i]->codec->codec_type = input_format_context->streams[i]->codec->codec_type;
         if (input_format_context->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO) {
             if(output_format_context->oformat->flags & AVFMT_GLOBALHEADER)
