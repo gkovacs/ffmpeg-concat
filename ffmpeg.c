@@ -1546,8 +1546,6 @@ static int stream_index_from_inputs(AVFormatContext **input_files,
  */
 static int check_same_settings(AVFormatContext **input_format_contexts, int num_input_files)
 {
-    int color_table_id;
-    char color_table_id_set = 0;
     int width;
     char width_set = 0;
     int height;
@@ -1561,14 +1559,6 @@ static int check_same_settings(AVFormatContext **input_format_contexts, int num_
         for (j = 0; j < input_format_contexts[i]->nb_streams; ++j) {
             if (avcodec_open(input_format_contexts[i]->streams[j]->codec, avcodec_find_decoder(input_format_contexts[i]->streams[j]->codec->codec_id)) < 0) {
                 fprintf(stderr, "Error: could not open codec for input file %s\n", input_format_contexts[i]->filename);
-                return -1;
-            }
-            if (!color_table_id_set) {
-                color_table_id_set = 1;
-                color_table_id = input_format_contexts[i]->streams[j]->codec->color_table_id;
-            }
-            else if (input_format_contexts[i]->streams[j]->codec->color_table_id != color_table_id) {
-                fprintf(stderr, "Error: different color table for input file %s: %i vs existing %i \n", input_format_contexts[i]->filename, input_format_contexts[i]->streams[j]->codec->color_table_id, color_table_id);
                 return -1;
             }
             if (!frame_rate_set) {
