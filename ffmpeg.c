@@ -1539,12 +1539,14 @@ static int stream_index_from_inputs(AVFormatContext **input_files,
 }
 
 /**
- * Function check_same_settings checks that the input formats are identical. It is used internally by concatenation.
- * @param AVFormatContext **input_format_contexts list of input format contexts
- * @param int num_input_files number of input files.
- * @return returns 0 on success or -1 on failure
+ * Function check_same_settings checks that the input formats are identical.
+ * It is used internally by concatenation.
+ * @param AVFormatContext **input_format_contexts List of input format contexts.
+ * @param int num_input_files Number of input files.
+ * @return Returns 0 on success or -1 on failure.
  */
-static int check_same_settings(AVFormatContext **input_format_contexts, int num_input_files)
+static int check_same_settings(AVFormatContext **input_format_contexts,
+                               int num_input_files)
 {
     int width, height, frame_rate_num, frame_rate_den, i, j;
     char width_set = 0;
@@ -1554,7 +1556,8 @@ static int check_same_settings(AVFormatContext **input_format_contexts, int num_
         for (j = 0; j < input_format_contexts[i]->nb_streams; ++j) {
             if (avcodec_open(input_format_contexts[i]->streams[j]->codec,
                 avcodec_find_decoder(input_format_contexts[i]->streams[j]->codec->codec_id)) < 0) {
-                fprintf(stderr, "Error: could not open codec for input file %s\n", input_format_contexts[i]->filename);
+                fprintf(stderr, "Error: could not open codec for input file %s\n",
+                        input_format_contexts[i]->filename);
                 return -1;
             }
             if (!frame_rate_set) {
@@ -1562,8 +1565,14 @@ static int check_same_settings(AVFormatContext **input_format_contexts, int num_
                 frame_rate_num = input_format_contexts[i]->streams[j]->r_frame_rate.num;
                 frame_rate_den = input_format_contexts[i]->streams[j]->r_frame_rate.den;
             }
-            else if (input_format_contexts[i]->streams[j]->r_frame_rate.num != frame_rate_num || input_format_contexts[i]->streams[j]->r_frame_rate.den != frame_rate_den) {
-                fprintf(stderr, "Error: different frame rate for input file %s: %i/%i vs existing %i/%i\n", input_format_contexts[i]->filename, input_format_contexts[i]->streams[j]->r_frame_rate.num, input_format_contexts[i]->streams[j]->r_frame_rate.den, frame_rate_num, frame_rate_den);
+            else if (input_format_contexts[i]->streams[j]->r_frame_rate.num != frame_rate_num
+                || input_format_contexts[i]->streams[j]->r_frame_rate.den != frame_rate_den) {
+                fprintf(stderr, "Error: different frame rate for input file %s: %i/%i vs existing %i/%i\n",
+                        input_format_contexts[i]->filename,
+                        input_format_contexts[i]->streams[j]->r_frame_rate.num,
+                        input_format_contexts[i]->streams[j]->r_frame_rate.den,
+                        frame_rate_num,
+                        frame_rate_den);
                 return -1;
             }
             if (!width_set) {
@@ -1571,7 +1580,10 @@ static int check_same_settings(AVFormatContext **input_format_contexts, int num_
                 width = input_format_contexts[i]->streams[j]->codec->width;
             }
             else if (input_format_contexts[i]->streams[j]->codec->width != width) {
-                fprintf(stderr, "Error: different width for input file %s: %i vs existing %i\n", input_format_contexts[i]->filename, input_format_contexts[i]->streams[j]->codec->width, width);
+                fprintf(stderr, "Error: different width for input file %s: %i vs existing %i\n",
+                        input_format_contexts[i]->filename,
+                        input_format_contexts[i]->streams[j]->codec->width,
+                        width);
                 return -1;
             }
             if (!height_set) {
@@ -1579,7 +1591,10 @@ static int check_same_settings(AVFormatContext **input_format_contexts, int num_
                 height = input_format_contexts[i]->streams[j]->codec->height;
             }
             else if (input_format_contexts[i]->streams[j]->codec->height != height) {
-                fprintf(stderr, "Error: different height for input file %s: %i vs existing %i\n", input_format_contexts[i]->filename, input_format_contexts[i]->streams[j]->codec->width, width);
+                fprintf(stderr, "Error: different height for input file %s: %i vs existing %i\n",
+                        input_format_contexts[i]->filename,
+                        input_format_contexts[i]->streams[j]->codec->width,
+                        width);
                 return -1;
             }
         }
@@ -1588,9 +1603,10 @@ static int check_same_settings(AVFormatContext **input_format_contexts, int num_
 }
 
 /**
- * Function get_audio_codec retrives the CodecID of the audio stream. It is used internally by concatenation.
- * @param AVFormatContext *input_format_context input format context
- * @return returns audio CodecID on success or 0 on failure
+ * Retrives the CodecID of the audio stream.
+ * This is used internally by concatenation.
+ * @param AVFormatContext *input_format_context Input format context.
+ * @return Returns audio CodecID on success or -1 on failure.
  */
 static int get_audio_codec(AVFormatContext *input_format_context)
 {
@@ -1599,13 +1615,14 @@ static int get_audio_codec(AVFormatContext *input_format_context)
         if (input_format_context->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO)
             return input_format_context->streams[i]->codec->codec_id;
     }
-    return 0;
+    return -1;
 }
 
 /**
- * Function get_video_codec retrives the CodecID of the video stream. It is used internally by concatenation.
- * @param AVFormatContext *input_format_context input format context
- * @return returns video CodecID on success or 0 on failure
+ * Retrives the CodecID of the video stream.
+ * This is used internally by concatenation.
+ * @param AVFormatContext *input_format_context Input format context.
+ * @return Returns video CodecID on success or -1 on failure.
  */
 static int get_video_codec(AVFormatContext *input_format_context)
 {
@@ -1614,20 +1631,20 @@ static int get_video_codec(AVFormatContext *input_format_context)
         if (input_format_context->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
             return input_format_context->streams[i]->codec->codec_id;
     }
-    return 0;
+    return -1;
 }
 
 /**
- * Function setup_output_file populates the AVFormatContext for the output file
- * with appropriate values from input_format_context. It is used internally by
- * concatenation.
- * @param AVFormatContext *output_format_context format context for output file
- * @param AVFormatContext *input_format_context format context for input file,
- * assumed to be of same format as desired output
- * @return returns 0 on success
+ * Populates the AVFormatContext for the output file
+ * with appropriate values from input_format_context.
+ * This is used internally by concatenation.
+ * @param AVFormatContext *output_format_context Format context for output file.
+ * @param AVFormatContext *input_format_context Format context for input file,
+ * assumed to be of same format as desired output.
+ * @return Returns 0 on success.
  */
 static int setup_output_file(AVFormatContext *output_format_context,
-    AVFormatContext *input_format_context)
+                             AVFormatContext *input_format_context)
 {
     int i;
     output_format_context->oformat->video_codec = get_video_codec(input_format_context);
@@ -1645,26 +1662,39 @@ static int setup_output_file(AVFormatContext *output_format_context,
                 i, output_format_context->filename);
             return -1;
         }
-        output_format_context->streams[i]->id = input_format_context->streams[i]->id;
-        output_format_context->streams[i]->sample_aspect_ratio = input_format_context->streams[i]->sample_aspect_ratio;
-        output_format_context->streams[i]->codec = avcodec_alloc_context();
-        output_format_context->streams[i]->codec->sample_aspect_ratio = output_format_context->streams[i]->sample_aspect_ratio;
-        output_format_context->streams[i]->codec->extradata = input_format_context->streams[i]->codec->extradata;
-        output_format_context->streams[i]->codec->extradata_size = input_format_context->streams[i]->codec->extradata_size;
-        output_format_context->streams[i]->codec->codec_type = input_format_context->streams[i]->codec->codec_type;
+        output_format_context->streams[i]->id =
+                input_format_context->streams[i]->id;
+        output_format_context->streams[i]->sample_aspect_ratio =
+                input_format_context->streams[i]->sample_aspect_ratio;
+        output_format_context->streams[i]->codec =
+                avcodec_alloc_context();
+        output_format_context->streams[i]->codec->sample_aspect_ratio =
+                output_format_context->streams[i]->sample_aspect_ratio;
+        output_format_context->streams[i]->codec->extradata =
+                input_format_context->streams[i]->codec->extradata;
+        output_format_context->streams[i]->codec->extradata_size =
+                input_format_context->streams[i]->codec->extradata_size;
+        output_format_context->streams[i]->codec->codec_type =
+                input_format_context->streams[i]->codec->codec_type;
         if (input_format_context->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO) {
             if(output_format_context->oformat->flags & AVFMT_GLOBALHEADER)
                 output_format_context->streams[i]->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
-            output_format_context->streams[i]->codec->pix_fmt = input_format_context->streams[i]->codec->pix_fmt;
-            output_format_context->streams[i]->codec->time_base = input_format_context->streams[i]->codec->time_base;
-            output_format_context->streams[i]->codec->width = input_format_context->streams[i]->codec->width;
-            output_format_context->streams[i]->codec->height = input_format_context->streams[i]->codec->height;
+            output_format_context->streams[i]->codec->pix_fmt =
+                    input_format_context->streams[i]->codec->pix_fmt;
+            output_format_context->streams[i]->codec->time_base =
+                    input_format_context->streams[i]->codec->time_base;
+            output_format_context->streams[i]->codec->width =
+                    input_format_context->streams[i]->codec->width;
+            output_format_context->streams[i]->codec->height =
+                    input_format_context->streams[i]->codec->height;
         }
-        else if (input_format_context->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO) {
-            output_format_context->streams[i]->codec->sample_rate = input_format_context->streams[i]->codec->sample_rate;
-        }
-        if (avcodec_open(output_format_context->streams[i]->codec, avcodec_find_encoder(input_format_context->streams[i]->codec->codec_id)) < 0) {
-            fprintf(stderr, "Error: Could not open codec for stream %i in file %s\n", i, output_format_context->filename);
+        else if (input_format_context->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO)
+            output_format_context->streams[i]->codec->sample_rate =
+                    input_format_context->streams[i]->codec->sample_rate;
+        if (avcodec_open(output_format_context->streams[i]->codec,
+                avcodec_find_encoder(input_format_context->streams[i]->codec->codec_id)) < 0) {
+            fprintf(stderr, "Error: Could not open codec for stream %i in file %s\n",
+                    i, output_format_context->filename);
             return -1;
         }
     }
@@ -1676,14 +1706,17 @@ static int setup_output_file(AVFormatContext *output_format_context,
 }
 
 /**
- * write_frames_to_output reads frames from the input format contexts
- * and writes them to the output format context
- * @param AVFormatContext **input_format_contexts list of input format contexts
- * @param int num_input_files number of input files
- * @param AVFormatContext *output_format_context format context for the output file
- * @return returns 0 on success
+ * Reads frames from the input format contexts
+ * and writes them to the output format context.
+ * This is used internally by concatenation.
+ * @param AVFormatContext **input_format_contexts List of input format contexts.
+ * @param int num_input_files Number of input files.
+ * @param AVFormatContext *output_format_context Format context for the output file.
+ * @return Returns 0 on success.
  */
-static int write_frames_to_output(AVFormatContext **input_format_contexts, int num_input_files, AVFormatContext *output_format_context)
+static int write_frames_to_output(AVFormatContext **input_format_contexts,
+                                  int num_input_files,
+                                  AVFormatContext *output_format_context)
 {
     AVPacket *packet = av_malloc(sizeof(AVPacket));
     int64_t packet_pts;
@@ -1697,7 +1730,8 @@ static int write_frames_to_output(AVFormatContext **input_format_contexts, int n
             packet->dts += packet_timestamp_offset;
             packet_pts = packet->pts;
             if (av_write_frame(output_format_context, packet) != 0) {
-                fprintf(stderr, "Error writing frame to %s from input file %s\n", output_format_context->filename, input_format_contexts[i]->filename);
+                fprintf(stderr, "Error writing frame to %s from input file %s\n",
+                        output_format_context->filename, input_format_contexts[i]->filename);
                 return -1;
             }
             av_free_packet(packet);
