@@ -193,7 +193,7 @@ static char *vstats_filename;
 static FILE *vstats_file;
 static int opt_programid = 0;
 static int copy_initial_nonkeyframes = 0;
-static int concatenate_video_files = 0;
+static int concatenate_files = 0;
 
 static int rate_emu = 0;
 
@@ -1735,7 +1735,7 @@ static int write_frames_to_output(AVFormatContext **input_format_contexts,
                 return -1;
             }
             av_free_packet(packet);
-        
+
         }
         packet_timestamp_offset += packet_pts;
     }
@@ -1751,7 +1751,8 @@ static int av_encode(AVFormatContext **output_files,
                      int nb_input_files,
                      AVStreamMap *stream_maps, int nb_stream_maps)
 {
-    if (concatenate_video_files) {
+	/*
+    if (concatenate_files) {
         printf("concatenating video files\n");
         if (check_same_settings(input_files, nb_input_files) != 0) {
             av_exit(1);
@@ -1768,6 +1769,7 @@ static int av_encode(AVFormatContext **output_files,
         printf("wrote frames to output\n");
         return 0;
     }
+    */
     int ret = 0, i, j, k, n, nb_istreams = 0, nb_ostreams = 0;
     AVFormatContext *is, *os;
     AVCodecContext *codec, *icodec;
@@ -1779,6 +1781,10 @@ static int av_encode(AVFormatContext **output_files,
     int want_sdp = 1;
     uint8_t no_packet[MAX_FILES]={0};
     int no_packet_count=0;
+
+    if (concatenate_files)
+        nb_output_files = 1;
+    int conc_inp_index;
 
     file_table= av_mallocz(nb_input_files * sizeof(AVInputFile));
     if (!file_table)
@@ -2184,6 +2190,8 @@ static int av_encode(AVFormatContext **output_files,
         ist->is_start = 1;
     }
 
+    if (concatenate_files) verbose = 3;
+
     /* set meta data information from input file if required */
     for (i=0;i<nb_meta_data_maps;i++) {
         AVFormatContext *out_file;
@@ -2271,8 +2279,13 @@ static int av_encode(AVFormatContext **output_files,
 
     key = -1;
     timer_start = av_gettime();
-
-    for(; received_sigterm == 0;) {
+    conc_inp_index = 0;
+    if (concatenate_files) {
+        for (i=0;i<nb_istreams;i++) {
+            ist_table[i]->discard = 0;
+        }
+    }
+    for(; received_sigterm == 0;) { // main loop for encoding
         int file_index, ist_index;
         AVPacket pkt;
         double ipts_min;
@@ -2294,11 +2307,18 @@ static int av_encode(AVFormatContext **output_files,
         /* select the stream that we must read now by looking at the
            smallest output pts */
         file_index = -1;
+
+        if (concatenate_files) file_index = conc_inp_index;
+
         for(i=0;i<nb_ostreams;i++) {
             double ipts, opts;
+            int input_stream_curindex;
+            input_stream_curindex = ost->source_index;
             ost = ost_table[i];
             os = output_files[ost->file_index];
             ist = ist_table[ost->source_index];
+            if (concatenate_files) ist = ist_table[conc_inp_index];
+        nextist:
             if(no_packet[ist->file_index])
                 continue;
             if(ost->st->codec->codec_type == CODEC_TYPE_VIDEO)
@@ -2316,11 +2336,30 @@ static int av_encode(AVFormatContext **output_files,
                     if(!input_sync) file_index = ist->file_index;
                 }
             }
+            if (file_table[ist->file_index].eof_reached && concatenate_files) {
+//                fprintf(stderr, "ist eof reached");
+                input_stream_curindex++;
+                if (input_stream_curindex < nb_istreams) {
+//                    fprintf(stderr, "moving onwards to next stream");
+                    fprintf(stderr, "values are %i %i\n", input_stream_curindex, nb_istreams);
+                    ist = ist_table[input_stream_curindex];
+                    conc_inp_index++;
+                    file_index = ist->file_index;
+                    fprintf(stderr, "new index is %i\n", file_index);
+                    file_table[ist->file_index].eof_reached = 0;
+//                    goto nextist;
+                }
+//                else {
+//                    break;
+//                }
+            }
             if(ost->frame_number >= max_frames[ost->st->codec->codec_type]){
                 file_index= -1;
                 break;
             }
         }
+
+        if (file_index) fprintf(stderr, "file index is %i\n", file_index);
         /* if none, if is finished */
         if (file_index < 0) {
             if(no_packet_count){
@@ -2331,15 +2370,19 @@ static int av_encode(AVFormatContext **output_files,
             }
             break;
         }
+        if (file_index) fprintf(stderr, "made it to checkpoint 1\n");
 
         /* finish if recording time exhausted */
-        if (opts_min >= (recording_time / 1000000.0))
+        if (opts_min >= (recording_time / 1000000.0) && !concatenate_files)
             break;
+        if (file_index) fprintf(stderr, "made it to checkpoint 1-2\n");
 
         /* finish if limit size exhausted */
         if (limit_filesize != 0 && limit_filesize < url_ftell(output_files[0]->pb))
             break;
+        if (file_index) fprintf(stderr, "made it to checkpoint 1-3\n");
 
+        if (file_index) fprintf(stderr, "made it to checkpoint 2\n");
         /* read a frame from it and output it in the fifo */
         is = input_files[file_index];
         ret= av_read_frame(is, &pkt);
@@ -2348,6 +2391,7 @@ static int av_encode(AVFormatContext **output_files,
             no_packet_count++;
             continue;
         }
+        if (file_index) fprintf(stderr, "made it to checkpoint 2-2\n");
         if (ret < 0) {
             file_table[file_index].eof_reached = 1;
             if (opt_shortest)
@@ -2355,6 +2399,7 @@ static int av_encode(AVFormatContext **output_files,
             else
                 continue;
         }
+        if (file_index) fprintf(stderr, "made it to checkpoint 3\n");
 
         no_packet_count=0;
         memset(no_packet, 0, sizeof(no_packet));
@@ -2366,10 +2411,15 @@ static int av_encode(AVFormatContext **output_files,
            dynamically in stream : we ignore them */
         if (pkt.stream_index >= file_table[file_index].nb_streams)
             goto discard_packet;
+
+        if (file_index) fprintf(stderr, "made it to checkpoint 4\n");
+
         ist_index = file_table[file_index].ist_index + pkt.stream_index;
         ist = ist_table[ist_index];
         if (ist->discard)
             goto discard_packet;
+
+        if (file_index) fprintf(stderr, "made it to checkpoint 5\n");
 
         if (pkt.dts != AV_NOPTS_VALUE)
             pkt.dts += av_rescale_q(input_files_ts_offset[ist->file_index], AV_TIME_BASE_Q, ist->st->time_base);
@@ -2382,6 +2432,8 @@ static int av_encode(AVFormatContext **output_files,
             if(pkt.dts != AV_NOPTS_VALUE)
                 pkt.dts *= input_files_ts_scale[file_index][pkt.stream_index];
         }
+
+        if (file_index) fprintf(stderr, "made it to checkpoint 6\n");
 
 //        fprintf(stderr, "next:%"PRId64" dts:%"PRId64" off:%"PRId64" %d\n", ist->next_pts, pkt.dts, input_files_ts_offset[ist->file_index], ist->st->codec->codec_type);
         if (pkt.dts != AV_NOPTS_VALUE && ist->next_pts != AV_NOPTS_VALUE
@@ -4048,7 +4100,7 @@ static const OptionDef options[] = {
     { "programid", HAS_ARG | OPT_INT | OPT_EXPERT, {(void*)&opt_programid}, "desired program number", "" },
     { "xerror", OPT_BOOL, {(void*)&exit_on_error}, "exit on error", "error" },
     { "copyinkf", OPT_BOOL | OPT_EXPERT, {(void*)&copy_initial_nonkeyframes}, "copy initial non-keyframes" },
-    { "conc", OPT_BOOL, {(void*)&concatenate_video_files}, "concatenate video files", "concatenate" },
+    { "conc", OPT_BOOL, {(void*)&concatenate_files}, "concatenate video files", "concatenate" },
 
     /* video options */
     { "b", OPT_FUNC2 | HAS_ARG | OPT_VIDEO, {(void*)opt_bitrate}, "set bitrate (in bits/s)", "bitrate" },
