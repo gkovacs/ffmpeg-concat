@@ -115,7 +115,6 @@ static int compare_bufs(unsigned char *buf, unsigned char *rbuf)
         ++buf;
         ++rbuf;
     }
-    printf("buffer matched\n");
     return 1;
 }
 
@@ -127,19 +126,12 @@ static int m3u_probe(AVProbeData *p)
         if (compare_bufs(p->buf, "#EXTM3U"))
             return AVPROBE_SCORE_MAX;
         else
-            printf("buffer did not match\n");
+            return 0;
     }
     if (check_file_extn(p->filename, "m3u"))
-        return AVPROBE_SCORE_MAX;
+        return AVPROBE_SCORE_MAX/2;
     else
         return 0;
-
-    /* check file header */
-//    if (p->buf[0] == '.' && p->buf[1] == 's' &&
-//        p->buf[2] == 'n' && p->buf[3] == 'd')
-//        return AVPROBE_SCORE_MAX;
-//    else
-//        return 0;
 }
 
 static int m3u_list_files(unsigned char *buffer, int buffer_size, unsigned char **file_list, unsigned int *lfx_ptr)
@@ -199,42 +191,6 @@ static int m3u_read_header(AVFormatContext *s,
     s->priv_data = playld;
     playlist_populate_context(playld, s);
     return 0;
-
-    int size;
-    unsigned int i;
-    unsigned int tag;
-    unsigned int id, channels, rate;
-    enum CodecID codec;
-    AVStream *st;
-    /* check ".snd" header */
-    tag = get_le32(pb);
-    if (tag != MKTAG('.', 's', 'n', 'd'))
-        return -1;
-    size = get_be32(pb); /* header size */
-    get_be32(pb); /* data size */
-
-    id = get_be32(pb);
-    rate = get_be32(pb);
-    channels = get_be32(pb);
-
-    codec = codec_get_id(codec_m3u_tags, id);
-
-    if (size >= 24) {
-        /* skip unused data */
-        url_fseek(pb, size - 24, SEEK_CUR);
-    }
-
-    /* now we are ready: build format streams */
-    st = av_new_stream(s, 0);
-    if (!st)
-        return -1;
-    st->codec->codec_type = CODEC_TYPE_AUDIO;
-    st->codec->codec_tag = id;
-    st->codec->codec_id = codec;
-    st->codec->channels = channels;
-    st->codec->sample_rate = rate;
-    av_set_pts_info(st, 64, 1, rate);
-    return 0;
 }
 
 #define MAX_SIZE 4096
@@ -257,18 +213,6 @@ static int m3u_read_packet(AVFormatContext *s,
         goto retr;
     }
     return ret;
-
-    if (url_feof(s->pb))
-        return AVERROR(EIO);
-    ret= av_get_packet(s->pb, pkt, MAX_SIZE);
-    if (ret < 0)
-        return AVERROR(EIO);
-    pkt->stream_index = 0;
-
-    /* note: we need to modify the packet size here to handle the last
-       packet */
-    pkt->size = ret;
-    return 0;
 }
 
 #if CONFIG_M3U_DEMUXER
