@@ -1,6 +1,6 @@
 /*
- * AU muxer and demuxer
- * Copyright (c) 2001 Fabrice Bellard
+ * M3U muxer and demuxer
+ * Copyright (c) 2001 Geza Kovacs
  *
  * This file is part of FFmpeg.
  *
@@ -20,11 +20,7 @@
  */
 
 /*
- * First version by Francois Revol revol@free.fr
- *
- * Reference documents:
- * http://www.opengroup.org/public/pubs/external/auformat.html
- * http://www.goice.co.jp/member/mo/formats/au.html
+ * Based on AU muxer and demuxer in au.c
  */
 
 #include "avformat.h"
@@ -359,40 +355,37 @@ static unsigned char** playlist_list_files(unsigned char *buffer, int buffer_siz
     return file_list;
 }
 
-/* playlist input */
-static int playlist_read_header(AVFormatContext *s,
-                          AVFormatParameters *ap)
+static int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
 {
-    int size;
-    unsigned int i;
-    unsigned int tag;
-    ByteIOContext *pb = s->pb;
-    unsigned int id, channels, rate;
-    enum CodecID codec;
-    AVStream *st;
-    printf("survived -2\n");
-    fflush(stdout);
-    unsigned char **flist = playlist_list_files(pb->buffer, pb->buffer_size);
-    printf("survived -1\n");
-    fflush(stdout);
-    PlaylistD *playld = av_make_playlistd(flist);
-    s->priv_data = playld;
-    printf("survived 0\n");
-    fflush(stdout);
+    int i;
     AVFormatContext *ic = playld->pelist[playld->pe_curidx]->ic;
-    printf("survived 1\n");
-    fflush(stdout);
     AVFormatParameters *nap = playld->pelist[playld->pe_curidx]->ap;
-    printf("survived 2\n");
-    fflush(stdout);
     ic->iformat->read_header(ic, nap);
     s->nb_streams = ic->nb_streams;
     for (i = 0; i < ic->nb_streams; ++i)
     {
         s->streams[i] = ic->streams[i];
     }
-
     return 0;
+}
+
+/* playlist input */
+static int playlist_read_header(AVFormatContext *s,
+                          AVFormatParameters *ap)
+{
+    ByteIOContext *pb = s->pb;
+    unsigned char **flist = playlist_list_files(pb->buffer, pb->buffer_size);
+    PlaylistD *playld = av_make_playlistd(flist);
+    s->priv_data = playld;
+    playlist_populate_context(playld, s);
+    return 0;
+
+    int size;
+    unsigned int i;
+    unsigned int tag;
+    unsigned int id, channels, rate;
+    enum CodecID codec;
+    AVStream *st;
     /* check ".snd" header */
     tag = get_le32(pb);
     if (tag != MKTAG('.', 's', 'n', 'd'))
@@ -429,10 +422,21 @@ static int playlist_read_header(AVFormatContext *s,
 static int playlist_read_packet(AVFormatContext *s,
                           AVPacket *pkt)
 {
-    PlaylistD *playld = s->priv_data;
-    AVFormatContext *ic = playld->pelist[playld->pe_curidx]->ic;
-    return ic->iformat->read_packet(ic, pkt);
     int ret;
+    PlaylistD *playld;
+    AVFormatContext *ic;
+    playld = s->priv_data;
+    retr:
+    ic = playld->pelist[playld->pe_curidx]->ic;
+    ret = ic->iformat->read_packet(ic, pkt);
+    if (ret < 0 && playld->pe_curidx < playld->pelist_size - 1)
+    {
+        ++playld->pe_curidx;
+        // TODO clear all existing streams before repopulating
+        playlist_populate_context(playld, s);
+        goto retr;
+    }
+    return ret;
 
     if (url_feof(s->pb))
         return AVERROR(EIO);
