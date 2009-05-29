@@ -88,6 +88,7 @@ static int av_alloc_playelem(unsigned char *filename, PlayElem *pe)
     pe->fmt = 0;
     pe->buf_size = 0;
     pe->ap = ap;
+    pe->fmt = pe->ic->iformat;
     return 0;
 }
 
@@ -101,10 +102,33 @@ static PlayElem* av_make_playelem(unsigned char *filename)
     err = av_open_input_playelem(pe);
     if (err < 0)
         print_error("during-open_input_playelem", err);
+    if (pe->fmt != 0)
+    {
+        printf("pefmt set\n");
+    }
+    else
+    {
+        printf("pefmt not set\n");
+    }
+    fflush(stdout);
     err = av_find_stream_info(pe->ic);
     if (err < 0)
     {
-        fprintf(stderr, "failed codec probe av_make_playelem");
+        fprintf(stderr, "failed codec probe av_find_stream_info");
+        fflush(stderr);
+    }
+    if(pe->ic->pb)
+    {
+        pe->ic->pb->eof_reached = 0;
+    }
+    else
+    {
+        fprintf(stderr, "failed pe ic pb not set");
+        fflush(stderr);
+    }
+    if(!pe->fmt)
+    {
+        fprintf(stderr, "failed pe ic fmt not set");
         fflush(stderr);
     }
     return pe;
@@ -326,7 +350,9 @@ static int playlist_read_header(AVFormatContext *s,
     unsigned char **flist = playlist_list_files(pb->buffer, pb->buffer_size);
     PlaylistD *playld = av_make_playlistd(flist);
     s->priv_data = playld;
-
+    AVFormatContext *fmt = playld->pelist[playld->pe_curidx]->fmt;
+    AVFormatParameters *nap = playld->pelist[playld->pe_curidx]->ap;
+    return fmt->iformat->read_header(fmt, nap);
     /* check ".snd" header */
     tag = get_le32(pb);
     if (tag != MKTAG('.', 's', 'n', 'd'))
@@ -363,6 +389,9 @@ static int playlist_read_header(AVFormatContext *s,
 static int playlist_read_packet(AVFormatContext *s,
                           AVPacket *pkt)
 {
+    PlaylistD *playld = s->priv_data;
+    AVFormatContext *fmt = playld->pelist[playld->pe_curidx]->fmt;
+    return fmt->iformat->read_packet(fmt, pkt);
     int ret;
 
     if (url_feof(s->pb))
