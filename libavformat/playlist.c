@@ -147,18 +147,17 @@ static PlayElem* av_make_playelem(unsigned char *filename)
     return pe;
 }
 
-static PlaylistD* av_make_playlistd(unsigned char **flist)
+static PlaylistD* av_make_playlistd(unsigned char **flist, int flist_len)
 {
+    int i;
     PlaylistD *playld = av_malloc(sizeof(PlaylistD));
     playld->pe_curidx = 0;
-    playld->pelist_size = 0;
-    while (flist[playld->pelist_size] != 0 && *flist[playld->pelist_size] != 0)
+    playld->pelist_size = flist_len;
+    for (i = 0; i < playld->pelist_size; ++i)
     {
-        printf(flist[playld->pelist_size]);
+        printf(flist[i]);
         putchar('\n');
         fflush(stdout);
-//        av_make_playelem(flist[playld->pelist_size]);
-        ++playld->pelist_size;
     }
     printf("playlistd 0\n");
     fflush(stdout);
@@ -314,20 +313,19 @@ static int playlist_probe(AVProbeData *p)
 //        return 0;
 }
 
-static unsigned char** playlist_list_files(unsigned char *buffer, int buffer_size)
+static int playlist_list_files(unsigned char *buffer, int buffer_size, unsigned char **file_list, unsigned int *lfx_ptr)
 {
-    unsigned char *file_list[512];
     unsigned int i;
     unsigned int lfx = 0;
     unsigned int fx = 0;
     unsigned char hashed_out = 0;
     unsigned char fldata[262144];
     memset(fldata, 0, 262144);
+    memset(file_list, 0, 512 * sizeof(unsigned char*));
     for (i = 0; i < 512; ++i)
     {
         file_list[i] = fldata+i*512;
     }
-    fflush(stdout);
     for (i = 0; i < buffer_size; ++i)
     {
         if (buffer[i] == 0)
@@ -352,7 +350,8 @@ static unsigned char** playlist_list_files(unsigned char *buffer, int buffer_siz
         file_list[lfx][fx] = buffer[i];
         ++fx;
     }
-    return file_list;
+    *lfx_ptr = lfx;
+    return 0;
 }
 
 static int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
@@ -373,9 +372,13 @@ static int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
 static int playlist_read_header(AVFormatContext *s,
                           AVFormatParameters *ap)
 {
-    ByteIOContext *pb = s->pb;
-    unsigned char **flist = playlist_list_files(pb->buffer, pb->buffer_size);
-    PlaylistD *playld = av_make_playlistd(flist);
+    unsigned char *flist[512];
+    int flist_len;
+    ByteIOContext *pb;
+    PlaylistD *playld;
+    pb = s->pb;
+    playlist_list_files(pb->buffer, pb->buffer_size, flist, &flist_len);
+    playld = av_make_playlistd(flist, flist_len);
     s->priv_data = playld;
     playlist_populate_context(playld, s);
     return 0;
