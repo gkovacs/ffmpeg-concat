@@ -47,6 +47,91 @@ static const AVCodecTag codec_playlist_tags[] = {
     { 0, 0 },
 };
 
+typedef struct PlayElem {
+    AVFormatContext *ic;
+    char *filename;
+    AVInputFormat *fmt;
+    int buf_size;
+    AVFormatParameters *ap;
+} PlayElem;
+
+typedef struct PlaylistD {
+    PlayElem **pelist;
+    int pelist_size;
+    int pe_curidx;
+} PlaylistD;
+
+static int av_open_input_playelem(PlayElem *pe)
+{
+    return av_open_input_file(&(pe->ic), pe->filename, pe->fmt, pe->buf_size, pe->ap);
+}
+
+// based on decode_thread() in ffplay.c
+static int av_alloc_playelem(unsigned char *filename, PlayElem *pe)
+{
+//    AVProbeData *pd;
+    AVFormatContext *ic;
+    AVFormatParameters *ap;
+//    pd = av_malloc(sizeof(AVProbeData));
+//    ic = av_malloc(sizeof(AVFormatContext));
+    ap = av_malloc(sizeof(AVFormatParameters));
+    memset(ap, 0, sizeof(AVFormatParameters));
+    ap->width = 0;
+    ap->height = 0;
+    ap->time_base = (AVRational){1, 25};
+    ap->pix_fmt = 0;
+//    pd->filename = filename;
+//    pd->buf = NULL;
+//    pd->buf_size = 0;
+    pe->ic = ic;
+    pe->filename = filename;
+    pe->fmt = 0;
+    pe->buf_size = 0;
+    pe->ap = ap;
+    return 0;
+}
+
+static PlayElem* av_make_playelem(unsigned char *filename)
+{
+    int err;
+    PlayElem *pe = av_malloc(sizeof(PlayElem));
+    err = av_alloc_playelem(filename, pe);
+    if (err < 0)
+        print_error("during-av_alloc_playelem", err);
+    err = av_open_input_playelem(pe);
+    if (err < 0)
+        print_error("during-open_input_playelem", err);
+    err = av_find_stream_info(pe->ic);
+    if (err < 0)
+    {
+        fprintf(stderr, "failed codec probe av_make_playelem");
+        fflush(stderr);
+    }
+    return pe;
+}
+
+static PlaylistD* av_make_playlistd(unsigned char **flist)
+{
+    PlaylistD *playld = av_malloc(sizeof(PlaylistD));
+    playld->pe_curidx = 0;
+    playld->pelist_size = 0;
+    while (flist[playld->pelist_size] != 0 && *flist[playld->pelist_size] != 0)
+    {
+        printf(flist[playld->pelist_size]);
+        putchar('\n');
+        fflush(stdout);
+//        av_make_playelem(flist[playld->pelist_size]);
+        ++playld->pelist_size;
+    }
+    playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
+    memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));
+    for (int i = 0; i < playld->pelist_size; ++i)
+    {
+        playld->pelist[i] = av_make_playelem(flist[i]);
+    }
+    return playld;
+}
+
 #if CONFIG_PLAYLIST_MUXER
 /* AUDIO_FILE header */
 static int put_playlist_header(ByteIOContext *pb, AVCodecContext *enc)
@@ -232,19 +317,16 @@ static int playlist_read_header(AVFormatContext *s,
                           AVFormatParameters *ap)
 {
     int size;
+    unsigned int i;
     unsigned int tag;
     ByteIOContext *pb = s->pb;
     unsigned int id, channels, rate;
     enum CodecID codec;
     AVStream *st;
     unsigned char **flist = playlist_list_files(pb->buffer, pb->buffer_size);
-    while (*flist != 0 && **flist != 0)
-    {
-        printf(*flist);
-        putchar('\n');
-        fflush(stdout);
-        ++flist;
-    }
+    PlaylistD *playld = av_make_playlistd(flist);
+    s->priv_data = playld;
+
     /* check ".snd" header */
     tag = get_le32(pb);
     if (tag != MKTAG('.', 's', 'n', 'd'))
