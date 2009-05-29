@@ -83,12 +83,20 @@ static int av_alloc_playelem(unsigned char *filename, PlayElem *pe)
 //    pd->filename = filename;
 //    pd->buf = NULL;
 //    pd->buf_size = 0;
+    printf("survived av_alloc_playelem 0\n");
+    fflush(stdout);
     pe->ic = ic;
     pe->filename = filename;
     pe->fmt = 0;
+    printf("survived av_alloc_playelem 1\n");
+    fflush(stdout);
     pe->buf_size = 0;
     pe->ap = ap;
-    pe->fmt = pe->ic->iformat;
+    printf("survived av_alloc_playelem 2\n");
+    fflush(stdout);
+//    pe->fmt = pe->ic->iformat;
+    printf("survived av_alloc_playelem 3\n");
+    fflush(stdout);
     return 0;
 }
 
@@ -96,12 +104,19 @@ static PlayElem* av_make_playelem(unsigned char *filename)
 {
     int err;
     PlayElem *pe = av_malloc(sizeof(PlayElem));
+    printf("survived av_make_playelem -1\n");
+    fflush(stdout);
     err = av_alloc_playelem(filename, pe);
     if (err < 0)
         print_error("during-av_alloc_playelem", err);
+    printf("survived av_make_playelem 0\n");
+    fflush(stdout);
     err = av_open_input_playelem(pe);
     if (err < 0)
         print_error("during-open_input_playelem", err);
+    printf("survived av_make_playelem 1\n");
+    fflush(stdout);
+    pe->fmt = pe->ic->iformat;
     if (pe->fmt != 0)
     {
         printf("pefmt set\n");
@@ -131,6 +146,8 @@ static PlayElem* av_make_playelem(unsigned char *filename)
         fprintf(stderr, "failed pe ic fmt not set");
         fflush(stderr);
     }
+    printf("survived av_make_playelem 2\n");
+    fflush(stdout);
     return pe;
 }
 
@@ -147,12 +164,18 @@ static PlaylistD* av_make_playlistd(unsigned char **flist)
 //        av_make_playelem(flist[playld->pelist_size]);
         ++playld->pelist_size;
     }
+    printf("playlistd 0\n");
+    fflush(stdout);
     playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
     memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));
+    printf("playlistd 1 flist is %s\n", flist[0]);
+    fflush(stdout);
     for (int i = 0; i < playld->pelist_size; ++i)
     {
         playld->pelist[i] = av_make_playelem(flist[i]);
     }
+    printf("playlistd 2\n");
+    fflush(stdout);
     return playld;
 }
 
@@ -347,12 +370,29 @@ static int playlist_read_header(AVFormatContext *s,
     unsigned int id, channels, rate;
     enum CodecID codec;
     AVStream *st;
+    printf("survived -2\n");
+    fflush(stdout);
     unsigned char **flist = playlist_list_files(pb->buffer, pb->buffer_size);
+    printf("survived -1\n");
+    fflush(stdout);
     PlaylistD *playld = av_make_playlistd(flist);
     s->priv_data = playld;
-    AVFormatContext *fmt = playld->pelist[playld->pe_curidx]->fmt;
+    printf("survived 0\n");
+    fflush(stdout);
+    AVFormatContext *ic = playld->pelist[playld->pe_curidx]->ic;
+    printf("survived 1\n");
+    fflush(stdout);
     AVFormatParameters *nap = playld->pelist[playld->pe_curidx]->ap;
-    return fmt->iformat->read_header(fmt, nap);
+    printf("survived 2\n");
+    fflush(stdout);
+    ic->iformat->read_header(ic, nap);
+    s->nb_streams = ic->nb_streams;
+    for (i = 0; i < ic->nb_streams; ++i)
+    {
+        s->streams[i] = ic->streams[i];
+    }
+
+    return 0;
     /* check ".snd" header */
     tag = get_le32(pb);
     if (tag != MKTAG('.', 's', 'n', 'd'))
@@ -390,8 +430,8 @@ static int playlist_read_packet(AVFormatContext *s,
                           AVPacket *pkt)
 {
     PlaylistD *playld = s->priv_data;
-    AVFormatContext *fmt = playld->pelist[playld->pe_curidx]->fmt;
-    return fmt->iformat->read_packet(fmt, pkt);
+    AVFormatContext *ic = playld->pelist[playld->pe_curidx]->ic;
+    return ic->iformat->read_packet(ic, pkt);
     int ret;
 
     if (url_feof(s->pb))
