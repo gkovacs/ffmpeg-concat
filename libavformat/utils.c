@@ -291,6 +291,7 @@ static AVInputFormat *av_probe_input_format2(AVProbeData *pd, int is_opened, int
 
     fmt = NULL;
     for(fmt1 = first_iformat; fmt1 != NULL; fmt1 = fmt1->next) {
+//        printf("checking format %s", fmt1->long_name);
         if (!is_opened == !(fmt1->flags & AVFMT_NOFILE))
             continue;
         score = 0;
