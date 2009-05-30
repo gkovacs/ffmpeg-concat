@@ -120,7 +120,6 @@ static int compare_bufs(unsigned char *buf, unsigned char *rbuf)
 
 static int m3u_probe(AVProbeData *p)
 {
-    printf("buffer size %i\n", p->buf_size);
     if (p->buf_size >= 7 && p->buf != 0)
     {
         if (compare_bufs(p->buf, "#EXTM3U"))

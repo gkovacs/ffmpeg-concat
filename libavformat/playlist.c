@@ -49,20 +49,12 @@ int av_alloc_playelem(unsigned char *filename, PlayElem *pe)
 //    pd->filename = filename;
 //    pd->buf = NULL;
 //    pd->buf_size = 0;
-    printf("survived av_alloc_playelem 0\n");
-    fflush(stdout);
     pe->ic = ic;
     pe->filename = filename;
     pe->fmt = 0;
-    printf("survived av_alloc_playelem 1\n");
-    fflush(stdout);
     pe->buf_size = 0;
     pe->ap = ap;
-    printf("survived av_alloc_playelem 2\n");
-    fflush(stdout);
 //    pe->fmt = pe->ic->iformat;
-    printf("survived av_alloc_playelem 3\n");
-    fflush(stdout);
     return 0;
 }
 
@@ -70,28 +62,18 @@ PlayElem* av_make_playelem(unsigned char *filename)
 {
     int err;
     PlayElem *pe = av_malloc(sizeof(PlayElem));
-    printf("survived av_make_playelem -1\n");
-    fflush(stdout);
     err = av_alloc_playelem(filename, pe);
     if (err < 0)
         print_error("during-av_alloc_playelem", err);
-    printf("survived av_make_playelem 0\n");
-    fflush(stdout);
     err = av_open_input_playelem(pe);
     if (err < 0)
         print_error("during-open_input_playelem", err);
-    printf("survived av_make_playelem 1\n");
-    fflush(stdout);
     pe->fmt = pe->ic->iformat;
-    if (pe->fmt != 0)
+    if (!pe->fmt)
     {
-        printf("pefmt set\n");
+        fprintf(stderr, "pefmt not set\n");
+        fflush(stderr);
     }
-    else
-    {
-        printf("pefmt not set\n");
-    }
-    fflush(stdout);
     err = av_find_stream_info(pe->ic);
     if (err < 0)
     {
@@ -112,8 +94,6 @@ PlayElem* av_make_playelem(unsigned char *filename)
         fprintf(stderr, "failed pe ic fmt not set");
         fflush(stderr);
     }
-    printf("survived av_make_playelem 2\n");
-    fflush(stdout);
     return pe;
 }
 
@@ -123,24 +103,12 @@ PlaylistD* av_make_playlistd(unsigned char **flist, int flist_len)
     PlaylistD *playld = av_malloc(sizeof(PlaylistD));
     playld->pe_curidx = 0;
     playld->pelist_size = flist_len;
-    for (i = 0; i < playld->pelist_size; ++i)
-    {
-        printf(flist[i]);
-        putchar('\n');
-        fflush(stdout);
-    }
-    printf("playlistd 0\n");
-    fflush(stdout);
     playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
     memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));
-    printf("playlistd 1 flist is %s\n", flist[0]);
-    fflush(stdout);
     for (int i = 0; i < playld->pelist_size; ++i)
     {
         playld->pelist[i] = av_make_playelem(flist[i]);
     }
-    printf("playlistd 2\n");
-    fflush(stdout);
     return playld;
 }
 
