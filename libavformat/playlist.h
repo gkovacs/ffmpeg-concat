@@ -30,12 +30,18 @@ typedef struct PlayElem {
     AVInputFormat *fmt;
     int buf_size;
     AVFormatParameters *ap;
+    int64_t time_offset;
 } PlayElem;
 
 typedef struct PlaylistD {
+    unsigned char *flist[512];
+//    int flist_len;
     PlayElem **pelist;
     int pelist_size;
     int pe_curidx;
+    AVChapter **chlist;
+    int chlist_size;
+    int ch_curidx;
 } PlaylistD;
 
 int av_open_input_playelem(PlayElem *pe);

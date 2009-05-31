@@ -180,13 +180,17 @@ static int m3u_list_files(unsigned char *buffer, int buffer_size, unsigned char 
 static int m3u_read_header(AVFormatContext *s,
                           AVFormatParameters *ap)
 {
-    unsigned char *flist[512];
-    int flist_len;
+//    unsigned char *flist[512];
+//    int flist_len;
     ByteIOContext *pb;
     PlaylistD *playld;
     pb = s->pb;
-    m3u_list_files(pb->buffer, pb->buffer_size, flist, &flist_len);
-    playld = av_make_playlistd(flist, flist_len);
+    playld = av_malloc(sizeof(PlaylistD));
+    m3u_list_files(pb->buffer, pb->buffer_size, playld->flist, &(playld->pelist_size));
+//    playld = av_make_playlistd(flist, flist_len);
+    playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
+    memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));
+    playld->pe_curidx = 0;
     s->priv_data = playld;
     playlist_populate_context(playld, s);
     return 0;
@@ -197,18 +201,33 @@ static int m3u_read_header(AVFormatContext *s,
 static int m3u_read_packet(AVFormatContext *s,
                           AVPacket *pkt)
 {
+    int i;
     int ret;
+    int time_offset = 0;
     PlaylistD *playld;
     AVFormatContext *ic;
     playld = s->priv_data;
     retr:
+//    playld->pelist[playld->pe_curidx] = av_make_playelem(playld->flist[playld->pe_curidx]);
     ic = playld->pelist[playld->pe_curidx]->ic;
     ret = ic->iformat->read_packet(ic, pkt);
     if (ret < 0 && playld->pe_curidx < playld->pelist_size - 1)
     {
+//        time_offset += ic->streams[0]->duration;
+//        ic->iformat->read_close(ic);
+//        for (i = 0; i < ic->nb_streams; ++i)
+//        {
+//            s->streams[i] = 0;
+//        }
         ++playld->pe_curidx;
+//        pkt->destruct(pkt);
+//        pkt = av_malloc(sizeof(AVPacket));
         // TODO clear all existing streams before repopulating
         playlist_populate_context(playld, s);
+//        for (i = 0; i < ic->nb_streams; ++i)
+//        {
+//            playld->pelist[playld->pe_curidx]->ic->streams[i]->start_time = 0;
+//        }
         goto retr;
     }
     return ret;

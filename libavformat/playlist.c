@@ -94,6 +94,7 @@ PlayElem* av_make_playelem(unsigned char *filename)
         fprintf(stderr, "failed pe ic fmt not set");
         fflush(stderr);
     }
+    pe->time_offset = 0;
     return pe;
 }
 
@@ -105,19 +106,21 @@ PlaylistD* av_make_playlistd(unsigned char **flist, int flist_len)
     playld->pelist_size = flist_len;
     playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
     memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));
-    for (int i = 0; i < playld->pelist_size; ++i)
-    {
-        playld->pelist[i] = av_make_playelem(flist[i]);
-    }
+//    for (int i = 0; i < playld->pelist_size; ++i)
+//    {
+//        playld->pelist[i] = av_make_playelem(flist[i]);
+//    }
     return playld;
 }
 
 int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
 {
     int i;
+    playld->pelist[playld->pe_curidx] = av_make_playelem(playld->flist[playld->pe_curidx]);
     AVFormatContext *ic = playld->pelist[playld->pe_curidx]->ic;
     AVFormatParameters *nap = playld->pelist[playld->pe_curidx]->ap;
-    ic->iformat->read_header(ic, nap);
+//    ic->iformat->read_header(ic, nap);
+    ic->iformat->read_header(ic, 0);
     s->nb_streams = ic->nb_streams;
     for (i = 0; i < ic->nb_streams; ++i)
     {
