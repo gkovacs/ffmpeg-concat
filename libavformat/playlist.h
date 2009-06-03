@@ -31,6 +31,7 @@ typedef struct PlayElem {
     int buf_size;
     AVFormatParameters *ap;
     int64_t time_offset;
+    int64_t indv_time;
 } PlayElem;
 
 typedef struct PlaylistD {

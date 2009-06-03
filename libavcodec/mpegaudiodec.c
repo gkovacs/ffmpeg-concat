@@ -2250,6 +2250,7 @@ static int decode_frame(AVCodecContext * avctx,
                         void *data, int *data_size,
                         AVPacket *avpkt)
 {
+    av_log(avctx, AV_LOG_ERROR, "decoding frame mpegaudec.\n");
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     MPADecodeContext *s = avctx->priv_data;

@@ -25,9 +25,11 @@
 
 #include "avformat.h"
 #include "playlist.h"
+#include <time.h>
 
 int av_open_input_playelem(PlayElem *pe)
 {
+//    return av_open_input_file(&(pe->ic), pe->filename, 0, 0, 0);
     return av_open_input_file(&(pe->ic), pe->filename, pe->fmt, pe->buf_size, pe->ap);
 }
 
@@ -39,7 +41,7 @@ int av_alloc_playelem(unsigned char *filename, PlayElem *pe)
     AVFormatContext *ic;
     AVFormatParameters *ap;
 //    pd = av_malloc(sizeof(AVProbeData));
-//    ic = av_malloc(sizeof(AVFormatContext));
+    ic = av_malloc(sizeof(AVFormatContext));
     ap = av_malloc(sizeof(AVFormatParameters));
     memset(ap, 0, sizeof(AVFormatParameters));
     ap->width = 0;
@@ -77,7 +79,7 @@ PlayElem* av_make_playelem(unsigned char *filename)
     err = av_find_stream_info(pe->ic);
     if (err < 0)
     {
-        fprintf(stderr, "failed codec probe av_find_stream_info");
+        fprintf(stderr, "failed codec probe av_find_stream_info\n");
         fflush(stderr);
     }
     if(pe->ic->pb)
@@ -95,6 +97,7 @@ PlayElem* av_make_playelem(unsigned char *filename)
         fflush(stderr);
     }
     pe->time_offset = 0;
+    pe->indv_time = clock();
     return pe;
 }
 
@@ -120,6 +123,7 @@ int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
     AVFormatContext *ic = playld->pelist[playld->pe_curidx]->ic;
     AVFormatParameters *nap = playld->pelist[playld->pe_curidx]->ap;
 //    ic->iformat->read_header(ic, nap);
+//    ic->debug = 1;
     ic->iformat->read_header(ic, 0);
     s->nb_streams = ic->nb_streams;
     for (i = 0; i < ic->nb_streams; ++i)
