@@ -339,9 +339,7 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
     struct in_addr sdp_ip;
     int ttl;
 
-#ifdef DEBUG
-    printf("sdp: %c='%s'\n", letter, buf);
-#endif
+    dprintf(s, "sdp: %c='%s'\n", letter, buf);
 
     p = buf;
     if (s1->skip_media && letter != 'm')
@@ -705,20 +703,6 @@ void rtsp_parse_line(RTSPMessageHeader *reply, const char *buf)
     }
 }
 
-static int url_readbuf(URLContext *h, unsigned char *buf, int size)
-{
-    int ret, len;
-
-    len = 0;
-    while (len < size) {
-        ret = url_read(h, buf+len, size-len);
-        if (ret < 1)
-            return ret;
-        len += ret;
-    }
-    return len;
-}
-
 /* skip a RTP/TCP interleaved packet */
 static void rtsp_skip_packet(AVFormatContext *s)
 {
@@ -726,19 +710,19 @@ static void rtsp_skip_packet(AVFormatContext *s)
     int ret, len, len1;
     uint8_t buf[1024];
 
-    ret = url_readbuf(rt->rtsp_hd, buf, 3);
+    ret = url_read_complete(rt->rtsp_hd, buf, 3);
     if (ret != 3)
         return;
     len = AV_RB16(buf + 1);
-#ifdef DEBUG
-    printf("skipping RTP packet len=%d\n", len);
-#endif
+
+    dprintf(s, "skipping RTP packet len=%d\n", len);
+
     /* skip payload */
     while (len > 0) {
         len1 = len;
         if (len1 > sizeof(buf))
             len1 = sizeof(buf);
-        ret = url_readbuf(rt->rtsp_hd, buf, len1);
+        ret = url_read_complete(rt->rtsp_hd, buf, len1);
         if (ret != len1)
             return;
         len -= len1;
@@ -784,9 +768,9 @@ rtsp_read_reply (AVFormatContext *s, RTSPMessageHeader *reply,
     for(;;) {
         q = buf;
         for(;;) {
-            ret = url_readbuf(rt->rtsp_hd, &ch, 1);
+            ret = url_read_complete(rt->rtsp_hd, &ch, 1);
 #ifdef DEBUG_RTP_TCP
-            printf("ret=%d c=%02x [%c]\n", ret, ch, ch);
+            dprintf(s, "ret=%d c=%02x [%c]\n", ret, ch, ch);
 #endif
             if (ret != 1)
                 return -1;
@@ -804,9 +788,9 @@ rtsp_read_reply (AVFormatContext *s, RTSPMessageHeader *reply,
             }
         }
         *q = '\0';
-#ifdef DEBUG
-        printf("line='%s'\n", buf);
-#endif
+
+        dprintf(s, "line='%s'\n", buf);
+
         /* test if last line */
         if (buf[0] == '\0')
             break;
@@ -831,7 +815,7 @@ rtsp_read_reply (AVFormatContext *s, RTSPMessageHeader *reply,
     if (content_length > 0) {
         /* leave some room for a trailing '\0' (useful for simple parsing) */
         content = av_malloc(content_length + 1);
-        (void)url_readbuf(rt->rtsp_hd, content, content_length);
+        (void)url_read_complete(rt->rtsp_hd, content, content_length);
         content[content_length] = '\0';
     }
     if (content_ptr)
@@ -858,9 +842,9 @@ static void rtsp_send_cmd_async (AVFormatContext *s,
         av_strlcat(buf, buf1, sizeof(buf));
     }
     av_strlcat(buf, "\r\n", sizeof(buf));
-#ifdef DEBUG
-    printf("Sending:\n%s--\n", buf);
-#endif
+
+    dprintf(s, "Sending:\n%s--\n", buf);
+
     url_write(rt->rtsp_hd, buf, strlen(buf));
     rt->last_cmd_time = av_gettime();
 }
@@ -1318,7 +1302,7 @@ static int tcp_read_packet(AVFormatContext *s, RTSPStream **prtsp_st,
     RTSPStream *rtsp_st;
 
 #ifdef DEBUG_RTP_TCP
-    printf("tcp_read_packet:\n");
+    dprintf(s, "tcp_read_packet:\n");
 #endif
  redo:
     for(;;) {
@@ -1331,18 +1315,18 @@ static int tcp_read_packet(AVFormatContext *s, RTSPStream **prtsp_st,
             break;
         /* XXX: parse message */
     }
-    ret = url_readbuf(rt->rtsp_hd, buf, 3);
+    ret = url_read_complete(rt->rtsp_hd, buf, 3);
     if (ret != 3)
         return -1;
     id = buf[0];
     len = AV_RB16(buf + 1);
 #ifdef DEBUG_RTP_TCP
-    printf("id=%d len=%d\n", id, len);
+    dprintf(s, "id=%d len=%d\n", id, len);
 #endif
     if (len > buf_size || len < 12)
         goto redo;
     /* get the data */
-    ret = url_readbuf(rt->rtsp_hd, buf, len);
+    ret = url_read_complete(rt->rtsp_hd, buf, len);
     if (ret != len)
         return -1;
     if (rt->transport == RTSP_TRANSPORT_RDT &&

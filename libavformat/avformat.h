@@ -22,7 +22,7 @@
 #define AVFORMAT_AVFORMAT_H
 
 #define LIBAVFORMAT_VERSION_MAJOR 52
-#define LIBAVFORMAT_VERSION_MINOR 33
+#define LIBAVFORMAT_VERSION_MINOR 34
 #define LIBAVFORMAT_VERSION_MICRO  0
 
 #define LIBAVFORMAT_VERSION_INT AV_VERSION_INT(LIBAVFORMAT_VERSION_MAJOR, \
@@ -190,7 +190,7 @@ typedef struct AVOutputFormat {
     const char *name;
     /**
      * Descriptive name for the format, meant to be more human-readable
-     * than \p name. You \e should use the NULL_IF_CONFIG_SMALL() macro
+     * than name. You should use the NULL_IF_CONFIG_SMALL() macro
      * to define it.
      */
     const char *long_name;
@@ -229,7 +229,7 @@ typedef struct AVInputFormat {
     const char *name;
     /**
      * Descriptive name for the format, meant to be more human-readable
-     * than \p name. You \e should use the NULL_IF_CONFIG_SMALL() macro
+     * than name. You should use the NULL_IF_CONFIG_SMALL() macro
      * to define it.
      */
     const char *long_name;
@@ -443,6 +443,13 @@ typedef struct AVStream {
      * AV_NOPTS_VALUE by default.
      */
     int64_t reference_dts;
+
+    /**
+     * Number of packets to buffer for codec probing
+     * NOT PART OF PUBLIC API
+     */
+#define MAX_PROBE_PACKETS 100
+    int probe_packets;
 } AVStream;
 
 #define AV_PROGRAM_RUNNING 1
@@ -1114,7 +1121,7 @@ attribute_deprecated int parse_frame_rate(int *frame_rate, int *frame_rate_base,
 #endif
 
 /**
- * Parses \p datestr and returns a corresponding number of microseconds.
+ * Parses datestr and returns a corresponding number of microseconds.
  * @param datestr String representing a date or a duration.
  * - If a date the syntax is:
  * @code
@@ -1125,7 +1132,7 @@ attribute_deprecated int parse_frame_rate(int *frame_rate, int *frame_rate_base,
  * If the year-month-day part is not specified it takes the current
  * year-month-day.
  * Returns the number of microseconds since 1st of January, 1970 up to
- * the time of the parsed date or INT64_MIN if \p datestr cannot be
+ * the time of the parsed date or INT64_MIN if datestr cannot be
  * successfully parsed.
  * - If a duration the syntax is:
  * @code
@@ -1133,10 +1140,10 @@ attribute_deprecated int parse_frame_rate(int *frame_rate, int *frame_rate_base,
  *  [-]S+[.m...]
  * @endcode
  * Returns the number of microseconds contained in a time interval
- * with the specified duration or INT64_MIN if \p datestr cannot be
+ * with the specified duration or INT64_MIN if datestr cannot be
  * successfully parsed.
- * @param duration Flag which tells how to interpret \p datestr, if
- * not zero \p datestr is interpreted as a duration, otherwise as a
+ * @param duration Flag which tells how to interpret datestr, if
+ * not zero datestr is interpreted as a duration, otherwise as a
  * date.
  */
 int64_t parse_date(const char *datestr, int duration);
@@ -1231,6 +1238,12 @@ void url_split(char *proto, int proto_size,
                char *path, int path_size,
                const char *url);
 
+/**
+ * Returns a positive value if the given filename has one of the given
+ * extensions, 0 otherwise.
+ *
+ * @param extensions a comma-separated list of filename extensions
+ */
 int match_ext(const char *filename, const char *extensions);
 
 #endif /* HAVE_AV_CONFIG_H */

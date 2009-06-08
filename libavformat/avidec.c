@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+//#define DEBUG
+//#define DEBUG_SEEK
+
 #include "libavutil/intreadwrite.h"
 #include "libavutil/bswap.h"
 #include "avformat.h"
@@ -28,9 +31,6 @@
 
 #undef NDEBUG
 #include <assert.h>
-
-//#define DEBUG
-//#define DEBUG_SEEK
 
 typedef struct AVIStream {
     int64_t frame_offset; /* current frame (video) or byte (audio) counter
@@ -78,7 +78,7 @@ static int guess_ni_flag(AVFormatContext *s);
 #ifdef DEBUG
 static void print_tag(const char *str, unsigned int tag, int size)
 {
-    printf("%s: tag=%c%c%c%c size=0x%x\n",
+    dprintf(NULL, "%s: tag=%c%c%c%c size=0x%x\n",
            str, tag & 0xff,
            (tag >> 8) & 0xff,
            (tag >> 16) & 0xff,
@@ -287,7 +287,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 if(size) avi->movi_end = avi->movi_list + size + (size & 1);
                 else     avi->movi_end = url_fsize(pb);
 #ifdef DEBUG
-                printf("movi end=%"PRIx64"\n", avi->movi_end);
+                dprintf(NULL, "movi end=%"PRIx64"\n", avi->movi_end);
 #endif
                 goto end_of_header;
             }
@@ -955,19 +955,30 @@ static int guess_ni_flag(AVFormatContext *s){
     int i;
     int64_t last_start=0;
     int64_t first_end= INT64_MAX;
+    int64_t oldpos= url_ftell(s->pb);
 
     for(i=0; i<s->nb_streams; i++){
         AVStream *st = s->streams[i];
         int n= st->nb_index_entries;
+        unsigned int size;
 
         if(n <= 0)
             continue;
+
+        if(n >= 2){
+            int64_t pos= st->index_entries[0].pos;
+            url_fseek(s->pb, pos + 4, SEEK_SET);
+            size= get_le32(s->pb);
+            if(pos + size > st->index_entries[1].pos)
+                last_start= INT64_MAX;
+        }
 
         if(st->index_entries[0].pos > last_start)
             last_start= st->index_entries[0].pos;
         if(st->index_entries[n-1].pos < first_end)
             first_end= st->index_entries[n-1].pos;
     }
+    url_fseek(s->pb, oldpos, SEEK_SET);
     return last_start > first_end;
 }
 

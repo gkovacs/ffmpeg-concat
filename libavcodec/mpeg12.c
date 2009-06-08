@@ -30,7 +30,6 @@
 #include "avcodec.h"
 #include "dsputil.h"
 #include "mpegvideo.h"
-#include "mpegvideo_common.h"
 
 #include "mpeg12.h"
 #include "mpeg12data.h"
@@ -2226,7 +2225,7 @@ int ff_mpeg1_find_frame_end(ParseContext *pc, const uint8_t *buf, int buf_size, 
                 }
             }
             if(s && state == PICTURE_START_CODE){
-                ff_fetch_timestamp(s, i-4, 1);
+                ff_fetch_timestamp(s, i-3, 1);
             }
         }
     }
@@ -2373,7 +2372,7 @@ static int decode_chunks(AVCodecContext *avctx,
                         /* Allocate a dummy frame */
                         i= ff_find_unused_picture(s2, 0);
                         s2->last_picture_ptr= &s2->picture[i];
-                        if(alloc_picture(s2, s2->last_picture_ptr, 0) < 0)
+                        if(ff_alloc_picture(s2, s2->last_picture_ptr, 0) < 0)
                             return -1;
                     }
                 }

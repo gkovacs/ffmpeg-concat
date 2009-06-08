@@ -53,14 +53,14 @@ static const void *iirtable[5] = { &ff_mlp_iirorder_0, &ff_mlp_iirorder_1,
 #if ARCH_X86_64
 
 #define MLPMUL(label, offset, offs, offc)   \
-    MANGLE(label)":                   \n\t" \
+    LABEL_MANGLE(label)":             \n\t" \
     "movslq "offset"+"offs"(%0), %%rax\n\t" \
     "movslq "offset"+"offc"(%1), %%rdx\n\t" \
     "imul                 %%rdx, %%rax\n\t" \
     "add                  %%rax, %%rsi\n\t"
 
 #define FIRMULREG(label, offset, firc)\
-    MANGLE(label)":             \n\t" \
+    LABEL_MANGLE(label)":       \n\t" \
     "movslq "#offset"(%0), %%rax\n\t" \
     "imul        %"#firc", %%rax\n\t" \
     "add            %%rax, %%rsi\n\t"
@@ -75,15 +75,10 @@ static const void *iirtable[5] = { &ff_mlp_iirorder_0, &ff_mlp_iirorder_1,
 #define RESULT   "%%rsi"
 #define RESULT32 "%%esi"
 
-#define READVAL "r"
-#define RDWRVAL "+r"
-#define COUNTER "c"
-#define ECXUSED
-
 #else /* if ARCH_X86_32 */
 
 #define MLPMUL(label, offset, offs, offc)  \
-    MANGLE(label)":                  \n\t" \
+    LABEL_MANGLE(label)":            \n\t" \
     "mov   "offset"+"offs"(%0), %%eax\n\t" \
     "imull "offset"+"offc"(%1)       \n\t" \
     "add                %%eax , %%esi\n\t" \
@@ -105,11 +100,6 @@ static const void *iirtable[5] = { &ff_mlp_iirorder_0, &ff_mlp_iirorder_1,
 #define ACCUM    "%%edx"
 #define RESULT   "%%eax"
 #define RESULT32 "%%eax"
-
-#define READVAL "m"
-#define RDWRVAL "+m"
-#define COUNTER "m"
-#define ECXUSED , "ecx"
 
 #endif /* !ARCH_X86_64 */
 
@@ -142,13 +132,13 @@ static void mlp_filter_channel_x86(int32_t *state, const int32_t *coeff,
         FIRMULREG(ff_mlp_firorder_3, 0x08,10)
         FIRMULREG(ff_mlp_firorder_2, 0x04, 9)
         FIRMULREG(ff_mlp_firorder_1, 0x00, 8)
-        MANGLE   (ff_mlp_firorder_0)":\n\t"
+        LABEL_MANGLE(ff_mlp_firorder_0)":\n\t"
         "jmp  *%6                     \n\t"
         IIRMUL   (ff_mlp_iirorder_4, 0x0c   )
         IIRMUL   (ff_mlp_iirorder_3, 0x08   )
         IIRMUL   (ff_mlp_iirorder_2, 0x04   )
         IIRMUL   (ff_mlp_iirorder_1, 0x00   )
-        MANGLE   (ff_mlp_iirorder_0)":\n\t"
+        LABEL_MANGLE(ff_mlp_iirorder_0)":\n\t"
         SHIFT_ACCUM
         "mov  "RESULT"  ,"ACCUM"      \n\t"
         "add  (%2)      ,"RESULT"     \n\t"
@@ -164,19 +154,20 @@ static void mlp_filter_channel_x86(int32_t *state, const int32_t *coeff,
         : /* 0*/"+r"(state),
           /* 1*/"+r"(coeff),
           /* 2*/"+r"(sample_buffer),
-          /* 3*/RDWRVAL(blocksize)
-        :
-          /* 4*/READVAL((x86_reg)mask),
-          /* 5*/READVAL(firjump),
-          /* 6*/READVAL(iirjump),
-          /* 7*/COUNTER(filter_shift)
 #if ARCH_X86_64
+          /* 3*/"+r"(blocksize)
+        : /* 4*/"r"((x86_reg)mask), /* 5*/"r"(firjump),
+          /* 6*/"r"(iirjump)      , /* 7*/"c"(filter_shift)
         , /* 8*/"r"((int64_t)coeff[0])
         , /* 9*/"r"((int64_t)coeff[1])
         , /*10*/"r"((int64_t)coeff[2])
-#endif /* ARCH_X86_64 */
-        : REG_a, REG_d, REG_S
-          ECXUSED
+        : "rax", "rdx", "rsi"
+#else /* ARCH_X86_32 */
+          /* 3*/"+m"(blocksize)
+        : /* 4*/"m"(         mask), /* 5*/"m"(firjump),
+          /* 6*/"m"(iirjump)      , /* 7*/"m"(filter_shift)
+        : "eax", "edx", "esi", "ecx"
+#endif /* !ARCH_X86_64 */
     );
 }
 

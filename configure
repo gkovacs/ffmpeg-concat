@@ -75,6 +75,7 @@ show_help(){
   echo "  --enable-shared          build shared libraries [no]"
   echo "  --enable-gpl             allow use of GPL code, the resulting libs"
   echo "                           and binaries will be under GPL [no]"
+  echo "  --enable-version3        upgrade (L)GPL to version 3 [no]"
   echo "  --enable-nonfree         allow use of nonfree code, the resulting libs"
   echo "                           and binaries will be unredistributable [no]"
   echo "  --disable-ffmpeg         disable ffmpeg build"
@@ -151,6 +152,8 @@ show_help(){
   echo "  --enable-bzlib           enable bzlib [autodetect]"
   echo "  --enable-libamr-nb       enable libamr-nb floating point audio codec [no]"
   echo "  --enable-libamr-wb       enable libamr-wb floating point audio codec [no]"
+  echo "  --enable-libopencore-amrnb enable AMR-NB de/encoding via libopencore-amrnb [no]"
+  echo "  --enable-libopencore-amrwb enable AMR-WB decoding via libopencore-amrwb [no]"
   echo "  --enable-libdc1394       enable IIDC-1394 grabbing using libdc1394"
   echo "                           and libraw1394 [no]"
   echo "  --enable-libdirac        enable Dirac support via libdirac [no]"
@@ -791,6 +794,8 @@ CONFIG_LIST="
     libgsm
     libmp3lame
     libnut
+    libopencore_amrnb
+    libopencore_amrwb
     libopenjpeg
     libschroedinger
     libspeex
@@ -812,6 +817,7 @@ CONFIG_LIST="
     small
     static
     swscale_alpha
+    version3
     x11grab
     zlib
 "
@@ -833,6 +839,7 @@ ARCH_LIST='
     mips64
     parisc
     ppc
+    ppc64
     s390
     sh4
     sparc
@@ -896,6 +903,7 @@ HAVE_LIST="
     libdc1394_1
     libdc1394_2
     llrint
+    loongson
     lrint
     lrintf
     lzo1x_999_compress
@@ -906,7 +914,6 @@ HAVE_LIST="
     mkstemp
     pld
     posix_memalign
-    ppc64
     round
     roundf
     sdl
@@ -932,6 +939,8 @@ HAVE_LIST="
 
 # options emitted with CONFIG_ prefix but not available on command line
 CONFIG_EXTRA="
+    gplv3
+    lgplv3
 "
 
 CMDLINE_SELECT="
@@ -1094,6 +1103,9 @@ libgsm_encoder_deps="libgsm"
 libgsm_ms_decoder_deps="libgsm"
 libgsm_ms_encoder_deps="libgsm"
 libmp3lame_encoder_deps="libmp3lame"
+libopencore_amrnb_decoder_deps="libopencore_amrnb"
+libopencore_amrnb_encoder_deps="libopencore_amrnb"
+libopencore_amrwb_decoder_deps="libopencore_amrwb"
 libopenjpeg_decoder_deps="libopenjpeg"
 libschroedinger_decoder_deps="libschroedinger"
 libschroedinger_encoder_deps="libschroedinger"
@@ -1514,6 +1526,7 @@ case "$arch" in
     ;;
     ppc64)
         arch="ppc"
+        subarch="ppc64"
         enable fast_64bit
         enable fast_unaligned
     ;;
@@ -1697,6 +1710,8 @@ case $target_os in
         ;;
     gnu/kfreebsd)
         ;;
+    gnu)
+        ;;
 
     *)
         die "Unknown OS '$target_os'."
@@ -1753,6 +1768,10 @@ die_license_disabled nonfree libamr_nb
 die_license_disabled nonfree libamr_wb
 die_license_disabled nonfree libfaac
 
+die_license_disabled version3 libopencore_amrnb
+die_license_disabled version3 libopencore_amrwb
+
+enabled version3 && { enabled gpl && enable gplv3 || enable lgplv3; }
 
 check_deps $ARCH_EXT_LIST
 
@@ -1805,12 +1824,11 @@ if test $cpu != "generic"; then
         G5|g5|970|ppc970|PowerPC970|power4*|Power4*)
             add_cflags -mcpu=970 -mpowerpc-gfxopt -mpowerpc64
             warn_altivec disabled PPC970
-            enable ppc64
         ;;
         Cell|CELL|cell)
             add_cflags -mcpu=cell
             warn_altivec disabled Cell
-            enable ppc64 ldbrx
+            enable ldbrx
         ;;
         # targets that do NOT support conditional mov (cmov)
         i[345]86|pentium|pentium-mmx|k6|k6-[23]|winchip-c6|winchip2|c3)
@@ -1913,6 +1931,8 @@ EOF
 fi
 
 # check for assembler specific support
+
+enabled mips && check_asm loongson '"dmult.g $1, $2, $3"'
 
 enabled ppc && check_asm dcbzl '"dcbzl 0, 1"'
 enabled ppc && check_asm ppc4xx '"maclhw r10, r11, r12"'
@@ -2055,6 +2075,8 @@ enabled libfaad    && require2 libfaad faad.h faacDecOpen -lfaad
 enabled libgsm     && require  libgsm gsm.h gsm_create -lgsm
 enabled libmp3lame && require  libmp3lame lame/lame.h lame_init -lmp3lame -lm
 enabled libnut     && require  libnut libnut.h nut_demuxer_init -lnut
+enabled libopencore_amrnb  && require libopencore_amrnb opencore-amrnb/interf_dec.h Decoder_Interface_init -lopencore-amrnb -lm
+enabled libopencore_amrwb  && require libopencore_amrwb opencore-amrwb/dec_if.h D_IF_init -lopencore-amrwb -lm
 enabled libopenjpeg && require libopenjpeg openjpeg.h opj_version -lopenjpeg
 enabled libschroedinger && add_cflags $(pkg-config --cflags schroedinger-1.0) &&
                            require libschroedinger schroedinger/schro.h schro_init $(pkg-config --libs schroedinger-1.0)
@@ -2363,6 +2385,8 @@ echo "libfaad dlopened          ${libfaadbin-no}"
 echo "libgsm enabled            ${libgsm-no}"
 echo "libmp3lame enabled        ${libmp3lame-no}"
 echo "libnut enabled            ${libnut-no}"
+echo "libopencore-amrnb support ${libopencore_amrnb-no}"
+echo "libopencore-amrwb support ${libopencore_amrwb-no}"
 echo "libopenjpeg enabled       ${libopenjpeg-no}"
 echo "libschroedinger enabled   ${libschroedinger-no}"
 echo "libspeex enabled          ${libspeex-no}"
@@ -2386,6 +2410,10 @@ done
 license="LGPL version 2.1 or later"
 if enabled nonfree; then
     license="nonfree and unredistributable"
+elif enabled gplv3; then
+    license="GPL version 3 or later"
+elif enabled lgplv3; then
+    license="LGPL version 3 or later"
 elif enabled gpl; then
     license="GPL version 2 or later"
 fi

@@ -385,6 +385,8 @@ OBJS-$(CONFIG_LIBFAAC)                 += libfaac.o
 OBJS-$(CONFIG_LIBFAAD)                 += libfaad.o
 OBJS-$(CONFIG_LIBGSM)                  += libgsm.o
 OBJS-$(CONFIG_LIBMP3LAME)              += libmp3lame.o
+OBJS-$(CONFIG_LIBOPENCORE_AMRNB)       += libopencore-amr.o
+OBJS-$(CONFIG_LIBOPENCORE_AMRWB)       += libopencore-amr.o
 OBJS-$(CONFIG_LIBOPENJPEG)             += libopenjpeg.o
 OBJS-$(CONFIG_LIBSCHROEDINGER_DECODER) += libschroedingerdec.o libschroedinger.o libdirac_libschro.o
 OBJS-$(CONFIG_LIBSCHROEDINGER_ENCODER) += libschroedingerenc.o libschroedinger.o libdirac_libschro.o
@@ -416,6 +418,7 @@ OBJS-$(CONFIG_VC1_PARSER)              += vc1_parser.o
 OBJS-$(CONFIG_VP3_PARSER)              += vp3_parser.o
 
 # bitstream filters
+OBJS-$(CONFIG_AAC_ADTSTOASC_BSF)          += aac_adtstoasc_bsf.o aac_parser.o mpeg4audio.o
 OBJS-$(CONFIG_DUMP_EXTRADATA_BSF)         += dump_extradata_bsf.o
 OBJS-$(CONFIG_H264_MP4TOANNEXB_BSF)       += h264_mp4toannexb_bsf.o
 OBJS-$(CONFIG_IMX_DUMP_HEADER_BSF)        += imx_dump_header_bsf.o
@@ -434,6 +437,11 @@ OBJS-$(HAVE_PTHREADS)                  += pthread.o
 OBJS-$(HAVE_W32THREADS)                += w32thread.o
 
 # processor-specific code
+X86-OBJS-$(CONFIG_MLP_DECODER)         += x86/mlpdsp.o
+X86-OBJS-$(CONFIG_TRUEHD_DECODER)      += x86/mlpdsp.o
+
+OBJS-$(ARCH_X86)                       += $(X86-OBJS-yes)
+
 YASM-OBJS-FFT-$(HAVE_AMD3DNOW)         += x86/fft_3dn.o
 YASM-OBJS-FFT-$(HAVE_AMD3DNOWEXT)      += x86/fft_3dn2.o
 YASM-OBJS-FFT-$(HAVE_SSE)              += x86/fft_sse.o
@@ -495,11 +503,15 @@ OBJS-$(HAVE_ARMVFP)                    += arm/dsputil_vfp.o             \
 OBJS-$(HAVE_IWMMXT)                    += arm/dsputil_iwmmxt.o          \
                                           arm/mpegvideo_iwmmxt.o        \
 
+NEON-OBJS-$(CONFIG_THEORA_DECODER)     += arm/vp3dsp_neon.o
+NEON-OBJS-$(CONFIG_VP3_DECODER)        += arm/vp3dsp_neon.o
+
 OBJS-$(HAVE_NEON)                      += arm/dsputil_neon.o            \
                                           arm/dsputil_neon_s.o          \
                                           arm/h264dsp_neon.o            \
                                           arm/h264idct_neon.o           \
                                           arm/simple_idct_neon.o        \
+                                          $(NEON-OBJS-yes)
 
 OBJS-$(ARCH_BFIN)                      += bfin/dsputil_bfin.o           \
                                           bfin/fdct_bfin.o              \
@@ -512,7 +524,13 @@ OBJS-$(ARCH_BFIN)                      += bfin/dsputil_bfin.o           \
 OBJS-$(ARCH_PPC)                       += ppc/dsputil_ppc.o             \
 
 ALTIVEC-OBJS-$(CONFIG_H264_DECODER)    += ppc/h264_altivec.o
+ALTIVEC-OBJS-$(CONFIG_THEORA_DECODER)  += ppc/vp3dsp_altivec.o
 ALTIVEC-OBJS-$(CONFIG_VC1_DECODER)     += ppc/vc1dsp_altivec.o
+ALTIVEC-OBJS-$(CONFIG_VP3_DECODER)     += ppc/vp3dsp_altivec.o
+ALTIVEC-OBJS-$(CONFIG_VP5_DECODER)     += ppc/vp3dsp_altivec.o
+ALTIVEC-OBJS-$(CONFIG_VP6_DECODER)     += ppc/vp3dsp_altivec.o
+ALTIVEC-OBJS-$(CONFIG_VP6A_DECODER)    += ppc/vp3dsp_altivec.o
+ALTIVEC-OBJS-$(CONFIG_VP6F_DECODER)    += ppc/vp3dsp_altivec.o
 ALTIVEC-OBJS-$(CONFIG_WMV3_DECODER)    += ppc/vc1dsp_altivec.o
 
 OBJS-$(HAVE_ALTIVEC)                   += ppc/check_altivec.o           \

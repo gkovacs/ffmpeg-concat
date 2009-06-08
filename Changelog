@@ -13,6 +13,7 @@ version <next>:
 - RTP packetization of H.263
 - RTP packetization of AMR
 - RTP depacketization of Vorbis
+- CorePNG decoding support
 - Cook multichannel decoding support
 - introduced avlanguage helpers in libavformat
 - 8088flex TMV demuxer and decoder
@@ -20,6 +21,8 @@ version <next>:
 - V210 decoder and encoder
 - remaining GPL parts in AC-3 decoder converted to LGPL
 - QCP demuxer
+- SoX native format muxer and demuxer
+- AMR-NB decoding/encoding, AMR-WB decoding via OpenCORE libraries
 
 
 

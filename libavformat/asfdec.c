@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+//#define DEBUG
+
 #include "libavutil/common.h"
 #include "libavutil/avstring.h"
 #include "libavcodec/mpegaudio.h"
@@ -46,7 +48,10 @@ static const ff_asf_guid stream_bitrate_guid = { /* (http://get.to/sdp) */
 /**********************************/
 /* decoding */
 
-//#define DEBUG
+static int guidcmp(const void *g1, const void *g2)
+{
+    return memcmp(g1, g2, sizeof(ff_asf_guid));
+}
 
 #ifdef DEBUG
 #define PRINT_IF_GUID(g,cmp) \
@@ -90,11 +95,6 @@ static void print_guid(const ff_asf_guid *g)
 #define print_guid(g)
 #endif
 
-static int guidcmp(const void *g1, const void *g2)
-{
-    return memcmp(g1, g2, sizeof(ff_asf_guid));
-}
-
 static void get_guid(ByteIOContext *s, ff_asf_guid *g)
 {
     assert(sizeof(*g) == 16);
@@ -122,11 +122,12 @@ static void get_str16(ByteIOContext *pb, char *buf, int buf_size)
 static void get_str16_nolen(ByteIOContext *pb, int len, char *buf, int buf_size)
 {
     char* q = buf;
-    len /= 2;
-    while (len--) {
+    for (; len > 1; len -= 2) {
         uint8_t tmp;
         PUT_UTF8(get_le16(pb), tmp, if (q - buf < buf_size - 1) *q++ = tmp;)
     }
+    if (len > 0)
+        url_fskip(pb, len);
     *q = '\0';
 }
 

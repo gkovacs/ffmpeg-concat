@@ -6003,6 +6003,7 @@ static void filter_mb_edgev( H264Context *h, uint8_t *pix, int stride, int16_t b
     const int index_a = qp + h->slice_alpha_c0_offset;
     const int alpha = (alpha_table+52)[index_a];
     const int beta  = (beta_table+52)[qp + h->slice_beta_offset];
+    if (alpha ==0 || beta == 0) return;
 
     if( bS[0] < 4 ) {
         int8_t tc[4];
@@ -6019,6 +6020,7 @@ static void filter_mb_edgecv( H264Context *h, uint8_t *pix, int stride, int16_t 
     const int index_a = qp + h->slice_alpha_c0_offset;
     const int alpha = (alpha_table+52)[index_a];
     const int beta  = (beta_table+52)[qp + h->slice_beta_offset];
+    if (alpha ==0 || beta == 0) return;
 
     if( bS[0] < 4 ) {
         int8_t tc[4];
@@ -6187,6 +6189,7 @@ static void filter_mb_edgeh( H264Context *h, uint8_t *pix, int stride, int16_t b
     const int index_a = qp + h->slice_alpha_c0_offset;
     const int alpha = (alpha_table+52)[index_a];
     const int beta  = (beta_table+52)[qp + h->slice_beta_offset];
+    if (alpha ==0 || beta == 0) return;
 
     if( bS[0] < 4 ) {
         int8_t tc[4];
@@ -6204,6 +6207,7 @@ static void filter_mb_edgech( H264Context *h, uint8_t *pix, int stride, int16_t 
     const int index_a = qp + h->slice_alpha_c0_offset;
     const int alpha = (alpha_table+52)[index_a];
     const int beta  = (beta_table+52)[qp + h->slice_beta_offset];
+    if (alpha ==0 || beta == 0) return;
 
     if( bS[0] < 4 ) {
         int8_t tc[4];
@@ -6887,6 +6891,9 @@ static int decode_picture_timing(H264Context *h){
                     skip_bits(&s->gb, h->sps.time_offset_length); /* time_offset */
             }
         }
+
+        if(s->avctx->debug & FF_DEBUG_PICT_INFO)
+            av_log(s->avctx, AV_LOG_DEBUG, "ct_type:%X pic_struct:%d\n", h->sei_ct_type, h->sei_pic_struct);
     }
     return 0;
 }
@@ -7786,7 +7793,7 @@ static int decode_frame(AVCodecContext *avctx,
 
             /* Signal interlacing information externally. */
             /* Prioritize picture timing SEI information over used decoding process if it exists. */
-            if (h->sei_ct_type)
+            if (h->sei_ct_type & 3)
                 cur->interlaced_frame = (h->sei_ct_type & (1<<1)) != 0;
             else
                 cur->interlaced_frame = FIELD_OR_MBAFF_PICTURE;
@@ -7898,12 +7905,7 @@ static int decode_frame(AVCodecContext *avctx,
     assert(pict->data[0] || !*data_size);
     ff_print_debug_info(s, pict);
 //printf("out %d\n", (int)pict->data[0]);
-#if 0 //?
 
-    /* Return the Picture timestamp as the frame number */
-    /* we subtract 1 because it is added on utils.c     */
-    avctx->frame_number = s->picture_number - 1;
-#endif
     return get_consumed_bytes(s, buf_index, buf_size);
 }
 #if 0

@@ -1013,8 +1013,11 @@ static int mov_write_hdlr_tag(ByteIOContext *pb, MOVTrack *track)
     put_be32(pb ,0); /* reserved */
     put_be32(pb ,0); /* reserved */
     put_be32(pb ,0); /* reserved */
-    put_byte(pb, strlen(descr)); /* string counter */
+    if (!track || track->mode == MODE_MOV)
+        put_byte(pb, strlen(descr)); /* pascal string */
     put_buffer(pb, descr, strlen(descr)); /* handler description */
+    if (track && track->mode != MODE_MOV)
+        put_byte(pb, 0); /* c string */
     return updateSize(pb, pos);
 }
 
@@ -1434,7 +1437,7 @@ static int mov_write_3gp_udta_tag(ByteIOContext *pb, AVFormatContext *s,
         put_be16(pb, atoi(t->value));
     else {
         put_be16(pb, language_code("eng")); /* language */
-        ascii_to_wc(pb, t->value);
+        put_buffer(pb, t->value, strlen(t->value)+1); /* UTF8 string value */
         if (!strcmp(tag, "albm") &&
             (t = av_metadata_get(s->metadata, "year", NULL, 0)))
             put_byte(pb, atoi(t->value));

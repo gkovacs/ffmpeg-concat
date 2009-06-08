@@ -763,15 +763,17 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOVAtom atom)
     for(pseudo_stream_id=0; pseudo_stream_id<entries; pseudo_stream_id++) {
         //Parsing Sample description table
         enum CodecID id;
-        int dref_id;
+        int dref_id = 1;
         MOVAtom a = { 0, 0, 0 };
         int64_t start_pos = url_ftell(pb);
         int size = get_be32(pb); /* size */
         uint32_t format = get_le32(pb); /* data format */
 
-        get_be32(pb); /* reserved */
-        get_be16(pb); /* reserved */
-        dref_id = get_be16(pb);
+        if (size >= 16) {
+            get_be32(pb); /* reserved */
+            get_be16(pb); /* reserved */
+            dref_id = get_be16(pb);
+        }
 
         if (st->codec->codec_tag &&
             st->codec->codec_tag != format &&
@@ -1403,49 +1405,47 @@ static void mov_build_index(MOVContext *mov, AVStream *st)
                 }
             }
         }
-    } else { /* read whole chunk */
-        unsigned int chunk_samples, chunk_size, chunk_duration;
-        unsigned int frames = 1;
+    } else {
         for (i = 0; i < sc->chunk_count; i++) {
+            unsigned chunk_samples;
+
             current_offset = sc->chunk_offsets[i];
             if (stsc_index + 1 < sc->stsc_count &&
                 i + 1 == sc->stsc_data[stsc_index + 1].first)
                 stsc_index++;
             chunk_samples = sc->stsc_data[stsc_index].count;
-            /* get chunk size, beware of alaw/ulaw/mace */
-            if (sc->samples_per_frame > 0 &&
-                (chunk_samples * sc->bytes_per_frame % sc->samples_per_frame == 0)) {
-                if (sc->samples_per_frame < 160)
-                    chunk_size = chunk_samples * sc->bytes_per_frame / sc->samples_per_frame;
-                else {
-                    chunk_size = sc->bytes_per_frame;
-                    frames = chunk_samples / sc->samples_per_frame;
-                    chunk_samples = sc->samples_per_frame;
-                }
-            } else
-                chunk_size = chunk_samples * sc->sample_size;
-            for (j = 0; j < frames; j++) {
-                av_add_index_entry(st, current_offset, current_dts, chunk_size, 0, AVINDEX_KEYFRAME);
-                /* get chunk duration */
-                chunk_duration = 0;
-                while (chunk_samples > 0) {
-                    if (chunk_samples < sc->stts_data[stts_index].count) {
-                        chunk_duration += sc->stts_data[stts_index].duration * chunk_samples;
-                        sc->stts_data[stts_index].count -= chunk_samples;
-                        break;
+
+            if (sc->samples_per_frame && chunk_samples % sc->samples_per_frame) {
+                av_log(mov->fc, AV_LOG_ERROR, "error unaligned chunk\n");
+                return;
+            }
+
+            while (chunk_samples > 0) {
+                unsigned size, samples;
+
+                if (sc->samples_per_frame >= 160) { // gsm
+                    samples = sc->samples_per_frame;
+                    size = sc->bytes_per_frame;
+                } else {
+                    if (sc->samples_per_frame > 1) {
+                        samples = FFMIN((1024 / sc->samples_per_frame)*
+                                        sc->samples_per_frame, chunk_samples);
+                        size = (samples / sc->samples_per_frame) * sc->bytes_per_frame;
                     } else {
-                        chunk_duration += sc->stts_data[stts_index].duration * chunk_samples;
-                        chunk_samples -= sc->stts_data[stts_index].count;
-                        if (stts_index + 1 < sc->stts_count)
-                            stts_index++;
+                        samples = FFMIN(1024, chunk_samples);
+                        size = samples * sc->sample_size;
                     }
                 }
+
+                av_add_index_entry(st, current_offset, current_dts, size, 0, AVINDEX_KEYFRAME);
                 dprintf(mov->fc, "AVIndex stream %d, chunk %d, offset %"PRIx64", dts %"PRId64", "
                         "size %d, duration %d\n", st->index, i, current_offset, current_dts,
-                        chunk_size, chunk_duration);
-                current_offset += sc->bytes_per_frame;
-                assert(chunk_duration % sc->time_rate == 0);
-                current_dts += chunk_duration / sc->time_rate;
+                        size, samples);
+
+                current_offset += size;
+                assert(samples % sc->time_rate == 0);
+                current_dts += samples / sc->time_rate;
+                chunk_samples -= samples;
             }
         }
     }
@@ -2025,7 +2025,7 @@ static int mov_read_packet(AVFormatContext *s, AVPacket *pkt)
         if (!url_is_streamed(s->pb) ||
             mov_read_default(mov, s->pb, (MOVAtom){ 0, 0, INT64_MAX }) < 0 ||
             url_feof(s->pb))
-            return -1;
+            return AVERROR_EOF;
         dprintf(s, "read fragments, offset 0x%llx\n", url_ftell(s->pb));
         goto retry;
     }

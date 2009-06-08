@@ -29,8 +29,6 @@
 /* XXX: POST protocol is not completely implemented because ffmpeg uses
    only a subset of it. */
 
-//#define DEBUG
-
 /* used for protocol handling */
 #define BUFFER_SIZE 1024
 #define URL_SIZE    4096
@@ -151,6 +149,30 @@ static int http_getc(HTTPContext *s)
     return *s->buf_ptr++;
 }
 
+static int http_get_line(HTTPContext *s, char *line, int line_size)
+{
+    int ch;
+    char *q;
+
+    q = line;
+    for(;;) {
+        ch = http_getc(s);
+        if (ch < 0)
+            return AVERROR(EIO);
+        if (ch == '\n') {
+            /* process line */
+            if (q > line && q[-1] == '\r')
+                q--;
+            *q = '\0';
+
+            return 0;
+        } else {
+            if ((q - line) < line_size - 1)
+                *q++ = ch;
+        }
+    }
+}
+
 static int process_line(URLContext *h, char *line, int line_count,
                         int *new_location)
 {
@@ -168,9 +190,9 @@ static int process_line(URLContext *h, char *line, int line_count,
         while (isspace(*p))
             p++;
         s->http_code = strtol(p, NULL, 10);
-#ifdef DEBUG
-        printf("http_code=%d\n", s->http_code);
-#endif
+
+        dprintf(NULL, "http_code=%d\n", s->http_code);
+
         /* error codes are 4xx and 5xx */
         if (s->http_code >= 400 && s->http_code < 600)
             return -1;
@@ -209,8 +231,8 @@ static int http_connect(URLContext *h, const char *path, const char *hoststr,
                         const char *auth, int *new_location)
 {
     HTTPContext *s = h->priv_data;
-    int post, err, ch;
-    char line[1024], *q;
+    int post, err;
+    char line[1024];
     char *auth_b64;
     int auth_b64_len = (strlen(auth) + 2) / 3 * 4 + 1;
     int64_t off = s->off;
@@ -251,30 +273,18 @@ static int http_connect(URLContext *h, const char *path, const char *hoststr,
     }
 
     /* wait for header */
-    q = line;
     for(;;) {
-        ch = http_getc(s);
-        if (ch < 0)
+        if (http_get_line(s, line, sizeof(line)) < 0)
             return AVERROR(EIO);
-        if (ch == '\n') {
-            /* process line */
-            if (q > line && q[-1] == '\r')
-                q--;
-            *q = '\0';
-#ifdef DEBUG
-            printf("header='%s'\n", line);
-#endif
-            err = process_line(h, line, s->line_count, new_location);
-            if (err < 0)
-                return err;
-            if (err == 0)
-                break;
-            s->line_count++;
-            q = line;
-        } else {
-            if ((q - line) < sizeof(line) - 1)
-                *q++ = ch;
-        }
+
+        dprintf(NULL, "header='%s'\n", line);
+
+        err = process_line(h, line, s->line_count, new_location);
+        if (err < 0)
+            return err;
+        if (err == 0)
+            break;
+        s->line_count++;
     }
 
     return (off == s->off) ? 0 : -1;
