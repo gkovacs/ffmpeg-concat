@@ -180,6 +180,8 @@ static int m3u_list_files(unsigned char *buffer, int buffer_size, unsigned char 
 static int m3u_read_header(AVFormatContext *s,
                           AVFormatParameters *ap)
 {
+    printf("m3u read header called\n");
+    fflush(stdout);
 //    unsigned char *flist[512];
 //    int flist_len;
     ByteIOContext *pb;
@@ -225,7 +227,7 @@ static int m3u_read_packet(AVFormatContext *s,
 //    printf("vidtime is %lf", av_q2d(curtime));
 //    putchar('\n');
 //    fflush(stdout);
-    if (ret < 0 && playld->pe_curidx < playld->pelist_size - 1 && (ic->streams[0]->cur_dts >= ic->streams[0]->duration || ic->streams[0]->duration < 0)) //&& pkt->pts >= ic->duration * 0.9)// && av_cmp_q(curtime, vidtime) >= 0)
+    if (ret < 0 && playld->pe_curidx < playld->pelist_size - 1) //&& (ic->streams[0]->cur_dts >= ic->streams[0]->duration || ic->streams[0]->duration < 0)) //&& pkt->pts >= ic->duration * 0.9)// && av_cmp_q(curtime, vidtime) >= 0)
     {
 //        if (!(ic->cur_st->cur_dts >= ic->cur_st->duration - 1))
 //        {
