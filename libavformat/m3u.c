@@ -276,6 +276,50 @@ static int m3u_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int 
     ic->iformat->read_seek(ic, stream_index, pts, flags);
 }
 
+static int m3u_read_play(AVFormatContext *s)
+{
+    printf("m3u_read_play called\n");
+    PlaylistD *playld;
+    AVFormatContext *ic;
+    playld = s->priv_data;
+    ic = playld->pelist[playld->pe_curidx]->ic;
+    return av_read_play(ic);
+}
+
+static int m3u_read_pause(AVFormatContext *s)
+{
+    printf("m3u_read_pause called\n");
+    PlaylistD *playld;
+    AVFormatContext *ic;
+    playld = s->priv_data;
+    ic = playld->pelist[playld->pe_curidx]->ic;
+    return av_read_pause(ic);
+}
+
+static int m3u_read_close(AVFormatContext *s)
+{
+    printf("m3u_read_close called\n");
+    PlaylistD *playld;
+    AVFormatContext *ic;
+    playld = s->priv_data;
+    ic = playld->pelist[playld->pe_curidx]->ic;
+    if (ic->iformat->read_close)
+        return ic->iformat->read_close(ic);
+    return 0;
+}
+
+static int m3u_read_timestamp(AVFormatContext *s, int stream_index, int64_t *pos, int64_t pos_limit)
+{
+    printf("m3u_read_timestamp called\n");
+    PlaylistD *playld;
+    AVFormatContext *ic;
+    playld = s->priv_data;
+    ic = playld->pelist[playld->pe_curidx]->ic;
+    if (ic->iformat->read_timestamp)
+        return ic->iformat->read_timestamp(ic, stream_index, pos, pos_limit);
+    return 0;
+}
+
 #if CONFIG_M3U_DEMUXER
 AVInputFormat m3u_demuxer = {
     "m3u",
@@ -284,9 +328,18 @@ AVInputFormat m3u_demuxer = {
     m3u_probe,
     m3u_read_header,
     m3u_read_packet,
-    NULL,
+    m3u_read_close, //m3u_read_close
     m3u_read_seek,
-    .codec_tag= (const AVCodecTag* const []){codec_m3u_tags, 0},
+    m3u_read_timestamp, //m3u_read_timestamp
+    NULL, //flags
+    NULL, //extensions
+    NULL, //value
+    m3u_read_play,
+    m3u_read_pause,
+    (const AVCodecTag* const []){codec_m3u_tags, 0},
+    NULL, //m3u_read_seek2
+    NULL, //metadata_conv
+    NULL, //next
 };
 #endif
 

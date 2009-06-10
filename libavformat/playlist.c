@@ -180,6 +180,17 @@ int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
     s->raw_packet_buffer_end = ic->raw_packet_buffer_end;
     s->packet_buffer_end = ic->packet_buffer_end;
     s->metadata = ic->metadata;
+    /*
+    s->iformat->name = ic->iformat->name;
+    s->iformat->long_name = ic->iformat->long_name;
+    s->iformat->priv_data_size = ic->iformat->priv_data_size;
+    s->iformat->flags = ic->iformat->flags;
+    s->iformat->extensions = ic->iformat->extensions;
+    s->iformat->value = ic->iformat->value;
+    s->iformat->codec_tag = ic->iformat->codec_tag;
+    s->iformat->metadata_conv = ic->iformat->metadata_conv;
+//    s->iformat->next = ic->iformat->next;
+     */
     return 0;
 }
 

@@ -2004,6 +2004,7 @@ static int decode_thread(void *arg)
     }
 
     for(;;) {
+        fprintf(stderr, "new stream\n");
         if (is->abort_request)
             break;
         if (is->paused != is->last_paused) {
