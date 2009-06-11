@@ -118,6 +118,7 @@ PlaylistD* av_make_playlistd(unsigned char **flist, int flist_len)
 
 int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
 {
+    fprintf(stderr, "playlist_populate_context stored");
     int i;
     playld->pelist[playld->pe_curidx] = av_make_playelem(playld->flist[playld->pe_curidx]);
     AVFormatContext *ic = playld->pelist[playld->pe_curidx]->ic;

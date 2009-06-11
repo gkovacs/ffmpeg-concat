@@ -2003,8 +2003,7 @@ static int decode_thread(void *arg)
         goto fail;
     }
 
-    for(;;) {
-        fprintf(stderr, "new stream\n");
+    for(;;) { // set breakpoint here
         if (is->abort_request)
             break;
         if (is->paused != is->last_paused) {

@@ -1032,7 +1032,9 @@ int av_read_frame(AVFormatContext *s, AVPacket *pkt)
     AVPacketList *pktl;
     int eof=0;
     const int genpts= s->flags & AVFMT_FLAG_GENPTS;
-
+//    if (s->iformat && s->iformat->name == "m3u" && pkt) {
+//        fprintf(stderr, "meosakln %ld\n", (long)pkt->priv);
+//    }
     for(;;){
         pktl = s->packet_buffer;
         if (pktl) {

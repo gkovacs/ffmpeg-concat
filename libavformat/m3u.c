@@ -212,12 +212,12 @@ static int m3u_read_packet(AVFormatContext *s,
     retr:
 //    playld->pelist[playld->pe_curidx] = av_make_playelem(playld->flist[playld->pe_curidx]);
     ic = playld->pelist[playld->pe_curidx]->ic;
-    fprintf(stderr, "%s\n", ic->iformat->name);
+//    fprintf(stderr, "%s\n", ic->iformat->name);
     ret = ic->iformat->read_packet(ic, pkt);
 //    printf("timestamp is %li ", s->timestamp);
 //    printf("duration is %li ", s->duration);
 //    printf("start time is %li", s->start_time);
-    fprintf(stderr, "%ld of %ld\n", ic->streams[0]->cur_dts, ic->streams[0]->duration);
+//    fprintf(stderr, "%ld of %ld\n", ic->streams[0]->cur_dts, ic->streams[0]->duration);
 //    fflush(stderr);
 
     //    AVRational curtime = {(clock() - playld->pelist[playld->pe_curidx]->indv_time), CLOCKS_PER_SEC};
