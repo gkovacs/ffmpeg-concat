@@ -1,6 +1,6 @@
 /*
  * M3U muxer and demuxer
- * Copyright (c) 2001 Geza Kovacs
+ * Copyright (c) 2009 Geza Kovacs
  *
  * This file is part of FFmpeg.
  *
@@ -133,7 +133,7 @@ static int m3u_probe(AVProbeData *p)
         return 0;
 }
 
-static int m3u_list_files(unsigned char *buffer, int buffer_size, unsigned char **file_list, unsigned int *lfx_ptr)
+static int m3u_list_files(unsigned char *buffer, int buffer_size, unsigned char **file_list, unsigned int *lfx_ptr, char *workingdir)
 {
     unsigned int i;
     unsigned int lfx = 0;
@@ -142,24 +142,20 @@ static int m3u_list_files(unsigned char *buffer, int buffer_size, unsigned char 
     unsigned char fldata[262144];
     memset(fldata, 0, 262144);
     memset(file_list, 0, 512 * sizeof(unsigned char*));
-    for (i = 0; i < 512; ++i)
-    {
+    for (i = 0; i < 512; ++i) {
         file_list[i] = fldata+i*512;
     }
-    for (i = 0; i < buffer_size; ++i)
-    {
-        if (buffer[i] == 0)
+    for (i = 0; i < buffer_size; ++i) {
+        char c = buffer[i];
+        if (c == 0)
             break;
-        if (buffer[i] == '#')
-        {
+        if (c == '#') {
             hashed_out = 1;
             continue;
         }
-        if (buffer[i] == '\n')
-        {
+        if (c == '\n') {
             hashed_out = 0;
-            if (fx != 0)
-            {
+            if (fx != 0) {
                 fx = 0;
                 ++lfx;
             }
@@ -167,10 +163,21 @@ static int m3u_list_files(unsigned char *buffer, int buffer_size, unsigned char 
         }
         if (hashed_out)
             continue;
-        file_list[lfx][fx] = buffer[i];
+        if (c == '\\')
+            c = '/';
+        file_list[lfx][fx] = c;
         ++fx;
     }
     *lfx_ptr = lfx;
+    for (i = 0; i < lfx; ++i) { // determine if relative paths
+        FILE *file;
+        char *fullfpath = conc_strings(workingdir, file_list[i]);
+        file = fopen(fullfpath, "r");
+        if (file) {
+            fclose(file);
+            file_list[i] = fullfpath;
+        }
+    }
     return 0;
 }
 
@@ -188,7 +195,10 @@ static int m3u_read_header(AVFormatContext *s,
     PlaylistD *playld;
     pb = s->pb;
     playld = av_malloc(sizeof(PlaylistD));
-    m3u_list_files(pb->buffer, pb->buffer_size, playld->flist, &(playld->pelist_size));
+    split_wd_fn(s->filename, &playld->workingdir, &playld->filename);
+    printf("dkagnwd%s\n", playld->workingdir);
+    printf("dkagnwd%s\n", playld->filename);
+    m3u_list_files(pb->buffer, pb->buffer_size, playld->flist, &(playld->pelist_size), playld->workingdir);
 //    playld = av_make_playlistd(flist, flist_len);
     playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
     memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));

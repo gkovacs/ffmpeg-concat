@@ -43,6 +43,8 @@ typedef struct PlaylistD {
     AVChapter **chlist;
     int chlist_size;
     int ch_curidx;
+    char *workingdir;
+    char *filename;
 } PlaylistD;
 
 int av_open_input_playelem(PlayElem *pe);
@@ -55,3 +57,6 @@ int check_file_extn(char *cch, char *extn);
 
 int playlist_populate_context(PlaylistD *playld, AVFormatContext *s);
 
+char* conc_strings(char *string1, char *string2);
+
+void split_wd_fn(char *filepath, char **workingdir, char **filename);

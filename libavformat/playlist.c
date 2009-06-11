@@ -1,6 +1,6 @@
 /*
  * M3U muxer and demuxer
- * Copyright (c) 2001 Geza Kovacs
+ * Copyright (c) 2009 Geza Kovacs
  *
  * This file is part of FFmpeg.
  *
@@ -116,8 +116,49 @@ PlaylistD* av_make_playlistd(unsigned char **flist, int flist_len)
     return playld;
 }
 
-int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
-{
+char* conc_strings(char *string1, char *string2) {
+    char *str1;
+    char *str2;
+    char *str;
+    str1 = string1;
+    str2 = string2;
+    while (*string1 != 0)
+        ++string1;
+    while (*string2 != 0)
+        ++string2;
+    str = av_malloc((string1-str1)+(string2-str2));
+    string1 = str1;
+    string2 = str2;
+    while (*string1 != 0)
+        str[string1-str1] = *(string1++);
+    str += (string1-str1);
+    while (*string2 != 0)
+        str[string2-str2] = *(string2++);
+    return (str-string1)+str1;
+}
+
+void split_wd_fn(char *filepath, char **workingdir, char **filename) {
+    char *ofp;
+    char *cofp;
+    char *lslash = filepath;
+    ofp = filepath;
+    cofp = filepath;
+    while (*filepath != 0) {
+        if (*filepath == '/' || *filepath == '\\')
+            lslash = filepath+1;
+        ++filepath;
+    }
+    *workingdir = av_malloc((lslash-ofp)+1);
+    *filename = av_malloc((filepath-lslash)+1);
+    while (cofp < lslash)
+        (*workingdir)[cofp-ofp] = *(cofp++);
+    (*workingdir)[cofp-ofp] = 0;
+    while (cofp < filepath)
+        (*filename)[cofp-lslash] = *(cofp++);
+    (*filename)[cofp-lslash] = 0;
+}
+
+int playlist_populate_context(PlaylistD *playld, AVFormatContext *s) {
     fprintf(stderr, "playlist_populate_context stored");
     int i;
     playld->pelist[playld->pe_curidx] = av_make_playelem(playld->flist[playld->pe_curidx]);
@@ -195,8 +236,7 @@ int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
     return 0;
 }
 
-int check_file_extn(char *cch, char *extn)
-{
+int check_file_extn(char *cch, char *extn) {
     int pos;
     int extnl;
     pos = -1;
