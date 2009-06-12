@@ -25,6 +25,7 @@
 
 #include "avformat.h"
 #include "playlist.h"
+#include "internal.h"
 #include <time.h>
 
 int av_open_input_playelem(PlayElem *pe)
@@ -135,6 +136,36 @@ char* conc_strings(char *string1, char *string2) {
     while (*string2 != 0)
         str[string2-str2] = *(string2++);
     return (str-string1)+str1;
+}
+
+char* buf_getline(ByteIOContext *s)
+{
+    char *q;
+    char *oq;
+    int bufsize = 64;
+    q = av_malloc(bufsize);
+    oq = q;
+    while (1) {
+        int c = url_fgetc(s);
+        if (c == EOF)
+            return NULL;
+        if (c == '\n')
+            break;
+        *q = c;
+        if ((++q)-oq == bufsize) {
+            oq = av_realloc(oq, bufsize+64);
+            q = oq + bufsize;
+            bufsize += 64;
+        }
+    }
+    *q = 0;
+    q = oq;
+    while (*q != 0 && *q != '#') {
+        ++q;
+    }
+    *q = 0;
+    oq = av_realloc(oq, (q-oq)+1);
+    return oq;
 }
 
 void split_wd_fn(char *filepath, char **workingdir, char **filename) {

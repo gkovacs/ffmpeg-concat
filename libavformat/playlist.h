@@ -35,7 +35,7 @@ typedef struct PlayElem {
 } PlayElem;
 
 typedef struct PlaylistD {
-    unsigned char *flist[512];
+    char **flist;
 //    int flist_len;
     PlayElem **pelist;
     int pelist_size;
@@ -58,5 +58,7 @@ int check_file_extn(char *cch, char *extn);
 int playlist_populate_context(PlaylistD *playld, AVFormatContext *s);
 
 char* conc_strings(char *string1, char *string2);
+
+char* buf_getline(ByteIOContext *s);
 
 void split_wd_fn(char *filepath, char **workingdir, char **filename);
