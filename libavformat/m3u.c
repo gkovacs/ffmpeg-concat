@@ -24,7 +24,6 @@
  */
 
 #include "avformat.h"
-#include "raw.h"
 #include "riff.h"
 #include "playlist.h"
 
@@ -104,7 +103,6 @@ static int m3u_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
     printf("m3u read header called\n");
-    fflush(stdout);
     PlaylistD *playld = av_malloc(sizeof(PlaylistD));
     split_wd_fn(s->filename,
                 &playld->workingdir,
@@ -132,63 +130,18 @@ static int m3u_read_packet(AVFormatContext *s,
     AVFormatContext *ic;
     playld = s->priv_data;
     retr:
-//    playld->pelist[playld->pe_curidx] = av_make_playelem(playld->flist[playld->pe_curidx]);
     ic = playld->pelist[playld->pe_curidx]->ic;
-//    fprintf(stderr, "%s\n", ic->iformat->name);
     ret = ic->iformat->read_packet(ic, pkt);
-    if (pkt) {
+//    if (pkt) {
 //        pkt->stream_index += get_stream_offset(s);
-        fprintf(stderr, "%ld\n", pkt->stream_index);
-    }
-//    printf("timestamp is %li ", s->timestamp);
-//    printf("duration is %li ", s->duration);
-//    printf("start time is %li", s->start_time);
-//    fprintf(stderr, "%ld of %ld\n", ic->streams[0]->cur_dts, ic->streams[0]->duration);
-//    fflush(stderr);
-
-    //    AVRational curtime = {(clock() - playld->pelist[playld->pe_curidx]->indv_time), CLOCKS_PER_SEC};
-//    AVRational vidtel = {ic->streams[i]->duration - ic->streams[i]->start_time, 1};
-//    AVRational vidtime = av_mul_q(vidtel, ic->streams[i]->time_base);
-//    printf("curtime is %lf", av_q2d(curtime));
-//    printf("vidtime is %lf", av_q2d(curtime));
-//    putchar('\n');
-//    fflush(stdout);
-    if (ret < 0 && playld->pe_curidx < playld->pelist_size - 1) //&& (ic->streams[0]->cur_dts >= ic->streams[0]->duration || ic->streams[0]->duration < 0)) //&& pkt->pts >= ic->duration * 0.9)// && av_cmp_q(curtime, vidtime) >= 0)
+//    }
+    if (ret < 0 && playld->pe_curidx < playld->pelist_size - 1)
     {
-//        if (!(ic->cur_st->cur_dts >= ic->cur_st->duration - 1))
-//        {
-//            pkt = av_malloc(sizeof(AVPacket));
-//            playlist_populate_context(playld, s);
-//            goto retr;
-//        }
-//        av_close_input_file(ic);
-//        time_offset += ic->streams[0]->duration;
-//        av_close_input_stream(ic);
-//        if (ic->iformat->read_close)
-//            ic->iformat->read_close(ic);
-//        flush_packet_queue();
-
-        for (i = 0; i < ic->nb_streams; ++i)
-        {
-//            av_parser_close(s->streams[i]->parser);
-//            s->streams[i] = 0;
-        }
-//        fprintf(stderr, "ch2\n");
-//                    fflush(stderr);
         ++playld->pe_curidx;
 //        pkt->destruct(pkt);
         pkt = av_malloc(sizeof(AVPacket));
-        // TODO clear all existing streams before repopulating
         playlist_populate_context(playld, s);
-//        fprintf(stderr, "ch3\n");
-//                    fflush(stderr);
-//        for (i = 0; i < ic->nb_streams; ++i)
-//        {
-//            playld->pelist[playld->pe_curidx]->ic->streams[i]->start_time = 0;
-//        }
         goto retr;
-//                    ic = playld->pelist[playld->pe_curidx]->ic;
-//                    ret = ic->iformat->read_packet(ic, pkt);
     }
     return ret;
 }

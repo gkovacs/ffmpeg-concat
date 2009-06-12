@@ -1,6 +1,6 @@
 /*
- * M3U muxer and demuxer
- * Copyright (c) 2001 Geza Kovacs
+ * General components used by playlist formats
+ * Copyright (c) 2009 Geza Kovacs
  *
  * This file is part of FFmpeg.
  *
@@ -17,10 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
-
-/*
- * Based on AU muxer and demuxer in au.c
  */
 
 
