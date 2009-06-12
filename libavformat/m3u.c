@@ -136,6 +136,10 @@ static int m3u_read_packet(AVFormatContext *s,
     ic = playld->pelist[playld->pe_curidx]->ic;
 //    fprintf(stderr, "%s\n", ic->iformat->name);
     ret = ic->iformat->read_packet(ic, pkt);
+    if (pkt) {
+        pkt->stream_index += get_stream_offset(s);
+/        fprintf(stderr, "%ld\n", pkt->stream_index);
+    }
 //    printf("timestamp is %li ", s->timestamp);
 //    printf("duration is %li ", s->duration);
 //    printf("start time is %li", s->start_time);

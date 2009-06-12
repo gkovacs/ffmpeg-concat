@@ -187,6 +187,7 @@ void split_wd_fn(char *filepath, char **workingdir, char **filename)
 int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
 {
     int i;
+    unsigned int stream_offset;
     AVFormatContext *ic;
     AVFormatParameters *nap;
     fprintf(stderr, "playlist_populate_context called\n");
@@ -196,9 +197,11 @@ int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
 //    ic->iformat->read_header(ic, nap);
 //    ic->debug = 1;
     ic->iformat->read_header(ic, 0);
-    s->nb_streams = ic->nb_streams;
-    for (i = 0; i < ic->nb_streams; ++i)
-        s->streams[i] = ic->streams[i];
+    stream_offset = get_stream_offset(s);
+    s->nb_streams = ic->nb_streams + stream_offset;
+    for (i = 0; i < ic->nb_streams; ++i) {
+        s->streams[i+stream_offset] = ic->streams[i];
+    }
     s->av_class = ic->av_class;
     s->oformat = ic->oformat;
     s->pb = ic->pb;
@@ -289,5 +292,16 @@ int check_file_extn(char *cch, char *extn) {
         ++cch;
     }
     return 0;
+}
+
+unsigned int get_stream_offset(AVFormatContext *s)
+{
+    PlaylistD *playld;
+    int i;
+    unsigned int snum = 0;
+    playld = s->priv_data;
+    for (i = 0; i < playld->pe_curidx; ++i)
+        snum += playld->pelist[i]->ic->nb_streams;
+    return snum;
 }
 

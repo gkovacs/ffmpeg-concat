@@ -62,3 +62,5 @@ char* conc_strings(char *string1, char *string2);
 char* buf_getline(ByteIOContext *s);
 
 void split_wd_fn(char *filepath, char **workingdir, char **filename);
+
+unsigned int get_stream_offset(AVFormatContext *s);
