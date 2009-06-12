@@ -187,7 +187,7 @@ void split_wd_fn(char *filepath, char **workingdir, char **filename)
 int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
 {
     int i;
-    unsigned int stream_offset;
+//    unsigned int stream_offset;
     AVFormatContext *ic;
     AVFormatParameters *nap;
     fprintf(stderr, "playlist_populate_context called\n");
@@ -197,10 +197,12 @@ int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
 //    ic->iformat->read_header(ic, nap);
 //    ic->debug = 1;
     ic->iformat->read_header(ic, 0);
-    stream_offset = get_stream_offset(s);
-    s->nb_streams = ic->nb_streams + stream_offset;
+//    stream_offset = get_stream_offset(s);
+    s->nb_streams = ic->nb_streams;
+//    s->nb_streams = ic->nb_streams + stream_offset;
     for (i = 0; i < ic->nb_streams; ++i) {
-        s->streams[i+stream_offset] = ic->streams[i];
+        s->streams[i] = ic->streams[i];
+//        s->streams[i+stream_offset] = ic->streams[i];
     }
     s->av_class = ic->av_class;
     s->oformat = ic->oformat;
