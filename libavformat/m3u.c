@@ -138,7 +138,7 @@ static int m3u_read_packet(AVFormatContext *s,
     ret = ic->iformat->read_packet(ic, pkt);
     if (pkt) {
         pkt->stream_index += get_stream_offset(s);
-/        fprintf(stderr, "%ld\n", pkt->stream_index);
+        fprintf(stderr, "%ld\n", pkt->stream_index);
     }
 //    printf("timestamp is %li ", s->timestamp);
 //    printf("duration is %li ", s->duration);

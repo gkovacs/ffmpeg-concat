@@ -1338,8 +1338,10 @@ static int video_thread(void *arg)
     int len1, got_picture;
     AVFrame *frame= avcodec_alloc_frame();
     double pts;
-
+    int cur_stream;
     for(;;) {
+        AVStream *video_st = is->ic->streams[pkt->stream_index];
+//        fprintf(stderr, "video thread running\n");
         while (is->paused && !is->videoq.abort_request) {
             SDL_Delay(10);
         }
@@ -1347,14 +1349,14 @@ static int video_thread(void *arg)
             break;
 
         if(pkt->data == flush_pkt.data){
-            avcodec_flush_buffers(is->video_st->codec);
+            avcodec_flush_buffers(video_st->codec);
             continue;
         }
-
+//        fprintf(stderr, "video thread running\n");
         /* NOTE: ipts is the PTS of the _first_ picture beginning in
            this packet, if any */
-        is->video_st->codec->reordered_opaque= pkt->pts;
-        len1 = avcodec_decode_video2(is->video_st->codec,
+        video_st->codec->reordered_opaque= pkt->pts;
+        len1 = avcodec_decode_video2(video_st->codec,
                                     frame, &got_picture,
                                     pkt);
 
@@ -1561,18 +1563,48 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 {
     AVPacket *pkt_temp = &is->audio_pkt_temp;
     AVPacket *pkt = &is->audio_pkt;
-    AVCodecContext *dec= is->audio_st->codec;
+//    printf("audio stream index is %d\n", pkt->stream_index);
+//    printf("audio stream is %ld\n", is->audio_st);
+//    printf("audio strea2 is %ld\n", is->ic->streams[pkt->stream_index]);
+    /*
+    if (is->ic->streams[pkt->stream_index] != is->audio_st) {
+        fprintf(stderr, "streams not same\n");
+        fprintf(stderr, "audio strea1 is %ld\n", is->audio_st);
+        fprintf(stderr, "want type %d\n", CODEC_TYPE_AUDIO);
+        fprintf(stderr, "audio strea1-type is %ld\n", is->audio_st->codec->codec_type);
+        fprintf(stderr, "audio strea2 is %ld\n", is->ic->streams[pkt->stream_index]);
+        fprintf(stderr, "audio strea2-type is %ld\n", is->ic->streams[pkt->stream_index]->codec->codec_type);
+    }
+    */
+    AVCodecContext *dec;
+    if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO)
+        dec = is->ic->streams[pkt->stream_index]->codec;
+    else {
+        dec = is->audio_st->codec;
+        fprintf(stderr, "audio stream not yet set\n");
+    }
     int n, len1, data_size;
     double pts;
 
     for(;;) {
+//        fprintf(stderr, "audio thread running1\n");
         /* NOTE: the audio packet can contain several frames */
         while (pkt_temp->size > 0) {
+            /*
+            if (is->ic->streams[pkt_temp->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO)
+                dec = is->ic->streams[pkt_temp->stream_index]->codec;
+            else {
+                dec = is->audio_st->codec;
+                fprintf(stderr, "audio stream not yet set 2\n");
+            }
+            */
+            fprintf(stderr, "using codec id %d\n", dec->codec_id);
             data_size = sizeof(is->audio_buf1);
             len1 = avcodec_decode_audio3(dec,
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
             if (len1 < 0) {
+                fprintf(stderr, "audio decoding error\n");
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
                 break;
@@ -1582,7 +1614,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             pkt_temp->size -= len1;
             if (data_size <= 0)
                 continue;
-
+//fprintf(stderr, "audio thread running2\n");
             if (dec->sample_fmt != is->audio_src_fmt) {
                 if (is->reformat_ctx)
                     av_audio_convert_free(is->reformat_ctx);
@@ -1596,7 +1628,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                 }
                 is->audio_src_fmt= dec->sample_fmt;
             }
-
+//fprintf(stderr, "audio thread running3\n");
             if (is->reformat_ctx) {
                 const void *ibuf[6]= {is->audio_buf1};
                 void *obuf[6]= {is->audio_buf2};
@@ -1604,7 +1636,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                 int ostride[6]= {2};
                 int len= data_size/istride[0];
                 if (av_audio_convert(is->reformat_ctx, obuf, ostride, ibuf, istride, len)<0) {
-                    printf("av_audio_convert() failed\n");
+                    fprintf(stderr, "av_audio_convert() failed\n");
                     break;
                 }
                 is->audio_buf= is->audio_buf2;
@@ -2022,6 +2054,7 @@ static int decode_thread(void *arg)
         }
 #endif
         if (is->seek_req) {
+//            fprintf(stderr, "seeking needed\n");
             int64_t seek_target= is->seek_pos;
             int64_t seek_min= is->seek_rel > 0 ? seek_target - is->seek_rel + 2: INT64_MIN;
             int64_t seek_max= is->seek_rel < 0 ? seek_target - is->seek_rel - 2: INT64_MAX;
@@ -2055,9 +2088,11 @@ static int decode_thread(void *arg)
             is->subtitleq.size > MAX_SUBTITLEQ_SIZE) {
             /* wait 10 ms */
             SDL_Delay(10);
+//            fprintf(stderr, "packet queue full\n");
             continue;
         }
         if(url_feof(ic->pb) || eof) {
+//            fprintf(stderr, "end of file\n");
             if(is->video_stream >= 0){
                 av_init_packet(pkt);
                 pkt->data=NULL;
@@ -2069,6 +2104,7 @@ static int decode_thread(void *arg)
             continue;
         }
         ret = av_read_frame(ic, pkt);
+//        fprintf(stderr, "read frame\n");
         if (ret < 0) {
             if (ret == AVERROR_EOF)
                 eof=1;
@@ -2089,6 +2125,7 @@ static int decode_thread(void *arg)
     }
     /* wait until the end */
     while (!is->abort_request) {
+        fprintf(stderr, "waiting for end\n");
         SDL_Delay(100);
     }
 
