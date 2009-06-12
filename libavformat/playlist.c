@@ -72,28 +72,23 @@ PlayElem* av_make_playelem(unsigned char *filename)
     if (err < 0)
         print_error("during-open_input_playelem", err);
     pe->fmt = pe->ic->iformat;
-    if (!pe->fmt)
-    {
+    if (!pe->fmt) {
         fprintf(stderr, "pefmt not set\n");
         fflush(stderr);
     }
     err = av_find_stream_info(pe->ic);
-    if (err < 0)
-    {
+    if (err < 0) {
         fprintf(stderr, "failed codec probe av_find_stream_info\n");
         fflush(stderr);
     }
-    if(pe->ic->pb)
-    {
+    if(pe->ic->pb) {
         pe->ic->pb->eof_reached = 0;
     }
-    else
-    {
+    else {
         fprintf(stderr, "failed pe ic pb not set");
         fflush(stderr);
     }
-    if(!pe->fmt)
-    {
+    if(!pe->fmt) {
         fprintf(stderr, "failed pe ic fmt not set");
         fflush(stderr);
     }
@@ -110,8 +105,7 @@ PlaylistD* av_make_playlistd(unsigned char **flist, int flist_len)
     playld->pelist_size = flist_len;
     playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
     memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));
-//    for (int i = 0; i < playld->pelist_size; ++i)
-//    {
+//    for (int i = 0; i < playld->pelist_size; ++i) {
 //        playld->pelist[i] = av_make_playelem(flist[i]);
 //    }
     return playld;
@@ -168,7 +162,8 @@ char* buf_getline(ByteIOContext *s)
     return oq;
 }
 
-void split_wd_fn(char *filepath, char **workingdir, char **filename) {
+void split_wd_fn(char *filepath, char **workingdir, char **filename)
+{
     char *ofp;
     char *cofp;
     char *lslash = filepath;
@@ -189,20 +184,21 @@ void split_wd_fn(char *filepath, char **workingdir, char **filename) {
     (*filename)[cofp-lslash] = 0;
 }
 
-int playlist_populate_context(PlaylistD *playld, AVFormatContext *s) {
-    fprintf(stderr, "playlist_populate_context stored");
+int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
+{
     int i;
+    AVFormatContext *ic;
+    AVFormatParameters *nap;
+    fprintf(stderr, "playlist_populate_context called\n");
     playld->pelist[playld->pe_curidx] = av_make_playelem(playld->flist[playld->pe_curidx]);
-    AVFormatContext *ic = playld->pelist[playld->pe_curidx]->ic;
-    AVFormatParameters *nap = playld->pelist[playld->pe_curidx]->ap;
+    ic = playld->pelist[playld->pe_curidx]->ic;
+    nap = playld->pelist[playld->pe_curidx]->ap;
 //    ic->iformat->read_header(ic, nap);
 //    ic->debug = 1;
     ic->iformat->read_header(ic, 0);
     s->nb_streams = ic->nb_streams;
     for (i = 0; i < ic->nb_streams; ++i)
-    {
         s->streams[i] = ic->streams[i];
-    }
     s->av_class = ic->av_class;
     s->oformat = ic->oformat;
     s->pb = ic->pb;
@@ -276,29 +272,19 @@ int check_file_extn(char *cch, char *extn) {
        ++extnl;
     pos = -1;
     if (!cch)
-    {
         return 0;
-    }
     if (*cch == 0)
-    {
         return 0;
-    }
-    while (*cch != 0)
-    {
+    while (*cch != 0) {
         if (*cch == '.')
-        {
             pos = 0;
-        }
-        else if (pos >= 0)
-        {
+        else if (pos >= 0) {
             if (*cch == extn[pos])
                 ++pos;
             else
                 pos = -1;
             if (pos == extnl)
-            {
                 return 1;
-            }
         }
         ++cch;
     }
