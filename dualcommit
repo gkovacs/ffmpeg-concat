@@ -1,0 +1,35 @@
+#!/bin/bash
+
+gitdir=$(pwd)
+svndir=$(pwd)/../ffmpeg-svn
+
+if [ "$1" == "" ]
+then
+echo "need commit arguments"
+exit 0
+fi
+
+cd $svndir
+git reset --hard
+
+for x in $(git ls-files)
+do
+diff $svndir/$x $gitdir/$x
+cp $gitdir/$x $svndir/$x
+done
+
+read -p "commit? (y/n) " yesno
+
+if [ "$yesno" != "y" ]
+then
+exit 0
+fi
+
+cd $gitdir
+git commit -a -m "$1"
+git push origin master
+
+cd $svndir
+git commit -a -m "$1"
+git svn dcommit
+

@@ -19,10 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/*
- * Based on AU muxer and demuxer in au.c
- */
-
 #include "avformat.h"
 #include "riff.h"
 #include "playlist.h"
