@@ -171,7 +171,7 @@ int playlist_populate_context(PlaylistD *playld,
 //    unsigned int stream_offset;
     AVFormatContext *ic;
     AVFormatParameters *nap;
-    fprintf(stderr, "playlist_populate_context called\n");
+    printf("playlist_populate_context called\n");
     playld->pelist[playld->pe_curidx] = av_make_playelem(playld->flist[playld->pe_curidx]);
     ic = playld->pelist[playld->pe_curidx]->ic;
     nap = playld->pelist[playld->pe_curidx]->ap;
@@ -240,36 +240,6 @@ int compare_bufs(unsigned char *buf,
         ++rbuf;
     }
     return 1;
-}
-
-int check_file_extn(char *cch,
-                    char *extn)
-{
-    int pos;
-    int extnl;
-    pos = -1;
-    extnl = 0;
-    while (extn[extnl] != 0)
-       ++extnl;
-    pos = -1;
-    if (!cch)
-        return 0;
-    if (*cch == 0)
-        return 0;
-    while (*cch != 0) {
-        if (*cch == '.')
-            pos = 0;
-        else if (pos >= 0) {
-            if (*cch == extn[pos])
-                ++pos;
-            else
-                pos = -1;
-            if (pos == extnl)
-                return 1;
-        }
-        ++cch;
-    }
-    return 0;
 }
 
 unsigned int get_stream_offset(AVFormatContext *s)
