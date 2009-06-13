@@ -51,6 +51,8 @@ PlaylistD* av_make_playlistd(unsigned char **flist, int flist_len);
 
 int check_file_extn(char *cch, char *extn);
 
+int compare_bufs(unsigned char *buf, unsigned char *rbuf);
+
 int playlist_populate_context(PlaylistD *playld, AVFormatContext *s);
 
 char* conc_strings(char *string1, char *string2);

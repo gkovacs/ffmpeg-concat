@@ -25,7 +25,8 @@
 #include <time.h>
 
 // based on decode_thread() in ffplay.c
-int av_alloc_playelem(unsigned char *filename, PlayElem *pe)
+int av_alloc_playelem(unsigned char *filename,
+                      PlayElem *pe)
 {
     AVFormatContext *ic;
     AVFormatParameters *ap;
@@ -76,7 +77,8 @@ PlayElem* av_make_playelem(unsigned char *filename)
     return pe;
 }
 
-PlaylistD* av_make_playlistd(unsigned char **flist, int flist_len)
+PlaylistD* av_make_playlistd(unsigned char **flist,
+                             int flist_len)
 {
     int i;
     PlaylistD *playld = av_malloc(sizeof(PlaylistD));
@@ -138,7 +140,9 @@ char* buf_getline(ByteIOContext *s)
     return oq;
 }
 
-void split_wd_fn(char *filepath, char **workingdir, char **filename)
+void split_wd_fn(char *filepath,
+                 char **workingdir,
+                 char **filename)
 {
     char *ofp;
     char *cofp;
@@ -160,7 +164,8 @@ void split_wd_fn(char *filepath, char **workingdir, char **filename)
     (*filename)[cofp-lslash] = 0;
 }
 
-int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
+int playlist_populate_context(PlaylistD *playld,
+                              AVFormatContext *s)
 {
     int i;
 //    unsigned int stream_offset;
@@ -222,21 +227,24 @@ int playlist_populate_context(PlaylistD *playld, AVFormatContext *s)
     s->raw_packet_buffer_end = ic->raw_packet_buffer_end;
     s->packet_buffer_end = ic->packet_buffer_end;
     s->metadata = ic->metadata;
-    /*
-    s->iformat->name = ic->iformat->name;
-    s->iformat->long_name = ic->iformat->long_name;
-    s->iformat->priv_data_size = ic->iformat->priv_data_size;
-    s->iformat->flags = ic->iformat->flags;
-    s->iformat->extensions = ic->iformat->extensions;
-    s->iformat->value = ic->iformat->value;
-    s->iformat->codec_tag = ic->iformat->codec_tag;
-    s->iformat->metadata_conv = ic->iformat->metadata_conv;
-//    s->iformat->next = ic->iformat->next;
-     */
     return 0;
 }
 
-int check_file_extn(char *cch, char *extn) {
+int compare_bufs(unsigned char *buf,
+                 unsigned char *rbuf)
+{
+    while (*rbuf != 0) {
+        if (*rbuf != *buf)
+            return 0;
+        ++buf;
+        ++rbuf;
+    }
+    return 1;
+}
+
+int check_file_extn(char *cch,
+                    char *extn)
+{
     int pos;
     int extnl;
     pos = -1;

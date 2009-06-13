@@ -35,27 +35,15 @@ static const AVCodecTag codec_m3u_tags[] = {
     { 0, 0 },
 };
 
-static int compare_bufs(unsigned char *buf,
-                        unsigned char *rbuf)
-{
-    while (*rbuf != 0) {
-        if (*rbuf != *buf)
-            return 0;
-        ++buf;
-        ++rbuf;
-    }
-    return 1;
-}
-
 static int m3u_probe(AVProbeData *p)
 {
-    if (p->buf_size >= 7 && p->buf != 0) {
+    if (p->buf != 0) {
         if (compare_bufs(p->buf, "#EXTM3U"))
             return AVPROBE_SCORE_MAX;
         else
             return 0;
     }
-    if (check_file_extn(p->filename, "m3u"))
+    if (match_ext(p->filename, "m3u"))
         return AVPROBE_SCORE_MAX/2;
     else
         return 0;
