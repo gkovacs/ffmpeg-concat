@@ -89,7 +89,9 @@ PlaylistD* ff_make_playlistd(unsigned char **flist,
     return playld;
 }
 
-char* ff_conc_strings(char *string1, char *string2) {
+char* ff_conc_strings(char *string1,
+                      char *string2)
+{
     char *str1;
     char *str2;
     char *str;
@@ -141,8 +143,8 @@ char* ff_buf_getline(ByteIOContext *s)
 }
 
 void ff_split_wd_fn(char *filepath,
-                 char **workingdir,
-                 char **filename)
+                    char **workingdir,
+                    char **filename)
 {
     char *ofp;
     char *cofp;
@@ -165,7 +167,7 @@ void ff_split_wd_fn(char *filepath,
 }
 
 int ff_playlist_populate_context(PlaylistD *playld,
-                              AVFormatContext *s)
+                                 AVFormatContext *s)
 {
     int i;
 //    unsigned int stream_offset;
