@@ -133,6 +133,7 @@ const AVCodecTag codec_bmp_tags[] = {
     { CODEC_ID_FFVHUFF,      MKTAG('F', 'F', 'V', 'H') },
     { CODEC_ID_CYUV,         MKTAG('C', 'Y', 'U', 'V') },
     { CODEC_ID_RAWVIDEO,     MKTAG( 0 ,  0 ,  0 ,  0 ) },
+    { CODEC_ID_RAWVIDEO,     MKTAG( 3 ,  0 ,  0 ,  0 ) },
     { CODEC_ID_RAWVIDEO,     MKTAG('I', '4', '2', '0') },
     { CODEC_ID_RAWVIDEO,     MKTAG('Y', 'U', 'Y', '2') },
     { CODEC_ID_RAWVIDEO,     MKTAG('Y', '4', '2', '2') },
@@ -212,6 +213,7 @@ const AVCodecTag codec_bmp_tags[] = {
     { CODEC_ID_SP5X,         MKTAG('S', 'P', '5', '4') },
     { CODEC_ID_AURA,         MKTAG('A', 'U', 'R', 'A') },
     { CODEC_ID_AURA2,        MKTAG('A', 'U', 'R', '2') },
+    { CODEC_ID_DPX,          MKTAG('d', 'p', 'x', ' ') },
     { CODEC_ID_NONE,         0 }
 };
 
@@ -253,6 +255,7 @@ const AVCodecTag codec_wav_tags[] = {
     { CODEC_ID_DTS,             0x2001 },
     { CODEC_ID_SONIC,           0x2048 },
     { CODEC_ID_SONIC_LS,        0x2048 },
+    { CODEC_ID_PCM_MULAW,       0x6c75 },
     { CODEC_ID_AAC,             0x706d },
     { CODEC_ID_AAC,             0x4143 },
     { CODEC_ID_FLAC,            0xF1AC },

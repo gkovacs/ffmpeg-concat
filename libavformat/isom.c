@@ -117,6 +117,7 @@ const AVCodecTag codec_movvideo_tags[] = {
     { CODEC_ID_H264, MKTAG('a', 'v', 'c', '1') }, /* AVC-1/H.264 */
 
     { CODEC_ID_MPEG1VIDEO, MKTAG('m', 'p', 'e', 'g') }, /* MPEG */
+    { CODEC_ID_MPEG1VIDEO, MKTAG('m', '1', 'v', '1') },
     { CODEC_ID_MPEG2VIDEO, MKTAG('h', 'd', 'v', '1') }, /* MPEG2 HDV 720p30 */
     { CODEC_ID_MPEG2VIDEO, MKTAG('h', 'd', 'v', '2') }, /* MPEG2 HDV 1080i60 */
     { CODEC_ID_MPEG2VIDEO, MKTAG('h', 'd', 'v', '3') }, /* MPEG2 HDV 1080i50 */
@@ -153,6 +154,7 @@ const AVCodecTag codec_movvideo_tags[] = {
     { CODEC_ID_MPEG2VIDEO, MKTAG('x', 'd', 'v', 'e') }, /* XDCAM EX 1080p25 VBR */
     { CODEC_ID_MPEG2VIDEO, MKTAG('x', 'd', 'v', 'f') }, /* XDCAM EX 1080p30 VBR */
     { CODEC_ID_MPEG2VIDEO, MKTAG('A', 'V', 'm', 'p') }, /* AVID IMX PAL */
+    { CODEC_ID_MPEG2VIDEO, MKTAG('m', '2', 'v', '1') },
 
     { CODEC_ID_JPEG2000, MKTAG('m', 'j', 'p', '2') }, /* JPEG 2000 produced by FCP */
 
@@ -167,6 +169,7 @@ const AVCodecTag codec_movvideo_tags[] = {
     { CODEC_ID_DIRAC, MKTAG('d', 'r', 'a', 'c') },
     { CODEC_ID_DNXHD, MKTAG('A', 'V', 'd', 'n') }, /* AVID DNxHD */
     { CODEC_ID_SGI,   MKTAG('s', 'g', 'i', ' ') }, /* SGI  */
+    { CODEC_ID_DPX,   MKTAG('d', 'p', 'x', ' ') }, /* DPX */
 
     { CODEC_ID_NONE, 0 },
 };
@@ -199,6 +202,7 @@ const AVCodecTag codec_movaudio_tags[] = {
 
     { CODEC_ID_AAC, MKTAG('m', 'p', '4', 'a') }, /* MPEG-4 AAC */
     { CODEC_ID_AC3, MKTAG('a', 'c', '-', '3') }, /* ETSI TS 102 366 Annex F */
+    { CODEC_ID_AC3, MKTAG('s', 'a', 'c', '3') }, /* Nero Recode */
 
     { CODEC_ID_AMR_NB, MKTAG('s', 'a', 'm', 'r') }, /* AMR-NB 3gp */
     { CODEC_ID_AMR_WB, MKTAG('s', 'a', 'w', 'b') }, /* AMR-WB 3gp */
@@ -207,6 +211,7 @@ const AVCodecTag codec_movaudio_tags[] = {
     { CODEC_ID_ALAC, MKTAG('a', 'l', 'a', 'c') }, /* Apple Lossless */
 
     { CODEC_ID_QCELP, MKTAG('Q','c','l','p') },
+    { CODEC_ID_QCELP, MKTAG('Q','c','l','q') },
     { CODEC_ID_QCELP, MKTAG('s','q','c','p') }, /* ISO Media fourcc */
 
     { CODEC_ID_QDM2, MKTAG('Q', 'D', 'M', '2') }, /* QDM2 */
