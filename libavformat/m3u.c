@@ -34,7 +34,7 @@ static const AVCodecTag codec_m3u_tags[] = {
 static int m3u_probe(AVProbeData *p)
 {
     if (p->buf != 0) {
-        if (compare_bufs(p->buf, "#EXTM3U"))
+        if (!strncmp(p->buf, "#EXTM3U", 7))
             return AVPROBE_SCORE_MAX;
         else
             return 0;
@@ -56,7 +56,7 @@ static int m3u_list_files(ByteIOContext *s,
     i = 0;
     ofl = av_malloc(sizeof(char*) * bufsize);
     while (1) {
-        char *c = buf_getline(s);
+        char *c = ff_buf_getline(s);
         if (c == NULL) // EOF
             break;
         if (*c == 0) // hashed out
@@ -72,7 +72,7 @@ static int m3u_list_files(ByteIOContext *s,
     ofl[i] = 0;
     while (*ofl != 0) { // determine if relative paths
         FILE *file;
-        char *fullfpath = conc_strings(workingdir, *ofl);
+        char *fullfpath = ff_conc_strings(workingdir, *ofl);
         file = fopen(fullfpath, "r");
         if (file) {
             fclose(file);
@@ -88,7 +88,7 @@ static int m3u_read_header(AVFormatContext *s,
 {
     printf("m3u read header called\n");
     PlaylistD *playld = av_malloc(sizeof(PlaylistD));
-    split_wd_fn(s->filename,
+    ff_split_wd_fn(s->filename,
                 &playld->workingdir,
                 &playld->filename);
     m3u_list_files(s->pb,
@@ -100,7 +100,7 @@ static int m3u_read_header(AVFormatContext *s,
     memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));
     playld->pe_curidx = 0;
     s->priv_data = playld;
-    playlist_populate_context(playld, s);
+    ff_playlist_populate_context(playld, s);
     return 0;
 }
 
@@ -124,7 +124,7 @@ static int m3u_read_packet(AVFormatContext *s,
         ++playld->pe_curidx;
 //        pkt->destruct(pkt);
         pkt = av_malloc(sizeof(AVPacket));
-        playlist_populate_context(playld, s);
+        ff_playlist_populate_context(playld, s);
         goto retr;
     }
     return ret;

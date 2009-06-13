@@ -25,7 +25,7 @@
 #include <time.h>
 
 // based on decode_thread() in ffplay.c
-int av_alloc_playelem(unsigned char *filename,
+int ff_alloc_playelem(unsigned char *filename,
                       PlayElem *pe)
 {
     AVFormatContext *ic;
@@ -45,11 +45,11 @@ int av_alloc_playelem(unsigned char *filename,
     return 0;
 }
 
-PlayElem* av_make_playelem(unsigned char *filename)
+PlayElem* ff_make_playelem(unsigned char *filename)
 {
     int err;
     PlayElem *pe = av_malloc(sizeof(PlayElem));
-    err = av_alloc_playelem(filename, pe);
+    err = ff_alloc_playelem(filename, pe);
     if (err < 0)
         print_error("during-av_alloc_playelem", err);
     err = av_open_input_file(&(pe->ic), pe->filename, pe->fmt, pe->buf_size, pe->ap);
@@ -77,7 +77,7 @@ PlayElem* av_make_playelem(unsigned char *filename)
     return pe;
 }
 
-PlaylistD* av_make_playlistd(unsigned char **flist,
+PlaylistD* ff_make_playlistd(unsigned char **flist,
                              int flist_len)
 {
     int i;
@@ -89,7 +89,7 @@ PlaylistD* av_make_playlistd(unsigned char **flist,
     return playld;
 }
 
-char* conc_strings(char *string1, char *string2) {
+char* ff_conc_strings(char *string1, char *string2) {
     char *str1;
     char *str2;
     char *str;
@@ -110,7 +110,7 @@ char* conc_strings(char *string1, char *string2) {
     return (str-string1)+str1;
 }
 
-char* buf_getline(ByteIOContext *s)
+char* ff_buf_getline(ByteIOContext *s)
 {
     char *q;
     char *oq;
@@ -140,7 +140,7 @@ char* buf_getline(ByteIOContext *s)
     return oq;
 }
 
-void split_wd_fn(char *filepath,
+void ff_split_wd_fn(char *filepath,
                  char **workingdir,
                  char **filename)
 {
@@ -164,7 +164,7 @@ void split_wd_fn(char *filepath,
     (*filename)[cofp-lslash] = 0;
 }
 
-int playlist_populate_context(PlaylistD *playld,
+int ff_playlist_populate_context(PlaylistD *playld,
                               AVFormatContext *s)
 {
     int i;
@@ -172,7 +172,7 @@ int playlist_populate_context(PlaylistD *playld,
     AVFormatContext *ic;
     AVFormatParameters *nap;
     printf("playlist_populate_context called\n");
-    playld->pelist[playld->pe_curidx] = av_make_playelem(playld->flist[playld->pe_curidx]);
+    playld->pelist[playld->pe_curidx] = ff_make_playelem(playld->flist[playld->pe_curidx]);
     ic = playld->pelist[playld->pe_curidx]->ic;
     nap = playld->pelist[playld->pe_curidx]->ap;
     ic->iformat->read_header(ic, 0);
@@ -230,19 +230,7 @@ int playlist_populate_context(PlaylistD *playld,
     return 0;
 }
 
-int compare_bufs(unsigned char *buf,
-                 unsigned char *rbuf)
-{
-    while (*rbuf != 0) {
-        if (*rbuf != *buf)
-            return 0;
-        ++buf;
-        ++rbuf;
-    }
-    return 1;
-}
-
-unsigned int get_stream_offset(AVFormatContext *s)
+unsigned int ff_get_stream_offset(AVFormatContext *s)
 {
     PlaylistD *playld;
     int i;

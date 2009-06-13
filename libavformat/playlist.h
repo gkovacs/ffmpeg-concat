@@ -43,20 +43,16 @@ typedef struct PlaylistD {
     char *filename;
 } PlaylistD;
 
-int av_open_input_playelem(PlayElem *pe);
+PlayElem* ff_make_playelem(unsigned char *filename);
 
-PlayElem* av_make_playelem(unsigned char *filename);
+PlaylistD* ff_make_playlistd(unsigned char **flist, int flist_len);
 
-PlaylistD* av_make_playlistd(unsigned char **flist, int flist_len);
+int ff_playlist_populate_context(PlaylistD *playld, AVFormatContext *s);
 
-int compare_bufs(unsigned char *buf, unsigned char *rbuf);
+char* ff_conc_strings(char *string1, char *string2);
 
-int playlist_populate_context(PlaylistD *playld, AVFormatContext *s);
+char* ff_buf_getline(ByteIOContext *s);
 
-char* conc_strings(char *string1, char *string2);
+void ff_split_wd_fn(char *filepath, char **workingdir, char **filename);
 
-char* buf_getline(ByteIOContext *s);
-
-void split_wd_fn(char *filepath, char **workingdir, char **filename);
-
-unsigned int get_stream_offset(AVFormatContext *s);
+unsigned int ff_get_stream_offset(AVFormatContext *s);
