@@ -119,7 +119,8 @@ static int m3u_read_packet(AVFormatContext *s,
 //    if (pkt) {
 //        pkt->stream_index += get_stream_offset(s);
 //    }
-    if (ret < 0 && playld->pe_curidx < playld->pelist_size - 1)
+    // TODO switch from AVERROR_EOF to AVERROR_EOS
+    if (ret == AVERROR_EOF && playld->pe_curidx < playld->pelist_size - 1)
     {
         ++playld->pe_curidx;
 //        pkt->destruct(pkt);

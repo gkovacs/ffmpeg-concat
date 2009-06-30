@@ -179,6 +179,31 @@ int ff_playlist_populate_context(PlaylistD *playld,
     nap = playld->pelist[playld->pe_curidx]->ap;
     ic->iformat->read_header(ic, 0);
 //    stream_offset = get_stream_offset(s);
+    /*
+    for(i=0;i<ic->nb_streams;i++) {
+//        ist = ist_table[i];
+//        if (ist->decoding_needed) {
+            if (!ic->streams[i]->codec->codec)
+                ic->streams[i]->codec->codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
+            if (!ic->streams[i]->codec->codec) {
+                fprintf(stderr, "Decoder (codec id %d) not found for input file %s stream %d\n",
+                        ic->streams[i]->codec->codec_id, playld->flist[playld->pe_curidx], i);
+//                return AVERROR(EINVAL);
+//                ret = AVERROR(EINVAL);
+//                goto dump_format;
+            }
+            if (avcodec_open(ic->streams[i]->codec, ic->streams[i]->codec->codec) < 0) {
+                fprintf(stderr, "Error while opening decoder for input file %s stream %d\n",
+                        playld->flist[playld->pe_curidx], i);
+//                return AVERROR(EINVAL);
+//                ret = AVERROR(EINVAL);
+//                goto dump_format;
+            }
+            //if (ist->st->codec->codec_type == CODEC_TYPE_VIDEO)
+            //    ist->st->codec->flags |= CODEC_FLAG_REPEAT_FIELD;
+//        }
+    }
+     */
     s->nb_streams = ic->nb_streams;
 //    s->nb_streams = ic->nb_streams + stream_offset;
     for (i = 0; i < ic->nb_streams; ++i) {
