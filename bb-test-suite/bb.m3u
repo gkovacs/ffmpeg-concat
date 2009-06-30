@@ -3,6 +3,8 @@
 #/home/geza/ffmpeg/bb-test-suite/bb2-h264.avi
 #bb3-h264.avi
 bb1.avi
+bb-full.avi
+#bb-full.mpg
 /home/geza/ffmpeg/bb-test-suite/bb2.avi
 bb3.avi
 #/home/geza/ffmpeg/bb-test-suite/bb1.mkv

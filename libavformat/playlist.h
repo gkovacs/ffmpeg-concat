@@ -41,6 +41,10 @@ typedef struct PlaylistD {
     int ch_curidx;
     char *workingdir;
     char *filename;
+    int64_t pts_offset;
+    int64_t dts_offset;
+    int64_t pts_prevpacket;
+    int64_t dts_prevpacket;
 } PlaylistD;
 
 PlayElem* ff_make_playelem(unsigned char *filename);

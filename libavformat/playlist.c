@@ -82,6 +82,10 @@ PlaylistD* ff_make_playlistd(unsigned char **flist,
 {
     int i;
     PlaylistD *playld = av_malloc(sizeof(PlaylistD));
+    playld->pts_offset = 0;
+    playld->dts_offset = 0;
+    playld->pts_prevpacket = 0;
+    playld->dts_prevpacket = 0;
     playld->pe_curidx = 0;
     playld->pelist_size = flist_len;
     playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
