@@ -45,7 +45,7 @@ int ff_alloc_playelem(unsigned char *filename,
     return 0;
 }
 
-PlayElem* ff_make_playelem(unsigned char *filename)
+PlayElem* ff_make_playelem(char *filename)
 {
     int err;
     PlayElem *pe = av_malloc(sizeof(PlayElem));
@@ -77,19 +77,17 @@ PlayElem* ff_make_playelem(unsigned char *filename)
     return pe;
 }
 
-PlaylistD* ff_make_playlistd(unsigned char **flist,
-                             int flist_len)
+PlaylistD* ff_make_playlistd(char *filename)
 {
-    int i;
     PlaylistD *playld = av_malloc(sizeof(PlaylistD));
     playld->pts_offset = 0;
     playld->dts_offset = 0;
     playld->pts_prevpacket = 0;
     playld->dts_prevpacket = 0;
     playld->pe_curidx = 0;
-    playld->pelist_size = flist_len;
-    playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
-    memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));
+    ff_split_wd_fn(filename,
+                   &playld->workingdir,
+                   &playld->filename);
     return playld;
 }
 

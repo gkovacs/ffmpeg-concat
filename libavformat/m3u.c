@@ -87,18 +87,13 @@ static int m3u_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
     printf("m3u read header called\n");
-    PlaylistD *playld = av_malloc(sizeof(PlaylistD));
-    ff_split_wd_fn(s->filename,
-                &playld->workingdir,
-                &playld->filename);
+    PlaylistD *playld = ff_make_playlistd(s->filename);
     m3u_list_files(s->pb,
                    &(playld->flist),
                    &(playld->pelist_size),
                    playld->workingdir);
-//    playld = av_make_playlistd(flist, flist_len);
     playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
     memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));
-    playld->pe_curidx = 0;
     s->priv_data = playld;
     ff_playlist_populate_context(playld, s);
     return 0;
