@@ -102,9 +102,7 @@ static int m3u_read_header(AVFormatContext *s,
 static int m3u_read_packet(AVFormatContext *s,
                            AVPacket *pkt)
 {
-    int i;
     int ret;
-    int time_offset = 0;
     PlaylistD *playld;
     AVFormatContext *ic;
     playld = s->priv_data;
@@ -112,77 +110,32 @@ static int m3u_read_packet(AVFormatContext *s,
     ic = playld->pelist[playld->pe_curidx]->ic;
     ret = ic->iformat->read_packet(ic, pkt);
     if (ret >= 0) {
-//        if (pkt) {
             // TODO storing previous packet pts/dts is ugly hack
-//            playld->pts_prevpacket = pkt->pts;
-            if (pkt)
-                playld->dts_prevpacket = pkt->dts;
-
             // ic->stream[]->cur_dts correct
+            // ic->strea[]->duration correct
             // pkt->pts incorrect (huge negative)
-            // pkt->dts correct
+            // pkt->dts correct, depended on by ffmpeg (need to change)
             // ic->stream[]->pts incorrect (0)
             // ic->start_time always 0
             // changing ic->start_time has no effect
-            // changing pkt->dts screws stuff up
             // ic->duration correct, divide by AV_TIME_BASE to get seconds
-//            printf("cur dts is now %ld\n", pkt->dts);
-//            printf("cur pts is now %ld\n", ic->start_time);
-//            printf("cur dts is now %ld\n", ic->streams[0]->cur_dts);
-//            printf("dts is now %ld\n", ic->streams[0]->dts);
-//            pkt->pts += playld->pts_offset;
-//            pkt->dts = 400;
-
-            if (playld->pe_curidx > 0) {
-                printf("dts was formerly %ld\n", pkt->dts);
-                printf("offsetting dts by %ld\n", playld->dts_offset);
-                pkt->dts += playld->dts_offset;
-            }
-//            pkt->dts += playld->dts_offset;
-
-//            printf("new dts is %ld\n", pkt->dts);
-//            printf("dts offset is %ld\n", playld->dts_offset);
-//            printf("dts prevpacket is %ld\n", playld->dts_prevpacket);
-
-//            pkt->pts = pkt->dts;
-
-//            ic->streams[0]->cur_dts += playld->dts_offset;
-//            ic->streams[1]->cur_dts += playld->dts_offset;
-//        }
+        if (pkt) {
+            playld->dts_prevpacket = pkt->dts;
+            pkt->dts += playld->dts_offset;
+        }
     }
-//    if (pkt) {
-//        pkt->stream_index += get_stream_offset(s);
-//    }
     // TODO switch from AVERROR_EOF to AVERROR_EOS
     else if (ret == AVERROR_EOF && playld->pe_curidx < playld->pelist_size - 1) {
         // TODO account for out-of-sync audio/video by using per-stream offsets
-        printf("pts offset was %ld\n", playld->pts_offset);
-        printf("dts offset was %ld\n", playld->dts_offset);
-        printf("duration is %ld\n",ic->duration*100/AV_TIME_BASE);
-//        printf("duration is %ld\n", ic->duration/AV_TIME_BASE*ic->streams[0]->time_base.den/ic->streams[0]->time_base.num);
-//        printf("stream duration is %ld\n", ic->streams[0]->duration);
-
-//        if (playld->dts_prevpacket < 1000) {
-
-//        playld->pts_offset += playld->pts_prevpacket;
-            printf("dts_offset modified to %ld\n", playld->dts_offset);
-            printf("stream dts is %ld\n", ic->streams[0]->cur_dts);
-//            playld->dts_offset += ic->duration/AV_TIME_BASE*100;
-//        playld->dts_offset += playld->dts_prevpacket;
-            playld->dts_offset = 0;
-            for (i = 0; i <= playld->pe_curidx; ++i) {
-                playld->dts_offset += playld->pelist[i]->ic->streams[0]->duration;
-            }
-
-//        }
+        // using streams[]->duration slightly overestimates offset
+//        playld->dts_offset += ic->streams[0]->duration;
+        // using streams[]->cur_dts slightly overestimates offset
+//        playld->dts_offset += ic->streams[0]->cur_dts;
+        playld->dts_offset += playld->dts_prevpacket;
         ++playld->pe_curidx;
-        printf("pts offset is now %ld\n", playld->pts_offset);
-        printf("dts offset is now %ld\n", playld->dts_offset);
-        
 //        pkt->destruct(pkt);
         pkt = av_malloc(sizeof(AVPacket));
         ff_playlist_populate_context(playld, s);
-//        playld->pelist[playld->pe_curidx]->ic->start_time += playld->dts_offset;
         goto retr;
     }
     return ret;

@@ -80,9 +80,9 @@ PlayElem* ff_make_playelem(char *filename)
 PlaylistD* ff_make_playlistd(char *filename)
 {
     PlaylistD *playld = av_malloc(sizeof(PlaylistD));
-    playld->pts_offset = 0;
+//    playld->pts_offset = 0;
     playld->dts_offset = 0;
-    playld->pts_prevpacket = 0;
+//    playld->pts_prevpacket = 0;
     playld->dts_prevpacket = 0;
     playld->pe_curidx = 0;
     ff_split_wd_fn(filename,
@@ -172,7 +172,6 @@ int ff_playlist_populate_context(PlaylistD *playld,
                                  AVFormatContext *s)
 {
     int i;
-//    unsigned int stream_offset;
     AVFormatContext *ic;
     AVFormatParameters *nap;
     printf("playlist_populate_context called\n");
@@ -180,37 +179,9 @@ int ff_playlist_populate_context(PlaylistD *playld,
     ic = playld->pelist[playld->pe_curidx]->ic;
     nap = playld->pelist[playld->pe_curidx]->ap;
     ic->iformat->read_header(ic, 0);
-//    stream_offset = get_stream_offset(s);
-    /*
-    for(i=0;i<ic->nb_streams;i++) {
-//        ist = ist_table[i];
-//        if (ist->decoding_needed) {
-            if (!ic->streams[i]->codec->codec)
-                ic->streams[i]->codec->codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
-            if (!ic->streams[i]->codec->codec) {
-                fprintf(stderr, "Decoder (codec id %d) not found for input file %s stream %d\n",
-                        ic->streams[i]->codec->codec_id, playld->flist[playld->pe_curidx], i);
-//                return AVERROR(EINVAL);
-//                ret = AVERROR(EINVAL);
-//                goto dump_format;
-            }
-            if (avcodec_open(ic->streams[i]->codec, ic->streams[i]->codec->codec) < 0) {
-                fprintf(stderr, "Error while opening decoder for input file %s stream %d\n",
-                        playld->flist[playld->pe_curidx], i);
-//                return AVERROR(EINVAL);
-//                ret = AVERROR(EINVAL);
-//                goto dump_format;
-            }
-            //if (ist->st->codec->codec_type == CODEC_TYPE_VIDEO)
-            //    ist->st->codec->flags |= CODEC_FLAG_REPEAT_FIELD;
-//        }
-    }
-     */
     s->nb_streams = ic->nb_streams;
-//    s->nb_streams = ic->nb_streams + stream_offset;
     for (i = 0; i < ic->nb_streams; ++i) {
         s->streams[i] = ic->streams[i];
-//        s->streams[i+stream_offset] = ic->streams[i];
     }
     // TODO remove this ugly hack
     s->av_class = ic->av_class;
