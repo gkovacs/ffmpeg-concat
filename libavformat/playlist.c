@@ -79,11 +79,12 @@ PlayElem* ff_make_playelem(char *filename)
 
 PlaylistD* ff_make_playlistd(char *filename)
 {
+    int i;
     PlaylistD *playld = av_malloc(sizeof(PlaylistD));
-//    playld->pts_offset = 0;
-    playld->dts_offset = 0;
-//    playld->pts_prevpacket = 0;
-    playld->dts_prevpacket = 0;
+    playld->time_offsets_size = 2; // TODO don't assume we have just 2 streams
+    playld->time_offsets = av_malloc(sizeof(playld->time_offsets) * playld->time_offsets_size);
+    for (i = 0; i < playld->time_offsets_size; ++i)
+        playld->time_offsets[i] = 0;
     playld->pe_curidx = 0;
     ff_split_wd_fn(filename,
                    &playld->workingdir,
@@ -239,5 +240,40 @@ unsigned int ff_get_stream_offset(AVFormatContext *s)
     for (i = 0; i < playld->pe_curidx; ++i)
         snum += playld->pelist[i]->ic->nb_streams;
     return snum;
+}
+
+// converts duration to stream base
+int64_t ff_conv_stream_time(AVFormatContext *ic, int stream_index, int64_t avt_duration)
+{
+    int64_t durn;
+    durn = (int64_t)(
+           avt_duration /
+           AV_TIME_BASE *
+           ic->streams[stream_index]->time_base.den /
+           ic->streams[stream_index]->time_base.num)
+           ;
+    printf("conv stream time from %ld to %ld/%ld is %ld\n", avt_duration, ic->streams[stream_index]->time_base.num, ic->streams[stream_index]->time_base.den, durn);
+    return durn;
+}
+
+// returns duration in seconds * AV_TIME_BASE
+int64_t ff_get_duration(AVFormatContext *ic, int stream_index)
+{
+// TODO storing previous packet pts/dts is ugly hack
+// ic->stream[]->cur_dts correct
+// ic->strea[]->duration correct
+// pkt->pts incorrect (huge negative)
+// pkt->dts correct, depended on by ffmpeg (need to change)
+// ic->stream[]->pts incorrect (0)
+// ic->start_time always 0
+// changing ic->start_time has no effect
+// ic->duration correct, divide by AV_TIME_BASE to get seconds
+// h264 and mpeg1: pkt->dts values incorrect
+    int64_t durn;
+    durn = ic->duration;
+//    durn = (ic->duration / ic->streams[stream_index]->time_base.den) *
+//           (ic->streams[stream_index]->time_base.num  / AV_TIME_BASE);
+    printf("duration is %ld\n", durn);
+    return durn;
 }
 

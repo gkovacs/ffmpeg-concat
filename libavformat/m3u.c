@@ -102,6 +102,7 @@ static int m3u_read_header(AVFormatContext *s,
 static int m3u_read_packet(AVFormatContext *s,
                            AVPacket *pkt)
 {
+    int i;
     int ret;
     PlaylistD *playld;
     AVFormatContext *ic;
@@ -110,18 +111,8 @@ static int m3u_read_packet(AVFormatContext *s,
     ic = playld->pelist[playld->pe_curidx]->ic;
     ret = ic->iformat->read_packet(ic, pkt);
     if (ret >= 0) {
-            // TODO storing previous packet pts/dts is ugly hack
-            // ic->stream[]->cur_dts correct
-            // ic->strea[]->duration correct
-            // pkt->pts incorrect (huge negative)
-            // pkt->dts correct, depended on by ffmpeg (need to change)
-            // ic->stream[]->pts incorrect (0)
-            // ic->start_time always 0
-            // changing ic->start_time has no effect
-            // ic->duration correct, divide by AV_TIME_BASE to get seconds
         if (pkt) {
-            playld->dts_prevpacket = pkt->dts;
-            pkt->dts += playld->dts_offset;
+            pkt->dts += ff_conv_stream_time(ic, pkt->stream_index, playld->time_offsets[pkt->stream_index]);
         }
     }
     // TODO switch from AVERROR_EOF to AVERROR_EOS
@@ -131,7 +122,11 @@ static int m3u_read_packet(AVFormatContext *s,
 //        playld->dts_offset += ic->streams[0]->duration;
         // using streams[]->cur_dts slightly overestimates offset
 //        playld->dts_offset += ic->streams[0]->cur_dts;
-        playld->dts_offset += playld->dts_prevpacket;
+//        playld->dts_offset += playld->dts_prevpacket;
+        for (i = 0; i < ic->nb_streams && i < playld->time_offsets_size; ++i) {
+            playld->time_offsets[i] += ff_get_duration(ic, i);
+        }
+//        playld->dts_offset += ff_get_duration(ic, pkt->stream_index);
         ++playld->pe_curidx;
 //        pkt->destruct(pkt);
         pkt = av_malloc(sizeof(AVPacket));
