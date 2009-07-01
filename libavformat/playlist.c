@@ -235,19 +235,6 @@ int ff_playlist_populate_context(PlaylistD *playld,
     return 0;
 }
 
-/*
-unsigned int ff_get_stream_offset(AVFormatContext *s)
-{
-    PlaylistD *playld;
-    int i;
-    unsigned int snum = 0;
-    playld = s->priv_data;
-    for (i = 0; i < playld->pe_curidxs[0]; ++i)
-        snum += playld->pelist[i]->ic->nb_streams;
-    return snum;
-}
-*/
-
 // converts duration to stream base
 int64_t ff_conv_stream_time(AVFormatContext *ic, int stream_index, int64_t avt_duration)
 {
