@@ -85,7 +85,10 @@ PlaylistD* ff_make_playlistd(char *filename)
     playld->time_offsets = av_malloc(sizeof(playld->time_offsets) * playld->time_offsets_size);
     for (i = 0; i < playld->time_offsets_size; ++i)
         playld->time_offsets[i] = 0;
-    playld->pe_curidx = 0;
+    playld->pe_curidxs_size = 2; // TODO don't assume we have just 2 streams
+    playld->pe_curidxs = av_malloc(sizeof(playld->pe_curidxs) * playld->pe_curidxs_size);
+    for (i = 0; i < playld->pe_curidxs_size; ++i)
+        playld->pe_curidxs[i] = 0;
     ff_split_wd_fn(filename,
                    &playld->workingdir,
                    &playld->filename);
@@ -170,15 +173,16 @@ void ff_split_wd_fn(char *filepath,
 }
 
 int ff_playlist_populate_context(PlaylistD *playld,
-                                 AVFormatContext *s)
+                                 AVFormatContext *s,
+                                 int stream_index)
 {
     int i;
     AVFormatContext *ic;
     AVFormatParameters *nap;
     printf("playlist_populate_context called\n");
-    playld->pelist[playld->pe_curidx] = ff_make_playelem(playld->flist[playld->pe_curidx]);
-    ic = playld->pelist[playld->pe_curidx]->ic;
-    nap = playld->pelist[playld->pe_curidx]->ap;
+    playld->pelist[playld->pe_curidxs[stream_index]] = ff_make_playelem(playld->flist[playld->pe_curidxs[stream_index]]);
+    ic = playld->pelist[playld->pe_curidxs[stream_index]]->ic;
+    nap = playld->pelist[playld->pe_curidxs[stream_index]]->ap;
     ic->iformat->read_header(ic, 0);
     s->nb_streams = ic->nb_streams;
     for (i = 0; i < ic->nb_streams; ++i) {
@@ -231,16 +235,18 @@ int ff_playlist_populate_context(PlaylistD *playld,
     return 0;
 }
 
+/*
 unsigned int ff_get_stream_offset(AVFormatContext *s)
 {
     PlaylistD *playld;
     int i;
     unsigned int snum = 0;
     playld = s->priv_data;
-    for (i = 0; i < playld->pe_curidx; ++i)
+    for (i = 0; i < playld->pe_curidxs[0]; ++i)
         snum += playld->pelist[i]->ic->nb_streams;
     return snum;
 }
+*/
 
 // converts duration to stream base
 int64_t ff_conv_stream_time(AVFormatContext *ic, int stream_index, int64_t avt_duration)

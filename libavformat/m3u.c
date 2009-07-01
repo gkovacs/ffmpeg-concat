@@ -86,7 +86,7 @@ static int m3u_list_files(ByteIOContext *s,
 static int m3u_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
-    printf("m3u read header called\n");
+    int i;
     PlaylistD *playld = ff_make_playlistd(s->filename);
     m3u_list_files(s->pb,
                    &(playld->flist),
@@ -95,7 +95,9 @@ static int m3u_read_header(AVFormatContext *s,
     playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
     memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));
     s->priv_data = playld;
-    ff_playlist_populate_context(playld, s);
+    for (i = 0; i < playld->pe_curidxs_size; ++i) {
+        ff_playlist_populate_context(playld, s, i);
+    }
     return 0;
 }
 
@@ -104,12 +106,18 @@ static int m3u_read_packet(AVFormatContext *s,
 {
     int i;
     int ret;
+    int stream_index;
     PlaylistD *playld;
     AVFormatContext *ic;
     playld = s->priv_data;
+    stream_index = 0;
     retr:
-    ic = playld->pelist[playld->pe_curidx]->ic;
+    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
     ret = ic->iformat->read_packet(ic, pkt);
+    if (pkt) {
+        stream_index = pkt->stream_index;
+        ic = playld->pelist[playld->pe_curidxs[stream_index]]->ic;
+    }
     if (ret >= 0) {
         if (pkt) {
             pkt->dts += ff_conv_stream_time(ic, pkt->stream_index, playld->time_offsets[pkt->stream_index]);
@@ -117,7 +125,7 @@ static int m3u_read_packet(AVFormatContext *s,
     }
     // TODO switch from AVERROR_EOF to AVERROR_EOS
     // -32 AVERROR_EOF for avi, -51 for ogg
-    else if (ret < 0 && playld->pe_curidx < playld->pelist_size - 1) {
+    else if (ret < 0 && playld->pe_curidxs[stream_index] < playld->pelist_size - 1) {
         // TODO account for out-of-sync audio/video by using per-stream offsets
         // using streams[]->duration slightly overestimates offset
 //        playld->dts_offset += ic->streams[0]->duration;
@@ -128,10 +136,12 @@ static int m3u_read_packet(AVFormatContext *s,
         for (i = 0; i < ic->nb_streams && i < playld->time_offsets_size; ++i) {
             playld->time_offsets[i] += ff_get_duration(ic, i);
         }
-        ++playld->pe_curidx;
+        ++playld->pe_curidxs[stream_index];
 //        pkt->destruct(pkt);
         pkt = av_malloc(sizeof(AVPacket));
-        ff_playlist_populate_context(playld, s);
+//        for (i = 0; i < playld->pe_curidxs_size; ++i) {
+            ff_playlist_populate_context(playld, s, stream_index);
+//        }
         goto retr;
     }
     else {
@@ -148,7 +158,7 @@ static int m3u_read_seek(AVFormatContext *s,
     PlaylistD *playld;
     AVFormatContext *ic;
     playld = s->priv_data;
-    ic = playld->pelist[playld->pe_curidx]->ic;
+    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
     ic->iformat->read_seek(ic, stream_index, pts, flags);
 }
 
@@ -158,7 +168,7 @@ static int m3u_read_play(AVFormatContext *s)
     PlaylistD *playld;
     AVFormatContext *ic;
     playld = s->priv_data;
-    ic = playld->pelist[playld->pe_curidx]->ic;
+    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
     return av_read_play(ic);
 }
 
@@ -168,7 +178,7 @@ static int m3u_read_pause(AVFormatContext *s)
     PlaylistD *playld;
     AVFormatContext *ic;
     playld = s->priv_data;
-    ic = playld->pelist[playld->pe_curidx]->ic;
+    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
     return av_read_pause(ic);
 }
 
@@ -178,7 +188,7 @@ static int m3u_read_close(AVFormatContext *s)
     PlaylistD *playld;
     AVFormatContext *ic;
     playld = s->priv_data;
-    ic = playld->pelist[playld->pe_curidx]->ic;
+    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
     if (ic->iformat->read_close)
         return ic->iformat->read_close(ic);
     return 0;
@@ -193,7 +203,7 @@ static int m3u_read_timestamp(AVFormatContext *s,
     PlaylistD *playld;
     AVFormatContext *ic;
     playld = s->priv_data;
-    ic = playld->pelist[playld->pe_curidx]->ic;
+    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
     if (ic->iformat->read_timestamp)
         return ic->iformat->read_timestamp(ic, stream_index, pos, pos_limit);
     return 0;

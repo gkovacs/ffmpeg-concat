@@ -35,7 +35,9 @@ typedef struct PlaylistD {
 //    int flist_len;
     PlayElem **pelist;
     int pelist_size;
-    int pe_curidx;
+    int *pe_curidxs;
+    int pe_curidxs_size;
+//    int pe_curidx;
     AVChapter **chlist;
     int chlist_size;
     int ch_curidx;
@@ -43,17 +45,13 @@ typedef struct PlaylistD {
     char *filename;
     int64_t *time_offsets;
     int time_offsets_size;
-//    int64_t pts_offset;
-//    int64_t dts_offset;
-//    int64_t pts_prevpacket;
-//    int64_t dts_prevpacket;
 } PlaylistD;
 
 PlayElem* ff_make_playelem(char *filename);
 
 PlaylistD* ff_make_playlistd(char *filename);
 
-int ff_playlist_populate_context(PlaylistD *playld, AVFormatContext *s);
+int ff_playlist_populate_context(PlaylistD *playld, AVFormatContext *s, int stream_index);
 
 char* ff_conc_strings(char *string1, char *string2);
 
@@ -61,7 +59,7 @@ char* ff_buf_getline(ByteIOContext *s);
 
 void ff_split_wd_fn(char *filepath, char **workingdir, char **filename);
 
-unsigned int ff_get_stream_offset(AVFormatContext *s);
+//unsigned int ff_get_stream_offset(AVFormatContext *s);
 
 int64_t ff_conv_stream_time(AVFormatContext *ic, int stream_index, int64_t avt_duration);
 
