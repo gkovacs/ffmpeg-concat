@@ -116,22 +116,26 @@ static int m3u_read_packet(AVFormatContext *s,
         }
     }
     // TODO switch from AVERROR_EOF to AVERROR_EOS
-    else if (ret == AVERROR_EOF && playld->pe_curidx < playld->pelist_size - 1) {
+    // -32 AVERROR_EOF for avi, -51 for ogg
+    else if (ret < 0 && playld->pe_curidx < playld->pelist_size - 1) {
         // TODO account for out-of-sync audio/video by using per-stream offsets
         // using streams[]->duration slightly overestimates offset
 //        playld->dts_offset += ic->streams[0]->duration;
         // using streams[]->cur_dts slightly overestimates offset
 //        playld->dts_offset += ic->streams[0]->cur_dts;
 //        playld->dts_offset += playld->dts_prevpacket;
+        printf("switching streams\n");
         for (i = 0; i < ic->nb_streams && i < playld->time_offsets_size; ++i) {
             playld->time_offsets[i] += ff_get_duration(ic, i);
         }
-//        playld->dts_offset += ff_get_duration(ic, pkt->stream_index);
         ++playld->pe_curidx;
 //        pkt->destruct(pkt);
         pkt = av_malloc(sizeof(AVPacket));
         ff_playlist_populate_context(playld, s);
         goto retr;
+    }
+    else {
+        printf("avpacket ret is %d\n", ret);
     }
     return ret;
 }

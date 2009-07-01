@@ -247,12 +247,12 @@ int64_t ff_conv_stream_time(AVFormatContext *ic, int stream_index, int64_t avt_d
 {
     int64_t durn;
     durn = (int64_t)(
-           avt_duration /
-           AV_TIME_BASE *
-           ic->streams[stream_index]->time_base.den /
-           ic->streams[stream_index]->time_base.num)
-           ;
-    printf("conv stream time from %ld to %ld/%ld is %ld\n", avt_duration, ic->streams[stream_index]->time_base.num, ic->streams[stream_index]->time_base.den, durn);
+           (double)avt_duration / //double casting may be unnecessary
+           ic->streams[stream_index]->time_base.num /
+           (AV_TIME_BASE / // 10^6
+           ic->streams[stream_index]->time_base.den)
+           );
+    printf("%s conv stream time from %ld to %ld/%ld is %ld\n", ic->iformat->name, avt_duration, ic->streams[stream_index]->time_base.num, ic->streams[stream_index]->time_base.den, durn);
     return durn;
 }
 
@@ -271,8 +271,7 @@ int64_t ff_get_duration(AVFormatContext *ic, int stream_index)
 // h264 and mpeg1: pkt->dts values incorrect
     int64_t durn;
     durn = ic->duration;
-//    durn = (ic->duration / ic->streams[stream_index]->time_base.den) *
-//           (ic->streams[stream_index]->time_base.num  / AV_TIME_BASE);
+//    durn = ic->streams[stream_index]->duration; // ogg gives wrong value
     printf("duration is %ld\n", durn);
     return durn;
 }
