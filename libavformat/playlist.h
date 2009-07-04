@@ -20,7 +20,7 @@
  */
 
 #ifndef _PLAYLIST_H
-#define	_PLAYLIST_H
+#define _PLAYLIST_H
 
 #include "avformat.h"
 #include "riff.h"

@@ -20,7 +20,7 @@
  */
 
 #ifndef _CONCATGEN_H
-#define	_CONCATGEN_H
+#define _CONCATGEN_H
 
 #include "playlist.h"
 
@@ -36,5 +36,5 @@ int concatgen_read_play(AVFormatContext *s);
 
 int concatgen_read_pause(AVFormatContext *s);
 
-#endif	/* _CONCATGEN_H */
+#endif /* _CONCATGEN_H */
 
