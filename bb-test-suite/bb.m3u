@@ -1,7 +1,7 @@
 #EXTM3U
-/home/geza/ffmpeg/bb-test-suite/bb1-h264.avi
-/home/geza/ffmpeg/bb-test-suite/bb2-h264.avi
-bb3-h264.avi
+#/home/geza/ffmpeg/bb-test-suite/bb1-h264.avi
+#/home/geza/ffmpeg/bb-test-suite/bb2-h264.avi
+#bb3-h264.avi
 #bb1.avi
 #bb-full.avi
 #bb-full.mpg
@@ -19,9 +19,9 @@ bb3-h264.avi
 #bb7.avi
 #bb8.avi
 #bb9.avi
-#/home/geza/ffmpeg/bb-test-suite/bb7.mp4
-#/home/geza/ffmpeg/bb-test-suite/bb8.mp4
-#/home/geza/ffmpeg/bb-test-suite/bb9.mp4
+/home/geza/ffmpeg/bb-test-suite/bb7.mp4
+/home/geza/ffmpeg/bb-test-suite/bb8.mp4
+/home/geza/ffmpeg/bb-test-suite/bb9.mp4
 #/home/geza/ffmpeg/bb-test-suite/bb10.ogg
 #bb10-h264.avi
 #/home/geza/ffmpeg/bb-test-suite/bb11.ogg
