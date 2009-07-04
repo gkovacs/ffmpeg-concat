@@ -56,7 +56,7 @@ PlayElem* ff_make_playelem(char *filename);
 
 PlaylistC* ff_make_playlistc(char *filename);
 
-int ff_playlist_populate_context(PlaylistC *playld, AVFormatContext *s, int stream_index);
+int ff_playlist_populate_context(PlaylistC *playlc, AVFormatContext *s, int stream_index);
 
 char* ff_conc_strings(char *string1, char *string2);
 
