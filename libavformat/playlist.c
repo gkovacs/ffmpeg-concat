@@ -235,29 +235,6 @@ int ff_playlist_populate_context(PlaylistContext *ctx,
     return 0;
 }
 
-// converts duration to stream base
-int64_t ff_conv_stream_time(AVFormatContext *ic, int stream_index, int64_t avt_duration)
-{
-    int64_t durn;
-    AVRational avtimebase;
-    avtimebase.num = 1;
-    avtimebase.den = AV_TIME_BASE;
-    durn = av_rescale_q(avt_duration, avtimebase, ic->streams[stream_index]->time_base);
-    printf("%s conv stream time from %ld to %ld/%ld is %ld\n", ic->iformat->name, avt_duration, ic->streams[stream_index]->time_base.num, ic->streams[stream_index]->time_base.den, durn);
-    return durn;
-}
-
-// converts duration to AV_TIME_BASE
-int64_t ff_conv_base_time(AVFormatContext *ic, int stream_index, int64_t stream_duration)
-{
-    int64_t durn;
-    AVRational avtimebase;
-    avtimebase.num = 1;
-    avtimebase.den = AV_TIME_BASE;
-    durn = av_rescale_q(stream_duration, ic->streams[stream_index]->time_base, avtimebase);
-    return durn;
-}
-
 // returns duration in seconds * AV_TIME_BASE
 int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index)
 {
@@ -274,7 +251,8 @@ int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index)
     int64_t durn;
 
 //    durn = ic->duration;
-    durn = ff_conv_base_time(ic, stream_index, ic->streams[stream_index]->duration);
+    AVRational avbasetime = {1, AV_TIME_BASE};
+    durn = av_rescale_q(ic->streams[stream_index]->duration, ic->streams[stream_index]->time_base, avbasetime);
 
 //    durn = ic->streams[stream_index]->duration; // ogg gives wrong value
     printf("duration is %ld\n", durn);

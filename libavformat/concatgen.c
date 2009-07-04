@@ -40,7 +40,11 @@ int concatgen_read_packet(AVFormatContext *s,
     }
     if (ret >= 0) {
         if (pkt) {
-            int64_t time_offset = ff_conv_stream_time(ic, pkt->stream_index, ctx->time_offsets[pkt->stream_index]);
+            int64_t time_offset;
+            AVRational avbasetime = {1, AV_TIME_BASE};
+            time_offset = av_rescale_q(ctx->time_offsets[pkt->stream_index], avbasetime, ic->streams[stream_index]->time_base);
+            printf("%s conv stream time from %ld to %ld/%ld is %ld\n", ic->iformat->name, ctx->time_offsets[pkt->stream_index], ic->streams[stream_index]->time_base.num, ic->streams[stream_index]->time_base.den, time_offset);
+            // TODO changing either dts or pts leads to timing issues on h264
             pkt->dts += time_offset;
             if (!ic->streams[pkt->stream_index]->codec->has_b_frames)
                 pkt->pts = pkt->dts + 1;
