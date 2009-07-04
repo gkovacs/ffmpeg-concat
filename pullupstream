@@ -1,0 +1,12 @@
+#!/bin/bash
+
+git checkout upstream-local
+git pull
+svnrevno=$(expr "$(git log --pretty=format:'' | wc -l)" + 36)
+gitrevno=$(git show-ref 'refs/heads/upstream-local' | sed 's/ /\n/g' | head --lines 1)
+committer=$(git log --pretty=format:'%H %an' | grep "$gitrevno" | sed 's/ /\n/g' | head --lines 1)
+commitdate=$(git log --pretty=format:'%H %aD' | grep "$gitrevno" | sed 's/ /\n/g' | head --lines 1)
+commitlog=$(git log --pretty=format:'%H %b' | grep "$gitrevno" | sed 's/ /\n/g' | head --lines 1)
+git checkout master
+git pull upstream master
+printf "svn: $svnrevno\ngit: $gitrevno\ncommitter: $committer\ncommitdate: $commitdate\ncommitlog: $commitlog" > upstreamrev
