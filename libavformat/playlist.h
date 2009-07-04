@@ -61,4 +61,6 @@ void ff_split_wd_fn(char *filepath, char **workingdir, char **filename);
 
 int64_t ff_conv_stream_time(AVFormatContext *ic, int stream_index, int64_t avt_duration);
 
+int64_t ff_conv_base_time(AVFormatContext *ic, int stream_index, int64_t stream_duration);
+
 int64_t ff_get_duration(AVFormatContext *ic, int stream_index);
