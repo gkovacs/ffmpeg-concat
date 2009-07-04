@@ -19,6 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifndef _PLAYLIST_H
+#define	_PLAYLIST_H
+
+#include "avformat.h"
+#include "riff.h"
 
 typedef struct PlayElem {
     AVFormatContext *ic;
@@ -64,3 +69,5 @@ int64_t ff_conv_stream_time(AVFormatContext *ic, int stream_index, int64_t avt_d
 int64_t ff_conv_base_time(AVFormatContext *ic, int stream_index, int64_t stream_duration);
 
 int64_t ff_get_duration(AVFormatContext *ic, int stream_index);
+
+#endif /* _PLAYLIST_H */
