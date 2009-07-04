@@ -122,7 +122,7 @@ static int m3u_read_packet(AVFormatContext *s,
         if (pkt) {
             int64_t time_offset = ff_conv_stream_time(ic, pkt->stream_index, playld->time_offsets[pkt->stream_index]);
             pkt->dts += time_offset;
-            pkt->pts += time_offset;
+            pkt->pts = pkt->dts;
         }
     }
     // TODO switch from AVERROR_EOF to AVERROR_EOS
