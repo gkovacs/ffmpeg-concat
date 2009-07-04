@@ -30,9 +30,9 @@ int ff_alloc_playelem(unsigned char *filename,
 {
     AVFormatContext *ic;
     AVFormatParameters *ap;
-    ic = av_malloc(sizeof(AVFormatContext));
-    ap = av_malloc(sizeof(AVFormatParameters));
-    memset(ap, 0, sizeof(AVFormatParameters));
+    ic = av_malloc(sizeof(*ic));
+    ap = av_malloc(sizeof(*ap));
+    memset(ap, 0, sizeof(*ap));
     ap->width = 0;
     ap->height = 0;
     ap->time_base = (AVRational){1, 25};
@@ -48,7 +48,7 @@ int ff_alloc_playelem(unsigned char *filename,
 PlayElem* ff_make_playelem(char *filename)
 {
     int err;
-    PlayElem *pe = av_malloc(sizeof(PlayElem));
+    PlayElem *pe = av_malloc(sizeof(*pe));
     err = ff_alloc_playelem(filename, pe);
     if (err < 0)
         print_error("during-av_alloc_playelem", err);
@@ -77,22 +77,22 @@ PlayElem* ff_make_playelem(char *filename)
     return pe;
 }
 
-PlaylistC* ff_make_playlistc(char *filename)
+PlaylistContext* ff_make_playlistc(char *filename)
 {
     int i;
-    PlaylistC *playlc = av_malloc(sizeof(PlaylistC));
-    playlc->time_offsets_size = 2; // TODO don't assume we have just 2 streams
-    playlc->time_offsets = av_malloc(sizeof(playlc->time_offsets) * playlc->time_offsets_size);
-    for (i = 0; i < playlc->time_offsets_size; ++i)
-        playlc->time_offsets[i] = 0;
-    playlc->pe_curidxs_size = 2; // TODO don't assume we have just 2 streams
-    playlc->pe_curidxs = av_malloc(sizeof(playlc->pe_curidxs) * playlc->pe_curidxs_size);
-    for (i = 0; i < playlc->pe_curidxs_size; ++i)
-        playlc->pe_curidxs[i] = 0;
+    PlaylistContext *ctx = av_malloc(sizeof(*ctx));
+    ctx->time_offsets_size = 2; // TODO don't assume we have just 2 streams
+    ctx->time_offsets = av_malloc(sizeof(*(ctx->time_offsets)) * ctx->time_offsets_size);
+    for (i = 0; i < ctx->time_offsets_size; ++i)
+        ctx->time_offsets[i] = 0;
+    ctx->pe_curidxs_size = 2; // TODO don't assume we have just 2 streams
+    ctx->pe_curidxs = av_malloc(sizeof(*(ctx->pe_curidxs)) * ctx->pe_curidxs_size);
+    for (i = 0; i < ctx->pe_curidxs_size; ++i)
+        ctx->pe_curidxs[i] = 0;
     ff_split_wd_fn(filename,
-                   &playlc->workingdir,
-                   &playlc->filename);
-    return playlc;
+                   &ctx->workingdir,
+                   &ctx->filename);
+    return ctx;
 }
 
 char* ff_conc_strings(char *string1,
@@ -172,7 +172,7 @@ void ff_split_wd_fn(char *filepath,
     (*filename)[cofp-lslash] = 0;
 }
 
-int ff_playlist_populate_context(PlaylistC *playlc,
+int ff_playlist_populate_context(PlaylistContext *ctx,
                                  AVFormatContext *s,
                                  int stream_index)
 {
@@ -180,9 +180,9 @@ int ff_playlist_populate_context(PlaylistC *playlc,
     AVFormatContext *ic;
     AVFormatParameters *nap;
     printf("playlist_populate_context called\n");
-    playlc->pelist[playlc->pe_curidxs[stream_index]] = ff_make_playelem(playlc->flist[playlc->pe_curidxs[stream_index]]);
-    ic = playlc->pelist[playlc->pe_curidxs[stream_index]]->ic;
-    nap = playlc->pelist[playlc->pe_curidxs[stream_index]]->ap;
+    ctx->pelist[ctx->pe_curidxs[stream_index]] = ff_make_playelem(ctx->flist[ctx->pe_curidxs[stream_index]]);
+    ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
+    nap = ctx->pelist[ctx->pe_curidxs[stream_index]]->ap;
     ic->iformat->read_header(ic, 0);
     s->nb_streams = ic->nb_streams;
     for (i = 0; i < ic->nb_streams; ++i) {

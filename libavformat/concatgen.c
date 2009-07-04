@@ -22,25 +22,25 @@
 #include "concatgen.h"
 
 int concatgen_read_packet(AVFormatContext *s,
-                       AVPacket *pkt)
+                          AVPacket *pkt)
 {
     int i;
     int ret;
     int stream_index;
-    PlaylistC *playld;
+    PlaylistContext *ctx;
     AVFormatContext *ic;
-    playld = s->priv_data;
+    ctx = s->priv_data;
     stream_index = 0;
     retr:
-    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
+    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
     ret = ic->iformat->read_packet(ic, pkt);
     if (pkt) {
         stream_index = pkt->stream_index;
-        ic = playld->pelist[playld->pe_curidxs[stream_index]]->ic;
+        ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
     }
     if (ret >= 0) {
         if (pkt) {
-            int64_t time_offset = ff_conv_stream_time(ic, pkt->stream_index, playld->time_offsets[pkt->stream_index]);
+            int64_t time_offset = ff_conv_stream_time(ic, pkt->stream_index, ctx->time_offsets[pkt->stream_index]);
             pkt->dts += time_offset;
             if (!ic->streams[pkt->stream_index]->codec->has_b_frames)
                 pkt->pts = pkt->dts + 1;
@@ -48,7 +48,7 @@ int concatgen_read_packet(AVFormatContext *s,
     }
     // TODO switch from AVERROR_EOF to AVERROR_EOS
     // -32 AVERROR_EOF for avi, -51 for ogg
-    else if (ret < 0 && playld->pe_curidxs[stream_index] < playld->pelist_size - 1) {
+    else if (ret < 0 && ctx->pe_curidxs[stream_index] < ctx->pelist_size - 1) {
         // TODO account for out-of-sync audio/video by using per-stream offsets
         // using streams[]->duration slightly overestimates offset
 //        playld->dts_offset += ic->streams[0]->duration;
@@ -56,14 +56,14 @@ int concatgen_read_packet(AVFormatContext *s,
 //        playld->dts_offset += ic->streams[0]->cur_dts;
 //        playld->dts_offset += playld->dts_prevpacket;
         printf("switching streams\n");
-        for (i = 0; i < ic->nb_streams && i < playld->time_offsets_size; ++i) {
-            playld->time_offsets[i] += ff_get_duration(ic, i);
+        for (i = 0; i < ic->nb_streams && i < ctx->time_offsets_size; ++i) {
+            ctx->time_offsets[i] += ff_get_duration(ic, i);
         }
-        ++playld->pe_curidxs[stream_index];
+        ++ctx->pe_curidxs[stream_index];
 //        pkt->destruct(pkt);
         pkt = av_malloc(sizeof(AVPacket));
 //        for (i = 0; i < playld->pe_curidxs_size; ++i) {
-            ff_playlist_populate_context(playld, s, stream_index);
+            ff_playlist_populate_context(ctx, s, stream_index);
 //        }
         goto retr;
     }
@@ -78,10 +78,10 @@ int concatgen_read_seek(AVFormatContext *s,
                      int64_t pts,
                      int flags)
 {
-    PlaylistC *playld;
+    PlaylistContext *ctx;
     AVFormatContext *ic;
-    playld = s->priv_data;
-    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
+    ctx = s->priv_data;
+    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
     ic->iformat->read_seek(ic, stream_index, pts, flags);
 }
 
@@ -91,10 +91,10 @@ int concatgen_read_timestamp(AVFormatContext *s,
                              int64_t pos_limit)
 {
     printf("m3u_read_timestamp called\n");
-    PlaylistC *playld;
+    PlaylistContext *ctx;
     AVFormatContext *ic;
-    playld = s->priv_data;
-    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
+    ctx = s->priv_data;
+    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
     if (ic->iformat->read_timestamp)
         return ic->iformat->read_timestamp(ic, stream_index, pos, pos_limit);
     return 0;
@@ -103,10 +103,10 @@ int concatgen_read_timestamp(AVFormatContext *s,
 int concatgen_read_close(AVFormatContext *s)
 {
     printf("m3u_read_close called\n");
-    PlaylistC *playld;
+    PlaylistContext *ctx;
     AVFormatContext *ic;
-    playld = s->priv_data;
-    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
+    ctx = s->priv_data;
+    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
     if (ic->iformat->read_close)
         return ic->iformat->read_close(ic);
     return 0;
@@ -115,19 +115,19 @@ int concatgen_read_close(AVFormatContext *s)
 int concatgen_read_play(AVFormatContext *s)
 {
     printf("m3u_read_play called\n");
-    PlaylistC *playld;
+    PlaylistContext *ctx;
     AVFormatContext *ic;
-    playld = s->priv_data;
-    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
+    ctx = s->priv_data;
+    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
     return av_read_play(ic);
 }
 
 int concatgen_read_pause(AVFormatContext *s)
 {
     printf("m3u_read_pause called\n");
-    PlaylistC *playld;
+    PlaylistContext *ctx;
     AVFormatContext *ic;
-    playld = s->priv_data;
-    ic = playld->pelist[playld->pe_curidxs[0]]->ic;
+    ctx = s->priv_data;
+    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
     return av_read_pause(ic);
 }
