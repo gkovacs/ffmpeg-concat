@@ -52,9 +52,9 @@ typedef struct PlaylistContext {
     int time_offsets_size;
 } PlaylistContext;
 
-PlayElem* ff_make_playelem(char *filename);
+PlayElem* ff_playlist_make_playelem(char *filename);
 
-PlaylistContext* ff_make_playlistc(char *filename);
+PlaylistContext* ff_playlist_make_context(char *filename);
 
 int ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index);
 
@@ -68,6 +68,6 @@ int64_t ff_conv_stream_time(AVFormatContext *ic, int stream_index, int64_t avt_d
 
 int64_t ff_conv_base_time(AVFormatContext *ic, int stream_index, int64_t stream_duration);
 
-int64_t ff_get_duration(AVFormatContext *ic, int stream_index);
+int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index);
 
 #endif /* _PLAYLIST_H */

@@ -82,7 +82,7 @@ static int m3u_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
     int i;
-    PlaylistContext *ctx = ff_make_playlistc(s->filename);
+    PlaylistContext *ctx = ff_playlist_make_context(s->filename);
     m3u_list_files(s->pb,
                    &(ctx->flist),
                    &(ctx->pelist_size),

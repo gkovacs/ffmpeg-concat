@@ -57,7 +57,7 @@ int concatgen_read_packet(AVFormatContext *s,
 //        playld->dts_offset += playld->dts_prevpacket;
         printf("switching streams\n");
         for (i = 0; i < ic->nb_streams && i < ctx->time_offsets_size; ++i) {
-            ctx->time_offsets[i] += ff_get_duration(ic, i);
+            ctx->time_offsets[i] += ff_playlist_get_duration(ic, i);
         }
         ++ctx->pe_curidxs[stream_index];
 //        pkt->destruct(pkt);
@@ -82,7 +82,7 @@ int concatgen_read_seek(AVFormatContext *s,
     AVFormatContext *ic;
     ctx = s->priv_data;
     ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
-    ic->iformat->read_seek(ic, stream_index, pts, flags);
+    return ic->iformat->read_seek(ic, stream_index, pts, flags);
 }
 
 int concatgen_read_timestamp(AVFormatContext *s,
@@ -90,7 +90,6 @@ int concatgen_read_timestamp(AVFormatContext *s,
                              int64_t *pos,
                              int64_t pos_limit)
 {
-    printf("m3u_read_timestamp called\n");
     PlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
@@ -102,7 +101,6 @@ int concatgen_read_timestamp(AVFormatContext *s,
 
 int concatgen_read_close(AVFormatContext *s)
 {
-    printf("m3u_read_close called\n");
     PlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
@@ -114,7 +112,6 @@ int concatgen_read_close(AVFormatContext *s)
 
 int concatgen_read_play(AVFormatContext *s)
 {
-    printf("m3u_read_play called\n");
     PlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
@@ -124,7 +121,6 @@ int concatgen_read_play(AVFormatContext *s)
 
 int concatgen_read_pause(AVFormatContext *s)
 {
-    printf("m3u_read_pause called\n");
     PlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;

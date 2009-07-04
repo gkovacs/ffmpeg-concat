@@ -45,7 +45,7 @@ int ff_alloc_playelem(unsigned char *filename,
     return 0;
 }
 
-PlayElem* ff_make_playelem(char *filename)
+PlayElem* ff_playlist_make_playelem(char *filename)
 {
     int err;
     PlayElem *pe = av_malloc(sizeof(*pe));
@@ -77,7 +77,7 @@ PlayElem* ff_make_playelem(char *filename)
     return pe;
 }
 
-PlaylistContext* ff_make_playlistc(char *filename)
+PlaylistContext* ff_playlist_make_context(char *filename)
 {
     int i;
     PlaylistContext *ctx = av_malloc(sizeof(*ctx));
@@ -180,7 +180,7 @@ int ff_playlist_populate_context(PlaylistContext *ctx,
     AVFormatContext *ic;
     AVFormatParameters *nap;
     printf("playlist_populate_context called\n");
-    ctx->pelist[ctx->pe_curidxs[stream_index]] = ff_make_playelem(ctx->flist[ctx->pe_curidxs[stream_index]]);
+    ctx->pelist[ctx->pe_curidxs[stream_index]] = ff_playlist_make_playelem(ctx->flist[ctx->pe_curidxs[stream_index]]);
     ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
     nap = ctx->pelist[ctx->pe_curidxs[stream_index]]->ap;
     ic->iformat->read_header(ic, 0);
@@ -259,7 +259,7 @@ int64_t ff_conv_base_time(AVFormatContext *ic, int stream_index, int64_t stream_
 }
 
 // returns duration in seconds * AV_TIME_BASE
-int64_t ff_get_duration(AVFormatContext *ic, int stream_index)
+int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index)
 {
 // TODO storing previous packet pts/dts is ugly hack
 // ic->stream[]->cur_dts correct
