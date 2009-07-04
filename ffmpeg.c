@@ -1261,33 +1261,12 @@ static int output_packet(AVInputStream *ist, int ist_index,
                         ist->st->codec->codec_id, ist->file_index, ist->index);
                 return AVERROR(EINVAL);
             }
-//            return AVERROR(EINVAL);
             if (avcodec_open(ist->st->codec, codec) < 0) {
                 fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d.%d\n",
                         ist->file_index, ist->index);
                 return AVERROR(EINVAL);
             }
         }
-
-        /*
-            if (!codec)
-                codec = avcodec_find_decoder(ist->st->codec->codec_id);
-            if (!codec) {
-                snprintf(error, sizeof(error), "Decoder (codec id %d) not found for input stream #%d.%d",
-                        ist->st->codec->codec_id, ist->file_index, ist->index);
-                ret = AVERROR(EINVAL);
-                goto dump_format;
-            }
-            if (avcodec_open(ist->st->codec, codec) < 0) {
-                snprintf(error, sizeof(error), "Error while opening decoder for input stream #%d.%d",
-                        ist->file_index, ist->index);
-                ret = AVERROR(EINVAL);
-                goto dump_format;
-         */
-//        codec = avcodec_find_decoder(ist->st->codec->codec_id);
-        
-//        ist->st->codec = is->streams[pkt->stream_index]->codec;
-//        assert(ist->st);
     }
 
     if(ist->next_pts == AV_NOPTS_VALUE)
