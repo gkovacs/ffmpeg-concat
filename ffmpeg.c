@@ -1237,7 +1237,8 @@ static void print_report(AVFormatContext **output_files,
 /* pkt = NULL means EOF (needed to flush decoder buffers) */
 static int output_packet(AVInputStream *ist, int ist_index,
                          AVOutputStream **ost_table, int nb_ostreams,
-                         const AVPacket *pkt)
+                         const AVPacket *pkt,
+                         AVFormatContext *is)
 {
     AVFormatContext *os;
     AVOutputStream *ost;
@@ -1250,6 +1251,44 @@ static int output_packet(AVInputStream *ist, int ist_index,
     AVSubtitle subtitle, *subtitle_to_free;
     int got_subtitle;
     AVPacket avpkt;
+    if (ist && is && pkt && is->nb_streams > pkt->stream_index && is->streams && is->streams[pkt->stream_index] && is->streams[pkt->stream_index]->codec) {
+        fprintf(stdout, "stream index modified to %d\n", pkt->stream_index);
+        ist->st = is->streams[pkt->stream_index];
+        if (!ist->st->codec->codec) {
+            AVCodec *codec = avcodec_find_decoder(ist->st->codec->codec_id);
+            if (!codec) {
+                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d.%d\n",
+                        ist->st->codec->codec_id, ist->file_index, ist->index);
+                return AVERROR(EINVAL);
+            }
+//            return AVERROR(EINVAL);
+            if (avcodec_open(ist->st->codec, codec) < 0) {
+                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d.%d\n",
+                        ist->file_index, ist->index);
+                return AVERROR(EINVAL);
+            }
+        }
+
+        /*
+            if (!codec)
+                codec = avcodec_find_decoder(ist->st->codec->codec_id);
+            if (!codec) {
+                snprintf(error, sizeof(error), "Decoder (codec id %d) not found for input stream #%d.%d",
+                        ist->st->codec->codec_id, ist->file_index, ist->index);
+                ret = AVERROR(EINVAL);
+                goto dump_format;
+            }
+            if (avcodec_open(ist->st->codec, codec) < 0) {
+                snprintf(error, sizeof(error), "Error while opening decoder for input stream #%d.%d",
+                        ist->file_index, ist->index);
+                ret = AVERROR(EINVAL);
+                goto dump_format;
+         */
+//        codec = avcodec_find_decoder(ist->st->codec->codec_id);
+        
+//        ist->st->codec = is->streams[pkt->stream_index]->codec;
+//        assert(ist->st);
+    }
 
     if(ist->next_pts == AV_NOPTS_VALUE)
         ist->next_pts= ist->pts;
@@ -1292,8 +1331,10 @@ static int output_packet(AVInputStream *ist, int ist_index,
                        endianness as CPU */
                 ret = avcodec_decode_audio3(ist->st->codec, samples, &data_size,
                                             &avpkt);
-                if (ret < 0)
+                if (ret < 0) {
+                    fprintf(stderr, "fail_decode 1 with ret %d\n", ret);
                     goto fail_decode;
+                }
                 avpkt.data += ret;
                 avpkt.size -= ret;
                 /* Some bug in mpeg audio decoder gives */
@@ -1314,9 +1355,12 @@ static int output_packet(AVInputStream *ist, int ist_index,
                     ret = avcodec_decode_video2(ist->st->codec,
                                                 &picture, &got_picture, &avpkt);
                     ist->st->quality= picture.quality;
-                    if (ret < 0)
+                    if (ret < 0) {
+                        fprintf(stderr, "fail_decode 2 with ret %d\n", ret);
                         goto fail_decode;
+                    }
                     if (!got_picture) {
+                        fprintf(stderr, "no picture frame\n");
                         /* no picture yet */
                         goto discard_packet;
                     }
@@ -1331,8 +1375,10 @@ static int output_packet(AVInputStream *ist, int ist_index,
             case CODEC_TYPE_SUBTITLE:
                 ret = avcodec_decode_subtitle2(ist->st->codec,
                                                &subtitle, &got_subtitle, &avpkt);
-                if (ret < 0)
+                if (ret < 0) {
+                    fprintf(stderr, "fail_decode 3 with ret %d\n", ret);
                     goto fail_decode;
+                }
                 if (!got_subtitle) {
                     goto discard_packet;
                 }
@@ -2278,8 +2324,9 @@ static int av_encode(AVFormatContext **output_files,
         }
 
         //fprintf(stderr,"read #%d.%d size=%d\n", ist->file_index, ist->index, pkt.size);
-        if (output_packet(ist, ist_index, ost_table, nb_ostreams, &pkt) < 0) {
-
+        int otpakv = output_packet(ist, ist_index, ost_table, nb_ostreams, &pkt, is);
+        if (otpakv < 0) {
+            fprintf(stderr, "error while decoding stream: %d\n", otpakv);
             if (verbose >= 0)
                 fprintf(stderr, "Error while decoding stream #%d.%d\n",
                         ist->file_index, ist->index);
@@ -2300,7 +2347,7 @@ static int av_encode(AVFormatContext **output_files,
     for(i=0;i<nb_istreams;i++) {
         ist = ist_table[i];
         if (ist->decoding_needed) {
-            output_packet(ist, i, ost_table, nb_ostreams, NULL);
+            output_packet(ist, i, ost_table, nb_ostreams, NULL, is);
         }
     }
 
