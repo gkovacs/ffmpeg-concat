@@ -82,16 +82,16 @@ static int m3u_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
     int i;
-    PlaylistD *playld = ff_make_playlistd(s->filename);
+    PlaylistC *playlc = ff_make_playlistc(s->filename);
     m3u_list_files(s->pb,
-                   &(playld->flist),
-                   &(playld->pelist_size),
-                   playld->workingdir);
-    playld->pelist = av_malloc(playld->pelist_size * sizeof(PlayElem*));
-    memset(playld->pelist, 0, playld->pelist_size * sizeof(PlayElem*));
-    s->priv_data = playld;
-    for (i = 0; i < playld->pe_curidxs_size; ++i) {
-        ff_playlist_populate_context(playld, s, i);
+                   &(playlc->flist),
+                   &(playlc->pelist_size),
+                   playlc->workingdir);
+    playlc->pelist = av_malloc(playlc->pelist_size * sizeof(PlayElem*));
+    memset(playlc->pelist, 0, playlc->pelist_size * sizeof(PlayElem*));
+    s->priv_data = playlc;
+    for (i = 0; i < playlc->pe_curidxs_size; ++i) {
+        ff_playlist_populate_context(playlc, s, i);
     }
     return 0;
 }

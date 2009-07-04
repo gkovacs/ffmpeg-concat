@@ -35,7 +35,7 @@ typedef struct PlayElem {
     int64_t indv_time;
 } PlayElem;
 
-typedef struct PlaylistD {
+typedef struct PlaylistC {
     char **flist;
 //    int flist_len;
     PlayElem **pelist;
@@ -50,13 +50,13 @@ typedef struct PlaylistD {
     char *filename;
     int64_t *time_offsets;
     int time_offsets_size;
-} PlaylistD;
+} PlaylistC;
 
 PlayElem* ff_make_playelem(char *filename);
 
-PlaylistD* ff_make_playlistd(char *filename);
+PlaylistC* ff_make_playlistc(char *filename);
 
-int ff_playlist_populate_context(PlaylistD *playld, AVFormatContext *s, int stream_index);
+int ff_playlist_populate_context(PlaylistC *playld, AVFormatContext *s, int stream_index);
 
 char* ff_conc_strings(char *string1, char *string2);
 

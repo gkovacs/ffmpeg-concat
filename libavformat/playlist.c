@@ -77,10 +77,10 @@ PlayElem* ff_make_playelem(char *filename)
     return pe;
 }
 
-PlaylistD* ff_make_playlistd(char *filename)
+PlaylistC* ff_make_playlistc(char *filename)
 {
     int i;
-    PlaylistD *playld = av_malloc(sizeof(PlaylistD));
+    PlaylistC *playld = av_malloc(sizeof(PlaylistC));
     playld->time_offsets_size = 2; // TODO don't assume we have just 2 streams
     playld->time_offsets = av_malloc(sizeof(playld->time_offsets) * playld->time_offsets_size);
     for (i = 0; i < playld->time_offsets_size; ++i)
@@ -172,7 +172,7 @@ void ff_split_wd_fn(char *filepath,
     (*filename)[cofp-lslash] = 0;
 }
 
-int ff_playlist_populate_context(PlaylistD *playld,
+int ff_playlist_populate_context(PlaylistC *playld,
                                  AVFormatContext *s,
                                  int stream_index)
 {
