@@ -31,7 +31,7 @@ cd $svndir
 
 for x in $diffiles
 do
-echo $x
+git diff $x | cat
 done
 
 read -p "commit? (y/n) " yesno
