@@ -254,10 +254,10 @@ int64_t ff_conv_base_time(AVFormatContext *ic, int stream_index, int64_t stream_
 {
     int64_t durn;
     durn = (int64_t)(
-           stream_duration *
-           ic->streams[stream_index]->time_base.num *
-           AV_TIME_BASE / // 10^6
-           ic->streams[stream_index]->time_base.den
+           (stream_duration *
+           ic->streams[stream_index]->time_base.num) *
+           (AV_TIME_BASE / // 10^6
+           ic->streams[stream_index]->time_base.den)
            );
     return durn;
 }
