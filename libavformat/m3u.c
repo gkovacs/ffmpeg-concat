@@ -96,7 +96,7 @@ static int m3u_read_header(AVFormatContext *s,
     return 0;
 }
 
-#if CONFIG_CONCAT_DEMUXER
+#if CONFIG_M3U_DEMUXER
 AVInputFormat m3u_demuxer = {
     "m3u",
     NULL_IF_CONFIG_SMALL("M3U format"),

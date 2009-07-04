@@ -10,6 +10,8 @@
 *.mpg
 *.m3u
 *.log
+*.diff
+*.patch
 /ffmpeg
 /ffmpeg_g
 /ffplay
