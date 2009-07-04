@@ -12,10 +12,26 @@ fi
 cd $svndir
 git reset --hard
 
-for x in $(git ls-files)
+for x in $(git ls-files | grep -v '\.diff$')
 do
 diff $svndir/$x $gitdir/$x
 cp $gitdir/$x $svndir/$x
+done
+
+diffiles=$(git ls-files | grep '\.diff$')
+
+cd $gitdir
+
+for x in $diffiles
+do
+git diff upstream-local..master -- $(echo $x | sed 's/\.diff$//') > $svndir/$x
+done
+
+cd $svndir
+
+for x in $diffiles
+do
+echo $x
 done
 
 read -p "commit? (y/n) " yesno
