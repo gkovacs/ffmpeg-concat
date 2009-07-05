@@ -100,7 +100,7 @@ static int m3u_read_header(AVFormatContext *s,
 AVInputFormat m3u_demuxer = {
     "m3u",
     NULL_IF_CONFIG_SMALL("M3U format"),
-    0,
+    sizeof(PlaylistContext),
     m3u_probe,
     m3u_read_header,
     concatgen_read_packet,
@@ -113,7 +113,7 @@ AVInputFormat m3u_demuxer = {
     concatgen_read_play,
     concatgen_read_pause,
     (const AVCodecTag* const []){codec_m3u_tags, 0},
-    NULL, //m3u_read_seek2
+    concatgen_read_seek, //m3u_read_seek2
     NULL, //metadata_conv
     NULL, //next
 };

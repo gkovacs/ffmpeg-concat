@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "concatgen.h"
+#include "concat.h"
 
 /* The ffmpeg codecs we support, and the IDs they have in the file */
 static const AVCodecTag codec_concat_tags[] = {
@@ -33,14 +33,37 @@ static int concat_probe(AVProbeData *p)
 }
 
 static int concat_read_header(AVFormatContext *s,
-                              AVFormatParameters *ap)
+                       AVFormatParameters *ap)
 {
     // PlaylistD should be constructed externally
     return 0;
 }
 
+AVInputFormat *concat_make_demuxer()
+{
+    AVInputFormat *cdm = av_malloc(sizeof(*cdm));
+    cdm->name = "concat";
+    cdm->long_name = NULL_IF_CONFIG_SMALL("CONCAT format");
+    cdm->priv_data_size = sizeof(PlaylistContext);
+    cdm->read_probe = concat_probe;
+    cdm->read_header = concat_read_header;
+    cdm->read_packet = concatgen_read_packet;
+    cdm->read_close = concatgen_read_close;
+    cdm->read_seek = concatgen_read_seek;
+    cdm->read_timestamp = concatgen_read_timestamp;
+    cdm->flags = NULL;
+    cdm->extensions = NULL;
+    cdm->value = NULL;
+    cdm->read_play = concatgen_read_play;
+    cdm->read_pause = concatgen_read_pause;
+    cdm->codec_tag = codec_concat_tags;
+    cdm->read_seek2 = concatgen_read_seek;
+    cdm->metadata_conv = NULL;
+    cdm->next = NULL;
+    return cdm;
+}
 
-#if CONFIG_CONCAT_DEMUXER
+#if 0
 AVInputFormat concat_demuxer = {
     "concat",
     NULL_IF_CONFIG_SMALL("CONCAT format"),

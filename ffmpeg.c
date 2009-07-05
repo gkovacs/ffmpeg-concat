@@ -70,6 +70,8 @@
 
 #undef exit
 
+#include "libavformat/concat.h"
+
 const char program_name[] = "FFmpeg";
 const int program_birth_year = 2000;
 
@@ -222,6 +224,10 @@ static float dts_delta_threshold = 10;
 static unsigned int sws_flags = SWS_BICUBIC;
 
 static int64_t timer_start;
+
+static int concatenate_video_files;
+
+PlaylistContext *playlist_ctx;
 
 static uint8_t *audio_buf;
 static uint8_t *audio_out;
@@ -1669,6 +1675,7 @@ static int av_encode(AVFormatContext **output_files,
     uint8_t no_packet[MAX_FILES]={0};
     int no_packet_count=0;
 
+
     file_table= av_mallocz(nb_input_files * sizeof(AVInputFile));
     if (!file_table)
         goto fail;
@@ -2874,6 +2881,7 @@ static enum CodecID find_codec_or_die(const char *name, int type, int encoder)
 
 static void opt_input_file(const char *filename)
 {
+
     AVFormatContext *ic;
     AVFormatParameters params, *ap = &params;
     int err, i, ret, rfps, rfps_base;
@@ -2884,6 +2892,16 @@ static void opt_input_file(const char *filename)
 
     using_stdin |= !strncmp(filename, "pipe:", 5) ||
                     !strcmp(filename, "/dev/stdin");
+
+    if (concatenate_video_files) { // need to specify -conc before -i
+        if (!playlist_ctx) {
+            printf("need to generate playlist ctx\n");
+            playlist_ctx = ff_playlist_make_context(filename);
+            nb_input_files = 1;
+            input_files[nb_input_files] = ic;
+        }
+        return;
+    }
 
     /* get default parameters from command line */
     ic = avformat_alloc_context();
@@ -3900,6 +3918,7 @@ static const OptionDef options[] = {
     { "programid", HAS_ARG | OPT_INT | OPT_EXPERT, {(void*)&opt_programid}, "desired program number", "" },
     { "xerror", OPT_BOOL, {(void*)&exit_on_error}, "exit on error", "error" },
     { "copyinkf", OPT_BOOL | OPT_EXPERT, {(void*)&copy_initial_nonkeyframes}, "copy initial non-keyframes" },
+    { "conc", OPT_BOOL, {(void*)&concatenate_video_files}, "concatenate video files", "concatenate" },
 
     /* video options */
     { "b", OPT_FUNC2 | HAS_ARG | OPT_VIDEO, {(void*)opt_bitrate}, "set bitrate (in bits/s)", "bitrate" },

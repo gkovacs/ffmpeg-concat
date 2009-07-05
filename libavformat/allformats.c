@@ -67,7 +67,6 @@ void av_register_all(void)
     REGISTER_DEMUXER  (C93, c93);
     REGISTER_DEMUXER  (CAVSVIDEO, cavsvideo);
     REGISTER_DEMUXER  (M3U, m3u);
-    REGISTER_DEMUXER  (CONCAT, concat);
     REGISTER_MUXER    (CRC, crc);
     REGISTER_MUXDEMUX (DAUD, daud);
     REGISTER_MUXDEMUX (DIRAC, dirac);
