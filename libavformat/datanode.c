@@ -111,6 +111,157 @@ DataNode *ff_datanode_tree_from_ini(ByteIOContext *p)
 
 DataNode *ff_datanode_tree_from_xml(ByteIOContext *p)
 {
+    int c;
+    char *s;
+    char tag;
+    // tag:
+    // 0 = awaiting opening tag
+    // 1 = either in the opening tag or closing parent
+    // 2 = awaiting closing tag
+    // 3 = either in the closing tag or opening child
+    char ncn; // no closing needed if true
+    char quo; // text is in quotes if true
+    char ctg; // this is the closing tag if true
+    int i, b;
+    DataNode *o;
+    DataNode *d;
+    int ctgidx; // current index in ctgbuf
+    int ctgbuflen; // buffer length of ctgbuf
+    char *ctgbuf = 0;
+    // ctgbuf: used to verify that closing tag matches opening tag name
+    d = av_malloc(sizeof(*d));
+    memset(d, 0, sizeof(*d));
+    o = d;
+    s = d->name;
+    tag = ncn = quo = ctg = ctgidx = ctgbuflen = i = b = 0;
+    while (1) {
+        c = url_fgetc(p);
+        if (c == 0 || c == EOF)
+            break;
+
+        parsetag:
+
+        if (quo) { // we're in quoted text, tag changes don't matter
+            if (c == '"') { // quote closed
+                quo = 0;
+            }
+            goto writeoutput;
+        }
+        else if (c == '"') { // quote opened
+            quo = 1;
+            goto writeoutput;
+        }
+        if (tag == 0) { // awaiting opening tag
+            if (c == '<') { // opening tag
+                tag = 1;
+                d = ff_datanode_mknext(d);
+                i = b = 0;
+                s = d->name;
+                continue;
+            }
+        }
+        else if (tag == 1) { // in the opening tag
+            if (c == '>') { // opening tag closed
+                if (ncn) { // no closing tag needed
+                    ncn = 0;
+                    tag = 0;
+                }
+                else
+                    tag = 2;
+                i = b = 0;
+                s = d->value;
+                continue;
+            }
+            else if (c == '/') {
+                if (d->name) { // tag closed, no closing tag needed
+                    ncn = 1;
+                    continue;
+                }
+                else { // closing parent
+                    tag = 3;
+                    ctg = 1;
+                    ctgidx = 0;
+                    memset(ctgbuf, 0, ctgbuflen);
+                    d = d->parent;
+                    s = d->name;
+                    continue;
+                }
+            }
+            else if (c == ' ') { // no longer tag name but attributes
+                // ignore attributes by null-terminating string
+                c = 0;
+            }
+        }
+        else if (tag == 2) { // awaiting closing tag
+            if (c == '<') { // closing tag
+                tag = 3;
+                i = b = 0;
+                s = d->name;
+                continue;
+            }
+        }
+        else if (tag == 3) { // either in the closing tag or opening a new one
+            if (ctg) {
+                if (ctgidx >= ctgbuflen-1) {
+                    ctgbuflen += DATANODE_STR_BUFSIZE;
+                    ctgbuf = av_realloc(ctgbuf, ctgbuflen);
+                }
+                if (c == '>') {
+                    if (strncmp(d->name, ctgbuf, strlen(d->name)) ||
+                        strlen(d->name) != ctgidx) {
+                        fprintf(stderr, "malformed closing tag for %s\n", d->name);
+                        // closing anyways
+                    }
+                    // closing tag closed
+                    ctg = 0;
+                    memset(ctgbuf, 0, ctgbuflen);
+                    ctgidx = 0;
+                    tag = 0;
+                }
+                else if (c == ' ') { // ignore spaces and material afterwards
+                    ctgbuf[ctgidx++] = 0;
+                    ctgbuf[ctgidx] = 0;
+                }
+                else {
+                    ctgbuf[ctgidx++] = c;
+                    ctgbuf[ctgidx] = 0;
+                }
+                continue;
+            }
+            if (c == '/') { // closing tag
+                ctg = 1;
+                continue;
+            }
+            else { // opening child tag
+                tag = 1;
+                d = ff_datanode_mkchild(d);
+                i = b = 0;
+                s = d->name;
+                goto parsetag;
+            }
+        }
+
+        writeoutput:
+
+        if (i >= b-1) {
+            b += DATANODE_STR_BUFSIZE;
+            if (s == d->name) {
+                s = av_realloc(s, b);
+                d->name = s;
+            }
+            else if (s == d->value) {
+                s = av_realloc(s, b);
+                d->value = s;
+            }
+        }
+        s[i++] = c;
+        s[i] = 0;
+    }
+    return o;
+}
+
+DataNode *ff_datanode_tree_from_xml(ByteIOContext *p)
+{
     // TODO
     return NULL;
 }
