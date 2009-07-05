@@ -63,7 +63,7 @@ AVInputFormat *concat_make_demuxer()
     return cdm;
 }
 
-#if 0
+#if CONFIG_CONCAT_DEMUXER
 AVInputFormat concat_demuxer = {
     "concat",
     NULL_IF_CONFIG_SMALL("CONCAT format"),

@@ -44,9 +44,9 @@ DataNode *ff_datanode_mkchild(DataNode *o);
 
 DataNode *ff_datanode_mknext(DataNode *o);
 
-DataNode *ff_datanode_tree_from_ini(char *p);
+DataNode *ff_datanode_tree_from_ini(ByteIOContext *p);
 
-DataNode *ff_datanode_tree_from_xml(char *p);
+DataNode *ff_datanode_tree_from_xml(ByteIOContext *p);
 
 DataNode *ff_datanode_getlognext(DataNode *d);
 

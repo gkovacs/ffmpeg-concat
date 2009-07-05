@@ -109,7 +109,7 @@ DataNode *ff_datanode_tree_from_ini(ByteIOContext *p)
     return o;
 }
 
-DataNode *ff_datanode_tree_from_xml(char *p)
+DataNode *ff_datanode_tree_from_xml(ByteIOContext *p)
 {
     // TODO
     return NULL;
