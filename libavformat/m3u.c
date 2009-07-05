@@ -87,8 +87,8 @@ static int m3u_read_header(AVFormatContext *s,
                    &(ctx->flist),
                    &(ctx->pelist_size),
                    ctx->workingdir);
-    ctx->pelist = av_malloc(ctx->pelist_size * sizeof(PlayElem*));
-    memset(ctx->pelist, 0, ctx->pelist_size * sizeof(PlayElem*));
+    ctx->pelist = av_malloc(ctx->pelist_size * sizeof(*(ctx->pelist)));
+    memset(ctx->pelist, 0, ctx->pelist_size * sizeof(*(ctx->pelist)));
     s->priv_data = ctx;
     for (i = 0; i < ctx->pe_curidxs_size; ++i) {
         ff_playlist_populate_context(ctx, s, i);

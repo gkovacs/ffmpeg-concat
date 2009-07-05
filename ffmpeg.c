@@ -2893,15 +2893,42 @@ static void opt_input_file(const char *filename)
     using_stdin |= !strncmp(filename, "pipe:", 5) ||
                     !strcmp(filename, "/dev/stdin");
 
+
     if (concatenate_video_files) { // need to specify -conc before -i
+        int filenamelen = strlen(filename);
         if (!playlist_ctx) {
+            ic = av_malloc(sizeof(*ic));
+//            ic = avformat_alloc_context();
             printf("need to generate playlist ctx\n");
             playlist_ctx = ff_playlist_make_context(filename);
+            playlist_ctx->pelist_size = 1;
+            playlist_ctx->pelist = av_malloc(playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
+            memset(playlist_ctx->pelist, 0, playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
+            playlist_ctx->flist = av_malloc(playlist_ctx->pelist_size * sizeof(*(playlist_ctx->flist)));
+            playlist_ctx->flist[0] = av_malloc(sizeof(char) * (filenamelen+1));
+            av_strlcpy(playlist_ctx->flist[0], filename, filenamelen+1);
+            av_strlcpy(ic->filename, filename, sizeof(ic->filename));
+            ic->nb_streams = 2;
+            ic->iformat = concat_make_demuxer();
+            ic->priv_data = playlist_ctx;
+            for (i = 0; i < playlist_ctx->pe_curidxs_size; ++i) {
+                ff_playlist_populate_context(playlist_ctx, ic, i);
+            }
             nb_input_files = 1;
-            input_files[nb_input_files] = ic;
+            input_files[0] = ic;
+            goto configcodecs;
+        }
+        else {
+            printf("adding new file to playlist\n");
+            ++playlist_ctx->pelist_size;
+            playlist_ctx->pelist = av_realloc(playlist_ctx->pelist, playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
+            playlist_ctx->flist = av_realloc(playlist_ctx->flist, playlist_ctx->pelist_size);
+            playlist_ctx->flist[playlist_ctx->pelist_size-1] = av_malloc(sizeof(char) * (filenamelen+1));
+            av_strlcpy(playlist_ctx->flist[playlist_ctx->pelist_size-1], filename, filenamelen+1);
         }
         return;
     }
+
 
     /* get default parameters from command line */
     ic = avformat_alloc_context();
@@ -2968,6 +2995,8 @@ static void opt_input_file(const char *filename)
         /* reset seek info */
         start_time = 0;
     }
+
+    configcodecs:
 
     /* update the current parameters so that they match the one of the input stream */
     for(i=0;i<ic->nb_streams;i++) {
@@ -3044,6 +3073,8 @@ static void opt_input_file(const char *filename)
         dump_format(ic, nb_input_files, filename, 0);
 
     nb_input_files++;
+    if (concatenate_video_files)
+        nb_input_files = 1;
     file_iformat = NULL;
     file_oformat = NULL;
 
