@@ -21,8 +21,8 @@
 
 #include "concatgen.h"
 
-int concatgen_read_packet(AVFormatContext *s,
-                          AVPacket *pkt)
+int ff_concatgen_read_packet(AVFormatContext *s,
+                             AVPacket *pkt)
 {
     int i;
     int ret;
@@ -77,10 +77,10 @@ int concatgen_read_packet(AVFormatContext *s,
     return ret;
 }
 
-int concatgen_read_seek(AVFormatContext *s,
-                     int stream_index,
-                     int64_t pts,
-                     int flags)
+int ff_concatgen_read_seek(AVFormatContext *s,
+                           int stream_index,
+                           int64_t pts,
+                           int flags)
 {
     PlaylistContext *ctx;
     AVFormatContext *ic;
@@ -89,10 +89,10 @@ int concatgen_read_seek(AVFormatContext *s,
     return ic->iformat->read_seek(ic, stream_index, pts, flags);
 }
 
-int concatgen_read_timestamp(AVFormatContext *s,
-                             int stream_index,
-                             int64_t *pos,
-                             int64_t pos_limit)
+int ff_concatgen_read_timestamp(AVFormatContext *s,
+                                int stream_index,
+                                int64_t *pos,
+                                int64_t pos_limit)
 {
     PlaylistContext *ctx;
     AVFormatContext *ic;
@@ -103,7 +103,7 @@ int concatgen_read_timestamp(AVFormatContext *s,
     return 0;
 }
 
-int concatgen_read_close(AVFormatContext *s)
+int ff_concatgen_read_close(AVFormatContext *s)
 {
     PlaylistContext *ctx;
     AVFormatContext *ic;
@@ -114,7 +114,7 @@ int concatgen_read_close(AVFormatContext *s)
     return 0;
 }
 
-int concatgen_read_play(AVFormatContext *s)
+int ff_concatgen_read_play(AVFormatContext *s)
 {
     PlaylistContext *ctx;
     AVFormatContext *ic;
@@ -123,7 +123,7 @@ int concatgen_read_play(AVFormatContext *s)
     return av_read_play(ic);
 }
 
-int concatgen_read_pause(AVFormatContext *s)
+int ff_concatgen_read_pause(AVFormatContext *s)
 {
     PlaylistContext *ctx;
     AVFormatContext *ic;

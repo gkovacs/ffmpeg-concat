@@ -103,17 +103,17 @@ AVInputFormat m3u_demuxer = {
     sizeof(PlaylistContext),
     m3u_probe,
     m3u_read_header,
-    concatgen_read_packet,
-    concatgen_read_close,
-    concatgen_read_seek,
-    concatgen_read_timestamp,
+    ff_concatgen_read_packet,
+    ff_concatgen_read_close,
+    ff_concatgen_read_seek,
+    ff_concatgen_read_timestamp,
     NULL, //flags
     NULL, //extensions
     NULL, //value
-    concatgen_read_play,
-    concatgen_read_pause,
+    ff_concatgen_read_play,
+    ff_concatgen_read_pause,
     (const AVCodecTag* const []){codec_m3u_tags, 0},
-    concatgen_read_seek, //m3u_read_seek2
+    ff_concatgen_read_seek, //m3u_read_seek2
     NULL, //metadata_conv
     NULL, //next
 };

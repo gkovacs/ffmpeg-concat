@@ -19,22 +19,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _CONCATGEN_H
-#define _CONCATGEN_H
+#ifndef AVFORMAT_CONCATGEN_H
+#define AVFORMAT_CONCATGEN_H
 
 #include "playlist.h"
 
-int concatgen_read_packet(AVFormatContext *s, AVPacket *pkt);
+int ff_concatgen_read_packet(AVFormatContext *s, AVPacket *pkt);
 
-int concatgen_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int flags);
+int ff_concatgen_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int flags);
 
-int concatgen_read_timestamp(AVFormatContext *s, int stream_index, int64_t *pos, int64_t pos_limit);
+int ff_concatgen_read_timestamp(AVFormatContext *s, int stream_index, int64_t *pos, int64_t pos_limit);
 
-int concatgen_read_close(AVFormatContext *s);
+int ff_concatgen_read_close(AVFormatContext *s);
 
-int concatgen_read_play(AVFormatContext *s);
+int ff_concatgen_read_play(AVFormatContext *s);
 
-int concatgen_read_pause(AVFormatContext *s);
+int ff_concatgen_read_pause(AVFormatContext *s);
 
-#endif /* _CONCATGEN_H */
+#endif /* AVFORMAT_CONCATGEN_H */
 

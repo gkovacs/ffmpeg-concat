@@ -47,17 +47,17 @@ AVInputFormat *concat_make_demuxer()
     cdm->priv_data_size = sizeof(PlaylistContext);
     cdm->read_probe = concat_probe;
     cdm->read_header = concat_read_header;
-    cdm->read_packet = concatgen_read_packet;
-    cdm->read_close = concatgen_read_close;
-    cdm->read_seek = concatgen_read_seek;
-    cdm->read_timestamp = concatgen_read_timestamp;
+    cdm->read_packet = ff_concatgen_read_packet;
+    cdm->read_close = ff_concatgen_read_close;
+    cdm->read_seek = ff_concatgen_read_seek;
+    cdm->read_timestamp = ff_concatgen_read_timestamp;
     cdm->flags = NULL;
     cdm->extensions = NULL;
     cdm->value = NULL;
-    cdm->read_play = concatgen_read_play;
-    cdm->read_pause = concatgen_read_pause;
+    cdm->read_play = ff_concatgen_read_play;
+    cdm->read_pause = ff_concatgen_read_pause;
     cdm->codec_tag = codec_concat_tags;
-    cdm->read_seek2 = concatgen_read_seek;
+    cdm->read_seek2 = ff_concatgen_read_seek;
     cdm->metadata_conv = NULL;
     cdm->next = NULL;
     return cdm;
@@ -70,15 +70,15 @@ AVInputFormat concat_demuxer = {
     0,
     concat_probe,
     concat_read_header,
-    concatgen_read_packet,
-    concatgen_read_close,
-    concatgen_read_seek,
-    concatgen_read_timestamp,
+    ff_concatgen_read_packet,
+    ff_concatgen_read_close,
+    ff_concatgen_read_seek,
+    ff_concatgen_read_timestamp,
     NULL, //flags
     NULL, //extensions
     NULL, //value
-    concatgen_read_play,
-    concatgen_read_pause,
+    ff_concatgen_read_play,
+    ff_concatgen_read_pause,
     (const AVCodecTag* const []){codec_concat_tags, 0},
     NULL, //m3u_read_seek2
     NULL, //metadata_conv
