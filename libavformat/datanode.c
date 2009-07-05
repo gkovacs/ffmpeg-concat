@@ -193,18 +193,27 @@ void ff_stringlist_append(StringList *l, char *str)
         l->str = str;
 }
 
+char *ff_stringlist_at(StringList *l, int i)
+{
+    while ((i-- > 0))
+        l = l->next;
+    return l->str;
+}
+
 void ff_stringlist_export(StringList *l, char ***flist_ptr, unsigned int *lfx_ptr)
 {
     unsigned int i;
     char **flist;
     unsigned int strlen = ff_stringlist_len(l);
     *lfx_ptr = strlen;
-    flist = av_malloc(sizeof(*flist)*(strlen+1));
-    memset(flist, 0, sizeof(*flist)*(strlen+1));
-    for (i = 0; l && (i < strlen); ++i) {
-        flist[i] = (l = l->next);
+    *flist_ptr = av_malloc(sizeof(**flist_ptr)*(strlen+1));
+    memset(*flist_ptr, 0, sizeof(**flist_ptr)*(strlen+1));
+    flist = *flist_ptr;
+    for (i = 0; i < strlen; ++i) {
+        flist[i] = l->str;
+        l = l->next;
     }
-    *flist_ptr = flist;
+    flist[i] = 0;
 }
 
 unsigned int ff_stringlist_len(StringList *l)
@@ -212,7 +221,7 @@ unsigned int ff_stringlist_len(StringList *l)
     unsigned int i = 0;
     while ((l = l->next))
         ++i;
-    return i;
+    return i+1;
 }
 
 void ff_stringlist_print(StringList *l)

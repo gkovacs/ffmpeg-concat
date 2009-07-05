@@ -259,3 +259,16 @@ int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index)
     return durn;
 }
 
+void ff_playlist_relative_paths(char **flist, char *workingdir)
+{
+    while (*flist != 0) { // determine if relative paths
+        FILE *file;
+        char *fullfpath = ff_conc_strings(workingdir, *flist);
+        file = fopen(fullfpath, "r");
+        if (file) {
+            fclose(file);
+            *flist = fullfpath;
+        }
+        ++flist;
+    }
+}

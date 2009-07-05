@@ -60,6 +60,8 @@ StringList *ff_stringlist_alloc();
 
 void ff_stringlist_append(StringList *l, char *str);
 
+char *ff_stringlist_at(StringList *l, int i);
+
 void ff_stringlist_export(StringList *l, char ***flist_ptr, unsigned int *lfx_ptr);
 
 void ff_stringlist_print(StringList *l);

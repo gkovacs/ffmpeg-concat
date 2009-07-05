@@ -54,6 +54,7 @@ static int pls_list_files(ByteIOContext *s,
     ff_datanode_filter_values_by_name(d, l, "File");
     ff_stringlist_print(l);
     ff_stringlist_export(l, flist_ptr, lfx_ptr);
+    ff_playlist_relative_paths(*flist_ptr, workingdir);
     return 0;
 }
 

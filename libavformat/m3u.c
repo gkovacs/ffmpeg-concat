@@ -65,16 +65,7 @@ static int m3u_list_files(ByteIOContext *s,
     *flist_ptr = ofl;
     *lfx_ptr = i;
     ofl[i] = 0;
-    while (*ofl != 0) { // determine if relative paths
-        FILE *file;
-        char *fullfpath = ff_conc_strings(workingdir, *ofl);
-        file = fopen(fullfpath, "r");
-        if (file) {
-            fclose(file);
-            *ofl = fullfpath;
-        }
-        ++ofl;
-    }
+    ff_playlist_relative_paths(ofl, workingdir);
     return 0;
 }
 

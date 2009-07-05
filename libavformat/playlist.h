@@ -66,4 +66,6 @@ void ff_split_wd_fn(char *filepath, char **workingdir, char **filename);
 
 int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index);
 
+void ff_playlist_relative_paths(char **flist, char *workingdir);
+
 #endif /* _PLAYLIST_H */
