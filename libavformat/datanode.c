@@ -54,7 +54,7 @@ DataNode *ff_datanode_tree_from_ini(char *p)
     s = d->name;
     e = 1;
     i = b = 0;
-    for (; (c = *p++); ) {
+    while ((c = *p++)) {
         if (c == '\n') {
             d = ff_datanode_mknext(d);
             i = b = 0;
