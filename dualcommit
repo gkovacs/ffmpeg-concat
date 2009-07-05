@@ -24,7 +24,7 @@ cd $gitdir
 
 for x in $diffiles
 do
-git diff upstream-local..master -- $(echo $x | sed 's/\.diff$//') > $svndir/$x
+git diff upstream-local -- $(echo $x | sed 's/\.diff$//') > $svndir/$x
 done
 
 cd $svndir

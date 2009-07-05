@@ -1316,10 +1316,8 @@ static int output_packet(AVInputStream *ist, int ist_index,
                        endianness as CPU */
                 ret = avcodec_decode_audio3(ist->st->codec, samples, &data_size,
                                             &avpkt);
-                if (ret < 0) {
-                    fprintf(stderr, "fail_decode 1 with ret %d\n", ret);
+                if (ret < 0)
                     goto fail_decode;
-                }
                 avpkt.data += ret;
                 avpkt.size -= ret;
                 /* Some bug in mpeg audio decoder gives */
@@ -1340,12 +1338,9 @@ static int output_packet(AVInputStream *ist, int ist_index,
                     ret = avcodec_decode_video2(ist->st->codec,
                                                 &picture, &got_picture, &avpkt);
                     ist->st->quality= picture.quality;
-                    if (ret < 0) {
-                        fprintf(stderr, "fail_decode 2 with ret %d\n", ret);
+                    if (ret < 0)
                         goto fail_decode;
-                    }
                     if (!got_picture) {
-                        fprintf(stderr, "no picture frame\n");
                         /* no picture yet */
                         goto discard_packet;
                     }
@@ -1360,10 +1355,8 @@ static int output_packet(AVInputStream *ist, int ist_index,
             case CODEC_TYPE_SUBTITLE:
                 ret = avcodec_decode_subtitle2(ist->st->codec,
                                                &subtitle, &got_subtitle, &avpkt);
-                if (ret < 0) {
-                    fprintf(stderr, "fail_decode 3 with ret %d\n", ret);
+                if (ret < 0)
                     goto fail_decode;
-                }
                 if (!got_subtitle) {
                     goto discard_packet;
                 }
@@ -2310,9 +2303,7 @@ static int av_encode(AVFormatContext **output_files,
         }
 
         //fprintf(stderr,"read #%d.%d size=%d\n", ist->file_index, ist->index, pkt.size);
-        int otpakv = output_packet(ist, ist_index, ost_table, nb_ostreams, &pkt, is);
-        if (otpakv < 0) {
-            fprintf(stderr, "error while decoding stream: %d\n", otpakv);
+        if (output_packet(ist, ist_index, ost_table, nb_ostreams, &pkt, is) < 0) {
             if (verbose >= 0)
                 fprintf(stderr, "Error while decoding stream #%d.%d\n",
                         ist->file_index, ist->index);
