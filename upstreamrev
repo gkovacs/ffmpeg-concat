@@ -1,5 +1,5 @@
-svn: 19344
-git: b14807a8941810deaaf6ddb9f609365ca5808506
-committer: reimar
-commitdate: Sat, 4 Jul 2009 18:24:43 +0000
-commitlog: If the end of the input buffer is reached while decoding MJPEG and at least a valid SOF was found, emulate an EOI. This allows e.g. to at least decode the available part of incomplete MJPEG frames.
+svn: 19346
+git: 2c73d654f72a730705996039d7e3d83da80e2a4c
+committer: lorenm
+commitdate: Sat, 4 Jul 2009 23:59:10 +0000
+commitlog: fix a buffer overrun on corrupt huffyuv streams
