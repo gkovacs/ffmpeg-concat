@@ -40,9 +40,9 @@ DataNode *ff_datanode_mknext(DataNode *o)
     return d;
 }
 
-DataNode *ff_datanode_tree_from_ini(char *p)
+DataNode *ff_datanode_tree_from_ini(ByteIOContext *p)
 {
-    char c;
+    int c;
     char *s;
     char e;
     int i, b;
@@ -54,7 +54,10 @@ DataNode *ff_datanode_tree_from_ini(char *p)
     s = d->name;
     e = 1;
     i = b = 0;
-    while ((c = *p++)) {
+    while (1) {
+        c = url_fgetc(p);
+        if (c == 0 || c == EOF)
+            break;
         if (c == '\n') {
             d = ff_datanode_mknext(d);
             i = b = 0;
@@ -143,9 +146,9 @@ void ff_datanode_filter_values_by_name(DataNode *d, StringList *l, char *n)
     ff_datanode_filter_values_by_name(ff_datanode_getlognext(d), l, n);
 }
 
-int ff_datanode_getdepth(DataNode *d)
+unsigned int ff_datanode_getdepth(DataNode *d)
 {
-    int i = 0;
+    unsigned int i = 0;
     while ((d = d->parent))
         ++i;
     return i;
@@ -190,6 +193,28 @@ void ff_stringlist_append(StringList *l, char *str)
         l->str = str;
 }
 
+void ff_stringlist_export(StringList *l, char ***flist_ptr, unsigned int *lfx_ptr)
+{
+    unsigned int i;
+    char **flist;
+    unsigned int strlen = ff_stringlist_len(l);
+    *lfx_ptr = strlen;
+    flist = av_malloc(sizeof(*flist)*(strlen+1));
+    memset(flist, 0, sizeof(*flist)*(strlen+1));
+    for (i = 0; l && (i < strlen); ++i) {
+        flist[i] = (l = l->next);
+    }
+    *flist_ptr = flist;
+}
+
+unsigned int ff_stringlist_len(StringList *l)
+{
+    unsigned int i = 0;
+    while ((l = l->next))
+        ++i;
+    return i;
+}
+
 void ff_stringlist_print(StringList *l)
 {
     if (!l)
@@ -200,3 +225,4 @@ void ff_stringlist_print(StringList *l)
     putchar('\n');
     ff_stringlist_print(l->next);
 }
+

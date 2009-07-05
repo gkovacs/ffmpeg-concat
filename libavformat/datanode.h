@@ -52,7 +52,7 @@ DataNode *ff_datanode_getlognext(DataNode *d);
 
 void ff_datanode_filter_values_by_name(DataNode *d, StringList *l, char *n);
 
-int ff_datanode_getdepth(DataNode *d);
+unsigned int ff_datanode_getdepth(DataNode *d);
 
 void ff_datanode_visualize(DataNode *d);
 
@@ -60,6 +60,10 @@ StringList *ff_stringlist_alloc();
 
 void ff_stringlist_append(StringList *l, char *str);
 
+void ff_stringlist_export(StringList *l, char ***flist_ptr, unsigned int *lfx_ptr);
+
 void ff_stringlist_print(StringList *l);
+
+unsigned int ff_stringlist_len(StringList *l);
 
 #endif /* AVFORMAT_DATANODE_H */
