@@ -106,7 +106,7 @@ DataNode *ff_datanode_tree_from_ini(char *p)
     return o;
 }
 
-DataNode *ff_datanode_tree_from_ini(char *p)
+DataNode *ff_datanode_tree_from_xml(char *p)
 {
     // TODO
     return NULL;
