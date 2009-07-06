@@ -51,9 +51,9 @@ typedef struct PlaylistContext {
     int64_t *time_offsets; /**< Time offsets, in 10^-6 seconds, for each multimedia stream */
 } PlaylistContext;
 
-void ff_playlist_make_playelem(PlayElem* pe);
+void ff_playlist_init_playelem(PlayElem* pe);
 
-PlaylistContext* ff_playlist_make_context(const char *filename);
+PlaylistContext* ff_playlist_alloc_context(const char *filename);
 
 int ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index);
 

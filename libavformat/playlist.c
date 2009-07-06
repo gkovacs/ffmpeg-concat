@@ -24,7 +24,7 @@
 #include "internal.h"
 #include <cmdutils.h>
 
-void ff_playlist_make_playelem(PlayElem *pe)
+void ff_playlist_init_playelem(PlayElem *pe)
 {
     int err;
     pe->ic = av_malloc(sizeof(*(pe->ic)));
@@ -57,7 +57,7 @@ void ff_playlist_make_playelem(PlayElem *pe)
     }
 }
 
-PlaylistContext* ff_playlist_make_context(const char *filename)
+PlaylistContext* ff_playlist_alloc_context(const char *filename)
 {
     int i;
     PlaylistContext *ctx = av_malloc(sizeof(*ctx));
@@ -160,7 +160,7 @@ int ff_playlist_populate_context(PlaylistContext *ctx,
     AVFormatParameters *nap;
     printf("playlist_populate_context called\n");
 //    ctx->pelist[ctx->pe_curidxs[stream_index]] = av_malloc(sizeof(*(ctx->pelist[ctx->pe_curidxs[stream_index]])));
-    ff_playlist_make_playelem(ctx->pelist[ctx->pe_curidxs[stream_index]]);
+    ff_playlist_init_playelem(ctx->pelist[ctx->pe_curidxs[stream_index]]);
     ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
     nap = ctx->pelist[ctx->pe_curidxs[stream_index]]->ap;
     ic->iformat->read_header(ic, 0);

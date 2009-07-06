@@ -68,7 +68,7 @@ static int xspf_read_header(AVFormatContext *s,
                             AVFormatParameters *ap)
 {
     int i;
-    PlaylistContext *ctx = ff_playlist_make_context(s->filename);
+    PlaylistContext *ctx = ff_playlist_alloc_context(s->filename);
     xspf_list_files(s->pb, ctx);
     s->priv_data = ctx;
     for (i = 0; i < ctx->pe_curidxs_size; ++i) {

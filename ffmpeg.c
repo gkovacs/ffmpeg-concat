@@ -2891,7 +2891,7 @@ static void opt_input_file(const char *filename)
             ic = av_malloc(sizeof(*ic));
 //            ic = avformat_alloc_context();
             printf("need to generate playlist ctx\n");
-            playlist_ctx = ff_playlist_make_context(filename);
+            playlist_ctx = ff_playlist_alloc_context(filename);
             playlist_ctx->pelist_size = 1;
             playlist_ctx->pelist = av_malloc(playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
             memset(playlist_ctx->pelist, 0, playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
