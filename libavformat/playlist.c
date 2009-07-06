@@ -22,6 +22,7 @@
 #include "avformat.h"
 #include "playlist.h"
 #include "internal.h"
+#include <cmdutils.h>
 
 void ff_playlist_make_playelem(PlayElem *pe)
 {
@@ -43,7 +44,7 @@ void ff_playlist_make_playelem(PlayElem *pe)
     }
     err = av_find_stream_info(pe->ic);
     if (err < 0) {
-        fprintf(stderr, "failed codec probe av_find_stream_info\n");
+        print_error("during-av_find_stream_info", err);
     }
     if(pe->ic->pb) {
         pe->ic->pb->eof_reached = 0;
