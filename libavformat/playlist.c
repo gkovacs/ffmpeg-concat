@@ -54,7 +54,6 @@ void ff_playlist_make_playelem(PlayElem *pe)
     if(!pe->fmt) {
         fprintf(stderr, "failed pe ic fmt not set");
     }
-    return pe;
 }
 
 PlaylistContext* ff_playlist_make_context(char *filename)
