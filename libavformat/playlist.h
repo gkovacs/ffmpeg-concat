@@ -57,14 +57,12 @@ PlaylistContext* ff_playlist_alloc_context(const char *filename);
 
 int ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index);
 
-char* ff_conc_strings(char *string1, char *string2);
-
 char* ff_buf_getline(ByteIOContext *s);
 
 void ff_split_wd_fn(const char *filepath, char **workingdir, char **filename);
 
 int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index);
 
-void ff_playlist_relative_paths(char **flist, char *workingdir);
+void ff_playlist_relative_paths(char **flist, const char *workingdir);
 
 #endif /* _PLAYLIST_H */

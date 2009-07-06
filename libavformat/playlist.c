@@ -74,29 +74,6 @@ PlaylistContext* ff_playlist_alloc_context(const char *filename)
     return ctx;
 }
 
-char* ff_conc_strings(char *string1,
-                      char *string2)
-{
-    char *str1;
-    char *str2;
-    char *str;
-    str1 = string1;
-    str2 = string2;
-    while (*string1 != 0)
-        ++string1;
-    while (*string2 != 0)
-        ++string2;
-    str = av_malloc((string1-str1)+(string2-str2));
-    string1 = str1;
-    string2 = str2;
-    while (*string1 != 0)
-        str[string1-str1] = *(string1++);
-    str += (string1-str1);
-    while (*string2 != 0)
-        str[string2-str2] = *(string2++);
-    return (str-string1)+str1;
-}
-
 char* ff_buf_getline(ByteIOContext *s)
 {
     char *q;
@@ -238,11 +215,18 @@ int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index)
     return durn;
 }
 
-void ff_playlist_relative_paths(char **flist, char *workingdir)
+void ff_playlist_relative_paths(char **flist, const char *workingdir)
 {
     while (*flist != 0) { // determine if relative paths
         FILE *file;
-        char *fullfpath = ff_conc_strings(workingdir, *flist);
+        char *fullfpath;
+        int wdslen = strlen(workingdir);
+        int flslen = strlen(*flist);
+        fullfpath = av_malloc(sizeof(char) * (wdslen+flslen+1));
+        av_strlcpy(fullfpath, workingdir, wdslen);
+        av_strlcpy(fullfpath+wdslen, *flist, flslen+1);
+        fullfpath[wdslen-1] = '/';
+        fullfpath[wdslen+flslen] = 0;
         file = fopen(fullfpath, "r");
         if (file) {
             fclose(file);
