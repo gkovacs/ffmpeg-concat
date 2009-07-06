@@ -35,8 +35,7 @@ void ff_playlist_make_playelem(PlayElem *pe)
     pe->ap->time_base = (AVRational){1, 25};
     pe->ap->pix_fmt = 0;
     pe->fmt = 0;
-    pe->buf_size = 0;
-    err = av_open_input_file(&(pe->ic), pe->filename, pe->fmt, pe->buf_size, pe->ap);
+    err = av_open_input_file(&(pe->ic), pe->filename, pe->fmt, 0, pe->ap);
     if (err < 0)
         print_error("during-open_input_playelem", err);
     pe->fmt = pe->ic->iformat;
