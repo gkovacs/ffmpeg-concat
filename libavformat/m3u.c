@@ -41,13 +41,10 @@ static int m3u_probe(AVProbeData *p)
 }
 
 static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx)
-//                          char ***flist_ptr,
-//                          unsigned int *lfx_ptr,
-//                          char *workingdir)
 {
     char **flist;
     int i, j;
-    int bufsize = 16;
+    int bufsize = 0;
     i = 0;
     flist = av_malloc(sizeof(char*) * bufsize);
     while (1) {
@@ -56,11 +53,8 @@ static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx)
             break;
         if (*c == 0) // hashed out
             continue;
-        flist[i] = c;
-        if (++i == bufsize) {
-            bufsize += 16;
-            flist = av_realloc(flist, sizeof(char*) * bufsize);
-        }
+        flist = av_fast_realloc(flist, &bufsize, i+2);
+        flist[i++] = c;
     }
     ctx->pelist_size = i;
     flist[i] = 0;
