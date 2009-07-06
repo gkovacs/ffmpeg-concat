@@ -260,12 +260,6 @@ DataNode *ff_datanode_tree_from_xml(ByteIOContext *p)
     return o;
 }
 
-DataNode *ff_datanode_tree_from_xml(ByteIOContext *p)
-{
-    // TODO
-    return NULL;
-}
-
 DataNode *ff_datanode_getlognext(DataNode *d)
 {
     if (d->child)
