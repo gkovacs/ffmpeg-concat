@@ -7,19 +7,19 @@
       <title>title1</title>
       <creator>creator1</creator>
       <album>album1</album>
-      <location>bb-test-suite/bb1.avi</location>
+      <location>bb1.avi</location>
     </track>
     <track>
       <title>title2</title>
       <creator>creator2</creator>
       <album>album2</album>
-      <location>bb-test-suite/bb2.avi</location>
+      <location>bb2.avi</location>
     </track>
     <track>
       <title>title3</title>
       <creator>creator3</creator>
       <album>album3</album>
-      <location>bb-test-suite/bb3.avi</location>
+      <location>bb3.avi</location>
     </track>
   </trackList>
 </playlist>
