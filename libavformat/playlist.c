@@ -45,10 +45,10 @@ int ff_alloc_playelem(unsigned char *filename,
     return 0;
 }
 
-PlayElem* ff_playlist_make_playelem(char *filename)
+void ff_playlist_make_playelem(PlayElem *pe, char *filename)
 {
     int err;
-    PlayElem *pe = av_malloc(sizeof(*pe));
+//    PlayElem *pe = av_malloc(sizeof(*pe));
     err = ff_alloc_playelem(filename, pe);
     if (err < 0)
         print_error("during-av_alloc_playelem", err);
@@ -180,7 +180,8 @@ int ff_playlist_populate_context(PlaylistContext *ctx,
     AVFormatContext *ic;
     AVFormatParameters *nap;
     printf("playlist_populate_context called\n");
-    ctx->pelist[ctx->pe_curidxs[stream_index]] = ff_playlist_make_playelem(ctx->flist[ctx->pe_curidxs[stream_index]]);
+    ctx->pelist[ctx->pe_curidxs[stream_index]] = av_malloc(sizeof(*(ctx->pelist[ctx->pe_curidxs[stream_index]])));
+    ff_playlist_make_playelem(ctx->pelist[ctx->pe_curidxs[stream_index]], ctx->flist[ctx->pe_curidxs[stream_index]]);
     ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
     nap = ctx->pelist[ctx->pe_curidxs[stream_index]]->ap;
     ic->iformat->read_header(ic, 0);
