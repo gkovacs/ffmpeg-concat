@@ -49,7 +49,6 @@ typedef struct PlaylistContext {
     char *workingdir; /**< Directory in which the playlist file is stored in */
     char *filename; /**< Filename (not path) of the playlist file */
     int64_t *time_offsets; /**< Time offsets, in 10^-6 seconds, for each multimedia stream */
-    int time_offsets_size; /**< Length of the time_offsets array (number of multimedia streams) currently set to 2 (video and audio) */
 } PlaylistContext;
 
 void ff_playlist_make_playelem(PlayElem* pe);

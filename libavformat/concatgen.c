@@ -42,7 +42,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         if (pkt) {
             int64_t time_offset;
             time_offset = av_rescale_q(ctx->time_offsets[pkt->stream_index], AV_TIME_BASE_Q, ic->streams[stream_index]->time_base);
-            printf("%s conv stream time from %ld to %ld/%ld is %ld\n", ic->iformat->name, ctx->time_offsets[pkt->stream_index], ic->streams[stream_index]->time_base.num, ic->streams[stream_index]->time_base.den, time_offset);
+            printf("%s conv stream time from %ld to %d/%d is %ld\n", ic->iformat->name, ctx->time_offsets[pkt->stream_index], ic->streams[stream_index]->time_base.num, ic->streams[stream_index]->time_base.den, time_offset);
             // TODO changing either dts or pts leads to timing issues on h264
             pkt->dts += time_offset;
             if (!ic->streams[pkt->stream_index]->codec->has_b_frames)
@@ -59,7 +59,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
 //        playld->dts_offset += ic->streams[0]->cur_dts;
 //        playld->dts_offset += playld->dts_prevpacket;
         printf("switching streams\n");
-        for (i = 0; i < ic->nb_streams && i < ctx->time_offsets_size; ++i) {
+        for (i = 0; i < ic->nb_streams && i < ctx->pe_curidxs_size; ++i) {
             ctx->time_offsets[i] += ff_playlist_get_duration(ic, i);
         }
         ++ctx->pe_curidxs[stream_index];

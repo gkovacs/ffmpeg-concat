@@ -61,14 +61,13 @@ PlaylistContext* ff_playlist_make_context(char *filename)
 {
     int i;
     PlaylistContext *ctx = av_malloc(sizeof(*ctx));
-    ctx->time_offsets_size = 2; // TODO don't assume we have just 2 streams
-    ctx->time_offsets = av_malloc(sizeof(*(ctx->time_offsets)) * ctx->time_offsets_size);
-    for (i = 0; i < ctx->time_offsets_size; ++i)
-        ctx->time_offsets[i] = 0;
     ctx->pe_curidxs_size = 2; // TODO don't assume we have just 2 streams
     ctx->pe_curidxs = av_malloc(sizeof(*(ctx->pe_curidxs)) * ctx->pe_curidxs_size);
     for (i = 0; i < ctx->pe_curidxs_size; ++i)
         ctx->pe_curidxs[i] = 0;
+    ctx->time_offsets = av_malloc(sizeof(*(ctx->time_offsets)) * ctx->pe_curidxs_size);
+    for (i = 0; i < ctx->pe_curidxs_size; ++i)
+        ctx->time_offsets[i] = 0;
     ff_split_wd_fn(filename,
                    &ctx->workingdir,
                    &ctx->filename);
