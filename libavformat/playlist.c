@@ -22,7 +22,6 @@
 #include "avformat.h"
 #include "playlist.h"
 #include "internal.h"
-#include <cmdutils.h>
 
 void ff_playlist_init_playelem(PlayElem *pe)
 {
@@ -37,23 +36,23 @@ void ff_playlist_init_playelem(PlayElem *pe)
     pe->fmt = 0;
     err = av_open_input_file(&(pe->ic), pe->filename, pe->fmt, 0, pe->ap);
     if (err < 0)
-        print_error("during-open_input_playelem", err);
+        av_log(pe->ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
     pe->fmt = pe->ic->iformat;
     if (!pe->fmt) {
         fprintf(stderr, "pefmt not set\n");
     }
     err = av_find_stream_info(pe->ic);
     if (err < 0) {
-        print_error("during-av_find_stream_info", err);
+        av_log(pe->ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
     }
     if(pe->ic->pb) {
         pe->ic->pb->eof_reached = 0;
     }
     else {
-        fprintf(stderr, "failed pe ic pb not set");
+        av_log(NULL, AV_LOG_ERROR, "failed pe ic pb not set\n");
     }
     if(!pe->fmt) {
-        fprintf(stderr, "failed pe ic fmt not set");
+        av_log(NULL, AV_LOG_ERROR, "failed pe ic fmt not set\n");
     }
 }
 
