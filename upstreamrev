@@ -1,5 +1,13 @@
-svn: 19346
-git: 2c73d654f72a730705996039d7e3d83da80e2a4c
-committer: lorenm
-commitdate: Sat, 4 Jul 2009 23:59:10 +0000
-commitlog: fix a buffer overrun on corrupt huffyuv streams
+ffmpeg:
+svn: 19360
+git: 3b38e9f3b90dd9abaf1ff071c9bd374b7f742c70
+committer: reimar
+commitdate: Mon, 6 Jul 2009 17:08:32 +0000
+commitlog: Check for packet_lenght 0, it is already treated as invalid by the padding check, but that resulted in a confusing/wrong error message.
+
+ffmpeg:
+svn: 19459
+git: 3b38e9f3b90dd9abaf1ff071c9bd374b7f742c70
+committer: reimar
+commitdate: Mon, 6 Jul 2009 17:08:32 +0000
+commitlog: Check for packet_lenght 0, it is already treated as invalid by the padding check, but that resulted in a confusing/wrong error message.
