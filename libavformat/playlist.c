@@ -22,7 +22,6 @@
 #include "avformat.h"
 #include "playlist.h"
 #include "internal.h"
-#include <time.h>
 
 void ff_playlist_make_playelem(PlayElem *pe)
 {
@@ -55,8 +54,6 @@ void ff_playlist_make_playelem(PlayElem *pe)
     if(!pe->fmt) {
         fprintf(stderr, "failed pe ic fmt not set");
     }
-    pe->time_offset = 0;
-    pe->indv_time = clock();
     return pe;
 }
 
