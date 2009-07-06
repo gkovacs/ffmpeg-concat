@@ -2895,9 +2895,10 @@ static void opt_input_file(const char *filename)
             playlist_ctx->pelist_size = 1;
             playlist_ctx->pelist = av_malloc(playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
             memset(playlist_ctx->pelist, 0, playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
-            playlist_ctx->flist = av_malloc(playlist_ctx->pelist_size * sizeof(*(playlist_ctx->flist)));
-            playlist_ctx->flist[0] = av_malloc(sizeof(char) * (filenamelen+1));
-            av_strlcpy(playlist_ctx->flist[0], filename, filenamelen+1);
+            playlist_ctx->pelist[playlist_ctx->pelist_size-1] = av_malloc(sizeof(*(playlist_ctx->pelist[playlist_ctx->pelist_size-1])));
+            memset(playlist_ctx->pelist[playlist_ctx->pelist_size-1], 0, sizeof(*(playlist_ctx->pelist[playlist_ctx->pelist_size-1])));
+            playlist_ctx->pelist[playlist_ctx->pelist_size-1]->filename =  av_malloc(sizeof(char) * (filenamelen+1));
+            av_strlcpy(playlist_ctx->pelist[playlist_ctx->pelist_size-1]->filename, filename, filenamelen+1);
             av_strlcpy(ic->filename, filename, sizeof(ic->filename));
             ic->nb_streams = 2;
             ic->iformat = concat_make_demuxer();
@@ -2913,9 +2914,10 @@ static void opt_input_file(const char *filename)
             printf("adding new file to playlist\n");
             ++playlist_ctx->pelist_size;
             playlist_ctx->pelist = av_realloc(playlist_ctx->pelist, playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
-            playlist_ctx->flist = av_realloc(playlist_ctx->flist, playlist_ctx->pelist_size);
-            playlist_ctx->flist[playlist_ctx->pelist_size-1] = av_malloc(sizeof(char) * (filenamelen+1));
-            av_strlcpy(playlist_ctx->flist[playlist_ctx->pelist_size-1], filename, filenamelen+1);
+            playlist_ctx->pelist[playlist_ctx->pelist_size-1] = av_malloc(sizeof(*(playlist_ctx->pelist[playlist_ctx->pelist_size-1])));
+            memset(playlist_ctx->pelist[playlist_ctx->pelist_size-1], 0, sizeof(*(playlist_ctx->pelist[playlist_ctx->pelist_size-1])));
+            playlist_ctx->pelist[playlist_ctx->pelist_size-1]->filename =  av_realloc(playlist_ctx->pelist[playlist_ctx->pelist_size-1]->filename, sizeof(char) * (filenamelen+1));
+            av_strlcpy(playlist_ctx->pelist[playlist_ctx->pelist_size-1]->filename, filename, filenamelen+1);
         }
         return;
     }

@@ -36,13 +36,10 @@ typedef struct PlayElem {
 } PlayElem;
 
 typedef struct PlaylistContext {
-    char **flist;
-//    int flist_len;
     PlayElem **pelist;
     int pelist_size;
     int *pe_curidxs;
     int pe_curidxs_size;
-//    int pe_curidx;
     AVChapter **chlist;
     int chlist_size;
     int ch_curidx;
