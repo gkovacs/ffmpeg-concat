@@ -5,3 +5,9 @@ committer: reimar
 commitdate: Mon, 6 Jul 2009 17:08:32 +0000
 commitlog: Check for packet_lenght 0, it is already treated as invalid by the padding check, but that resulted in a confusing/wrong error message.
 
+libswscale:
+svn: 19360
+git: 
+committer: arpi
+commitdate: Wed, 10 Oct 2001 22:13:27 +0000
+commitlog: new postprocess code by Michael Niedermayer (michaelni@gmx.at)

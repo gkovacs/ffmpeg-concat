@@ -12,7 +12,7 @@ git pull upstream master
 printf "ffmpeg:\nsvn: $svnrevno\ngit: $gitrevno\ncommitter: $committer\ncommitdate: $commitdate\ncommitlog: $commitlog\n\n" > upstreamrev
 cd libswscale
 git pull origin master
-gitrevno=$(git show-ref 'refs/heads/upstream-local' | sed 's/ /\n/g' | head --lines 1)
+gitrevno=$(git show-ref 'refs/heads/master' | sed 's/ /\n/g' | head --lines 1)
 committer=$(git log --pretty=format:'%H %an' | grep "$gitrevno" | sed 's/ /\n/' | tail --lines 1)
 commitdate=$(git log --pretty=format:'%H %aD' | grep "$gitrevno" | sed 's/ /\n/' | tail --lines 1)
 commitlog=$(git log --pretty=format:'%H %s' | grep "$gitrevno" | sed 's/ /\n/' | tail --lines 1)
