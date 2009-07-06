@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <playlist version="1" xmlns="http://xspf.org/ns/0/">
   <title>grandtitle</title>
   <date>2009-07-05T06:30:41.1297340Z</date>
@@ -13,13 +13,13 @@
       <title>title2</title>
       <creator>creator2</creator>
       <album>album2</album>
-      <location>bb-test-suite/bb1.avi</location>
+      <location>bb-test-suite/bb2.avi</location>
     </track>
     <track>
       <title>title3</title>
       <creator>creator3</creator>
       <album>album3</album>
-      <location>bb-test-suite/bb1.avi</location>
+      <location>bb-test-suite/bb3.avi</location>
     </track>
   </trackList>
 </playlist>

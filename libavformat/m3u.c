@@ -40,10 +40,10 @@ static int m3u_probe(AVProbeData *p)
         return 0;
 }
 
-static int m3u_list_files(ByteIOContext *s,
-                          char ***flist_ptr,
-                          unsigned int *lfx_ptr,
-                          char *workingdir)
+static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx)
+//                          char ***flist_ptr,
+//                          unsigned int *lfx_ptr,
+//                          char *workingdir)
 {
     char **ofl;
     int i;
@@ -62,10 +62,10 @@ static int m3u_list_files(ByteIOContext *s,
             ofl = av_realloc(ofl, sizeof(char*) * bufsize);
         }
     }
-    *flist_ptr = ofl;
-    *lfx_ptr = i;
+    ctx->flist = ofl;
+    ctx->pelist_size = i;
     ofl[i] = 0;
-    ff_playlist_relative_paths(ofl, workingdir);
+    ff_playlist_relative_paths(ofl, ctx->workingdir);
     return 0;
 }
 
@@ -74,10 +74,10 @@ static int m3u_read_header(AVFormatContext *s,
 {
     int i;
     PlaylistContext *ctx = ff_playlist_make_context(s->filename);
-    m3u_list_files(s->pb,
-                   &(ctx->flist),
-                   &(ctx->pelist_size),
-                   ctx->workingdir);
+    m3u_list_files(s->pb, ctx);
+//                   &(ctx->flist),
+//                   &(ctx->pelist_size),
+//                   ctx->workingdir);
     ctx->pelist = av_malloc(ctx->pelist_size * sizeof(*(ctx->pelist)));
     memset(ctx->pelist, 0, ctx->pelist_size * sizeof(*(ctx->pelist)));
     s->priv_data = ctx;

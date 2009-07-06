@@ -251,8 +251,7 @@ int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index)
     int64_t durn;
 
 //    durn = ic->duration;
-    AVRational avbasetime = {1, AV_TIME_BASE};
-    durn = av_rescale_q(ic->streams[stream_index]->duration, ic->streams[stream_index]->time_base, avbasetime);
+    durn = av_rescale_q(ic->streams[stream_index]->duration, ic->streams[stream_index]->time_base, AV_TIME_BASE_Q);
 
 //    durn = ic->streams[stream_index]->duration; // ogg gives wrong value
     printf("duration is %ld\n", durn);

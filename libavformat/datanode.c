@@ -151,6 +151,8 @@ DataNode *ff_datanode_tree_from_xml(ByteIOContext *p)
             quo = 1;
             goto writeoutput;
         }
+        if (c == '\n' || c == ' ' || c == '\t')
+            continue;
         if (tag == 0) { // awaiting opening tag
             if (c == '<') { // opening tag
                 tag = 1;
@@ -286,7 +288,7 @@ void ff_datanode_filter_values_by_name(DataNode *d, StringList *l, char *n)
 {
     if (!d)
         return;
-    if (d->value && !strncmp(n, d->name, strlen(n)))
+    if (d->name && d->value && !strncmp(n, d->name, strlen(n)))
         ff_stringlist_append(l, d->value);
     ff_datanode_filter_values_by_name(ff_datanode_getlognext(d), l, n);
 }

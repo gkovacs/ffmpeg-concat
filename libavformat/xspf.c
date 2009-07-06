@@ -29,11 +29,18 @@ static const AVCodecTag codec_xspf_tags[] = {
 
 static int xspf_probe(AVProbeData *p)
 {
+//    int i;
+//    unsigned char *probetemplate = "<?xml";
     if (p->buf != 0) {
-//        if (!strncmp(p->buf, "﻿﻿<?xml", 5))
+        if (!strncmp(p->buf, "<?xml", 4))
             return AVPROBE_SCORE_MAX;
-//        else
-//            return 0;
+        else
+            return 0;
+//        for (i = 0; i < 4; ++i) {
+//            if (probetemplate[i] != p->buf[i])
+//                return 0;
+        }
+        return AVPROBE_SCORE_MAX;
     }
     if (match_ext(p->filename, "xspf"))
         return AVPROBE_SCORE_MAX/2;
@@ -55,10 +62,6 @@ static int xspf_list_files(ByteIOContext *s,
     ff_stringlist_print(l);
     ff_stringlist_export(l, flist_ptr, lfx_ptr);
     ff_playlist_relative_paths(*flist_ptr, workingdir);
-    while (**flist_ptr != 0) {
-        printf(**flist_ptr);
-        (*flist_ptr)++;
-    }
     return 0;
 }
 
