@@ -57,7 +57,7 @@ void ff_playlist_make_playelem(PlayElem *pe)
     }
 }
 
-PlaylistContext* ff_playlist_make_context(char *filename)
+PlaylistContext* ff_playlist_make_context(const char *filename)
 {
     int i;
     PlaylistContext *ctx = av_malloc(sizeof(*ctx));
@@ -127,7 +127,7 @@ char* ff_buf_getline(ByteIOContext *s)
     return oq;
 }
 
-void ff_split_wd_fn(char *filepath,
+void ff_split_wd_fn(const char *filepath,
                     char **workingdir,
                     char **filename)
 {

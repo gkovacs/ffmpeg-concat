@@ -53,7 +53,7 @@ typedef struct PlaylistContext {
 
 void ff_playlist_make_playelem(PlayElem* pe);
 
-PlaylistContext* ff_playlist_make_context(char *filename);
+PlaylistContext* ff_playlist_make_context(const char *filename);
 
 int ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index);
 
@@ -61,7 +61,7 @@ char* ff_conc_strings(char *string1, char *string2);
 
 char* ff_buf_getline(ByteIOContext *s);
 
-void ff_split_wd_fn(char *filepath, char **workingdir, char **filename);
+void ff_split_wd_fn(const char *filepath, char **workingdir, char **filename);
 
 int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index);
 
