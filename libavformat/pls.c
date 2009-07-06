@@ -42,9 +42,6 @@ static int pls_probe(AVProbeData *p)
 }
 
 static int pls_list_files(ByteIOContext *s, PlaylistContext *ctx)
-//                          char ***flist_ptr,
-//                          unsigned int *lfx_ptr,
-//                          char *workingdir)
 {
     int i;
     char **flist;

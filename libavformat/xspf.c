@@ -41,11 +41,10 @@ static int xspf_probe(AVProbeData *p)
         return 0;
 }
 
-static int xspf_list_files(ByteIOContext *s,
-                           char ***flist_ptr,
-                           unsigned int *lfx_ptr,
-                           char *workingdir)
+static int xspf_list_files(ByteIOContext *s, PlaylistContext *ctx)
 {
+    int i;
+    char **flist;
     StringList *l;
     DataNode *d;
     l = ff_stringlist_alloc();
@@ -53,8 +52,15 @@ static int xspf_list_files(ByteIOContext *s,
     ff_datanode_visualize(d);
     ff_datanode_filter_values_by_name(d, l, "location");
     ff_stringlist_print(l);
-    ff_stringlist_export(l, flist_ptr, lfx_ptr);
-    ff_playlist_relative_paths(*flist_ptr, workingdir);
+    ff_stringlist_export(l, &flist, &(ctx->pelist_size));
+    ff_playlist_relative_paths(flist, ctx->workingdir);
+    ctx->pelist = av_malloc(ctx->pelist_size * sizeof(*(ctx->pelist)));
+    memset(ctx->pelist, 0, ctx->pelist_size * sizeof(*(ctx->pelist)));
+    for (i = 0; i < ctx->pelist_size; ++i) {
+        ctx->pelist[i] = av_malloc(sizeof(*(ctx->pelist[i])));
+        ctx->pelist[i]->filename = flist[i];
+    }
+    av_free(flist);
     return 0;
 }
 
@@ -63,12 +69,7 @@ static int xspf_read_header(AVFormatContext *s,
 {
     int i;
     PlaylistContext *ctx = ff_playlist_make_context(s->filename);
-    xspf_list_files(s->pb,
-                    &(ctx->flist),
-                    &(ctx->pelist_size),
-                    ctx->workingdir);
-    ctx->pelist = av_malloc(ctx->pelist_size * sizeof(*(ctx->pelist)));
-    memset(ctx->pelist, 0, ctx->pelist_size * sizeof(*(ctx->pelist)));
+    xspf_list_files(s->pb, ctx);
     s->priv_data = ctx;
     for (i = 0; i < ctx->pe_curidxs_size; ++i) {
         ff_playlist_populate_context(ctx, s, i);
