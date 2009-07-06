@@ -51,8 +51,6 @@ typedef struct PlaylistContext {
 
 void ff_playlist_make_playelem(PlayElem* pe);
 
-int ff_playlist_setup_playelem(PlayElem *pe);
-
 PlaylistContext* ff_playlist_make_context(char *filename);
 
 int ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index);

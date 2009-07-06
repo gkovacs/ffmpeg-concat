@@ -24,32 +24,18 @@
 #include "internal.h"
 #include <time.h>
 
-// based on decode_thread() in ffplay.c
-int ff_playlist_setup_playelem(PlayElem *pe)
-{
-    AVFormatContext *ic;
-    AVFormatParameters *ap;
-    ic = av_malloc(sizeof(*ic));
-    ap = av_malloc(sizeof(*ap));
-    memset(ap, 0, sizeof(*ap));
-    ap->width = 0;
-    ap->height = 0;
-    ap->time_base = (AVRational){1, 25};
-    ap->pix_fmt = 0;
-    pe->ic = ic;
-    pe->fmt = 0;
-    pe->buf_size = 0;
-    pe->ap = ap;
-    return 0;
-}
-
 void ff_playlist_make_playelem(PlayElem *pe)
 {
     int err;
-//    PlayElem *pe = av_malloc(sizeof(*pe));
-    err = ff_playlist_setup_playelem(pe);
-    if (err < 0)
-        print_error("during-av_alloc_playelem", err);
+    pe->ic = av_malloc(sizeof(*(pe->ic)));
+    pe->ap = av_malloc(sizeof(*(pe->ap)));
+    memset(pe->ap, 0, sizeof(*(pe->ap)));
+    pe->ap->width = 0;
+    pe->ap->height = 0;
+    pe->ap->time_base = (AVRational){1, 25};
+    pe->ap->pix_fmt = 0;
+    pe->fmt = 0;
+    pe->buf_size = 0;
     err = av_open_input_file(&(pe->ic), pe->filename, pe->fmt, pe->buf_size, pe->ap);
     if (err < 0)
         print_error("during-open_input_playelem", err);
