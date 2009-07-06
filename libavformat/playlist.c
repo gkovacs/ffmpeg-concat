@@ -25,8 +25,7 @@
 #include <time.h>
 
 // based on decode_thread() in ffplay.c
-int ff_alloc_playelem(unsigned char *filename,
-                      PlayElem *pe)
+int ff_playlist_setup_playelem(PlayElem *pe)
 {
     AVFormatContext *ic;
     AVFormatParameters *ap;
@@ -38,18 +37,17 @@ int ff_alloc_playelem(unsigned char *filename,
     ap->time_base = (AVRational){1, 25};
     ap->pix_fmt = 0;
     pe->ic = ic;
-    pe->filename = filename;
     pe->fmt = 0;
     pe->buf_size = 0;
     pe->ap = ap;
     return 0;
 }
 
-void ff_playlist_make_playelem(PlayElem *pe, char *filename)
+void ff_playlist_make_playelem(PlayElem *pe)
 {
     int err;
 //    PlayElem *pe = av_malloc(sizeof(*pe));
-    err = ff_alloc_playelem(filename, pe);
+    err = ff_playlist_setup_playelem(pe);
     if (err < 0)
         print_error("during-av_alloc_playelem", err);
     err = av_open_input_file(&(pe->ic), pe->filename, pe->fmt, pe->buf_size, pe->ap);
@@ -180,8 +178,8 @@ int ff_playlist_populate_context(PlaylistContext *ctx,
     AVFormatContext *ic;
     AVFormatParameters *nap;
     printf("playlist_populate_context called\n");
-    ctx->pelist[ctx->pe_curidxs[stream_index]] = av_malloc(sizeof(*(ctx->pelist[ctx->pe_curidxs[stream_index]])));
-    ff_playlist_make_playelem(ctx->pelist[ctx->pe_curidxs[stream_index]], ctx->flist[ctx->pe_curidxs[stream_index]]);
+//    ctx->pelist[ctx->pe_curidxs[stream_index]] = av_malloc(sizeof(*(ctx->pelist[ctx->pe_curidxs[stream_index]])));
+    ff_playlist_make_playelem(ctx->pelist[ctx->pe_curidxs[stream_index]]);
     ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
     nap = ctx->pelist[ctx->pe_curidxs[stream_index]]->ap;
     ic->iformat->read_header(ic, 0);

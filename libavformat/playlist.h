@@ -52,7 +52,9 @@ typedef struct PlaylistContext {
     int time_offsets_size;
 } PlaylistContext;
 
-void ff_playlist_make_playelem(PlayElem* pe, char *filename);
+void ff_playlist_make_playelem(PlayElem* pe);
+
+int ff_playlist_setup_playelem(PlayElem *pe);
 
 PlaylistContext* ff_playlist_make_context(char *filename);
 
