@@ -25,28 +25,36 @@
 #include "avformat.h"
 #include "riff.h"
 
+/** @struct PlayElem
+ *  @brief Represents each input file on a playlist
+ */
+
 typedef struct PlayElem {
-    AVFormatContext *ic;
-    char *filename;
-    AVInputFormat *fmt;
+    AVFormatContext *ic; /**< AVFormatContext for this playlist item */
+    char *filename; /**< Filename with absolute path of this playlist item */
+    AVInputFormat *fmt; /**< AVInputFormat manually specified for this playlist item */
     int buf_size;
-    AVFormatParameters *ap;
+    AVFormatParameters *ap; /**< AVFormatParameters for this playlist item */
     int64_t time_offset;
     int64_t indv_time;
 } PlayElem;
 
+/** @struct PlaylistContext
+ *  @brief Represents the playlist and contains PlayElem for each playlist item
+ */
+
 typedef struct PlaylistContext {
-    PlayElem **pelist;
-    int pelist_size;
-    int *pe_curidxs;
-    int pe_curidxs_size;
-    AVChapter **chlist;
-    int chlist_size;
-    int ch_curidx;
-    char *workingdir;
-    char *filename;
-    int64_t *time_offsets;
-    int time_offsets_size;
+    PlayElem **pelist; /**< List of PlayElem, with each representing a playlist item */
+    int pelist_size; /**< Length of the pelist array (number of playlist items) */
+    int *pe_curidxs; /**< Index of the PlayElem that each multimedia stream (video and audio) is currently on */
+    int pe_curidxs_size; /**< Length of pe_curidxs array (number of multimedia streams) currently set to 2 (video and audio) */
+    AVChapter **chlist; /**< List of chapters, with each playlist element representing a chapter */
+    int chlist_size; /**<  Length of chlist array (number of chapters) */
+    int ch_curidx; /**< Index of the current chapter */
+    char *workingdir; /**< Directory in which the playlist file is stored in */
+    char *filename; /**< Filename (not path) of the playlist file */
+    int64_t *time_offsets; /**< Time offsets, in 10^-6 seconds, for each multimedia stream */
+    int time_offsets_size; /**< Length of the time_offsets array (number of multimedia streams) currently set to 2 (video and audio) */
 } PlaylistContext;
 
 void ff_playlist_make_playelem(PlayElem* pe);
