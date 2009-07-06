@@ -71,6 +71,7 @@ static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx)
         ctx->pelist[i] = av_malloc(sizeof(*(ctx->pelist[i])));
         ctx->pelist[i]->filename = flist[i];
     }
+    av_free(flist);
     return 0;
 }
 
@@ -80,12 +81,7 @@ static int m3u_read_header(AVFormatContext *s,
     int i;
     PlaylistContext *ctx = ff_playlist_make_context(s->filename);
     m3u_list_files(s->pb, ctx);
-//                   &(ctx->flist),
-//                   &(ctx->pelist_size),
-//                   ctx->workingdir);
-
     s->priv_data = ctx;
-
     for (i = 0; i < ctx->pe_curidxs_size; ++i) {
         ff_playlist_populate_context(ctx, s, i);
     }
