@@ -46,8 +46,6 @@ typedef struct PlaylistContext {
     int *pe_curidxs; /**< Index of the PlayElem that each multimedia stream (video and audio) is currently on */
     int pe_curidxs_size; /**< Length of pe_curidxs array (number of multimedia streams) currently set to 2 (video and audio) */
     AVChapter **chlist; /**< List of chapters, with each playlist element representing a chapter */
-    int chlist_size; /**<  Length of chlist array (number of chapters) */
-    int ch_curidx; /**< Index of the current chapter */
     char *workingdir; /**< Directory in which the playlist file is stored in */
     char *filename; /**< Filename (not path) of the playlist file */
     int64_t *time_offsets; /**< Time offsets, in 10^-6 seconds, for each multimedia stream */
