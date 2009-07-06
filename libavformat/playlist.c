@@ -74,36 +74,6 @@ PlaylistContext* ff_playlist_alloc_context(const char *filename)
     return ctx;
 }
 
-char* ff_buf_getline(ByteIOContext *s)
-{
-    char *q;
-    char *oq;
-    int bufsize = 64;
-    q = av_malloc(bufsize);
-    oq = q;
-    while (1) {
-        int c = url_fgetc(s);
-        if (c == EOF)
-            return NULL;
-        if (c == '\n')
-            break;
-        *q = c;
-        if ((++q)-oq == bufsize) {
-            oq = av_realloc(oq, bufsize+64);
-            q = oq + bufsize;
-            bufsize += 64;
-        }
-    }
-    *q = 0;
-    q = oq;
-    while (*q != 0 && *q != '#') {
-        ++q;
-    }
-    *q = 0;
-    oq = av_realloc(oq, (q-oq)+1);
-    return oq;
-}
-
 void ff_split_wd_fn(const char *filepath,
                     char **workingdir,
                     char **filename)

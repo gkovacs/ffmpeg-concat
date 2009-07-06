@@ -48,13 +48,21 @@ static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx)
     i = 0;
     flist = av_malloc(sizeof(char*) * bufsize);
     while (1) {
-        char *c = ff_buf_getline(s);
-        if (c == NULL) // EOF
+        char *q;
+        char linebuf[1024] = {0};
+        if ((q = url_fgets(s, linebuf, sizeof(linebuf))) == NULL) // EOF
             break;
-        if (*c == 0) // hashed out
+        linebuf[sizeof(linebuf)-1] = 0; // cut off end if buffer overflowed
+        while (*q != 0) {
+            if (*q++ == '#')
+                *(q-1) = 0;
+        }
+        if (*linebuf == 0) // hashed out
             continue;
         flist = av_fast_realloc(flist, &bufsize, i+2);
-        flist[i++] = c;
+        flist[i] = av_malloc(q-linebuf+1);
+        av_strlcpy(flist[i], linebuf, q-linebuf+1);
+        flist[i++][q-linebuf] = 0;
     }
     ctx->pelist_size = i;
     flist[i] = 0;

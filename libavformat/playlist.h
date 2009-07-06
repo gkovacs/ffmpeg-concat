@@ -57,8 +57,6 @@ PlaylistContext* ff_playlist_alloc_context(const char *filename);
 
 int ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index);
 
-char* ff_buf_getline(ByteIOContext *s);
-
 void ff_split_wd_fn(const char *filepath, char **workingdir, char **filename);
 
 int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index);
