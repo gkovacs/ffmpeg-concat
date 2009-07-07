@@ -2901,7 +2901,8 @@ static void opt_input_file(const char *filename)
             av_strlcpy(playlist_ctx->pelist[playlist_ctx->pelist_size-1]->filename, filename, filenamelen+1);
             av_strlcpy(ic->filename, filename, sizeof(ic->filename));
             ic->nb_streams = 2;
-            ic->iformat = concat_make_demuxer();
+            ic->iformat = av_malloc(sizeof(*(ic->iformat)));
+            concat_init_demuxer(ic->iformat);
             ic->priv_data = playlist_ctx;
             for (i = 0; i < playlist_ctx->pe_curidxs_size; ++i) {
                 ff_playlist_populate_context(playlist_ctx, ic, i);

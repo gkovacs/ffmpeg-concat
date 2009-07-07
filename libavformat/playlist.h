@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _PLAYLIST_H
-#define _PLAYLIST_H
+#ifndef AVFORMAT_PLAYLIST_H
+#define AVFORMAT_PLAYLIST_H
 
 #include "avformat.h"
 #include "riff.h"
@@ -63,4 +63,4 @@ int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index);
 
 void ff_playlist_relative_paths(char **flist, const char *workingdir);
 
-#endif /* _PLAYLIST_H */
+#endif /* AVFORMAT_PLAYLIST_H */

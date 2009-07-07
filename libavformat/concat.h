@@ -21,14 +21,14 @@
 
 #include "concatgen.h"
 
-#ifndef _CONCAT_H
-#define _CONCAT_H
+#ifndef AVFORMAT_CONCAT_H
+#define AVFORMAT_CONCAT_H
 
 //int concat_probe(AVProbeData *p);
 
 //int concat_read_header(AVFormatContext *s, AVFormatParameters *ap);
 
-AVInputFormat *concat_make_demuxer();
+void concat_init_demuxer();
 
-#endif /* _CONCAT_H */
+#endif /* AVFORMAT_CONCAT_H */
 
