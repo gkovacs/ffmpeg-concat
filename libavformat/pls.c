@@ -20,7 +20,6 @@
  */
 
 #include "concatgen.h"
-#include "datanode.h"
 
 /* The ffmpeg codecs we support, and the IDs they have in the file */
 static const AVCodecTag codec_pls_tags[] = {
@@ -41,18 +40,55 @@ static int pls_probe(AVProbeData *p)
         return 0;
 }
 
-static int pls_list_files(ByteIOContext *s, PlaylistContext *ctx)
+static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx)
 {
-    int i;
+    int i, j, c;
+    unsigned int buflen;
+    char state;
     char **flist;
-    StringList *l;
-    DataNode *d;
-    l = ff_stringlist_alloc();
-    d = ff_datanode_tree_from_ini(s);
-    ff_datanode_visualize(d);
-    ff_datanode_filter_values_by_name(d, l, "File");
-    ff_stringlist_print(l);
-    ff_stringlist_export(l, &flist, &(ctx->pelist_size));
+    char buf[1024];
+    char s[5];
+    char t[] = "\nFile";
+    state = flist = buflen = i = j = 0;
+    while ((c = url_fgetc(b))) {
+        if (c == EOF)
+            break;
+        if (state == 0) {
+            s[0] = s[1];
+            s[1] = s[2];
+            s[2] = s[3];
+            s[3] = s[4];
+            s[4] = c;
+            if (s[0] == t[0] && s[1] == t[1] && s[2] == t[2] && s[3] == t[3] && s[4] == t[4])
+                state = 1;
+        }
+        else if (state == 1){
+            if (c == '=')
+                state = 2;
+            else if (c == '#')
+                state = 0;
+        }
+        else {
+            if (c == '\n' || c == '#') {
+                termfn:
+                buf[i++] = 0;
+                flist = av_fast_realloc(flist, &buflen, sizeof(*flist) * (j+2));
+                flist[j] = av_malloc(i);
+                av_strlcpy(flist[j++], buf, i);
+                i = 0;
+                state = 0;
+                s[sizeof(s)-1] = c;
+                continue;
+            }
+            else {
+                buf[i++] = c;
+                if (i >= sizeof(buf)-1)
+                    goto termfn;
+            }
+        }
+    }
+    flist[j] = 0;
+    ctx->pelist_size = j;
     ff_playlist_relative_paths(flist, ctx->workingdir);
     ctx->pelist = av_malloc(ctx->pelist_size * sizeof(*(ctx->pelist)));
     memset(ctx->pelist, 0, ctx->pelist_size * sizeof(*(ctx->pelist)));
