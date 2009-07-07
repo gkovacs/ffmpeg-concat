@@ -61,14 +61,12 @@ static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx)
             s[4] = c;
             if (s[0] == t[0] && s[1] == t[1] && s[2] == t[2] && s[3] == t[3] && s[4] == t[4])
                 state = 1;
-        }
-        else if (state == 1){
+        } else if (state == 1) {
             if (c == '=')
                 state = 2;
             else if (c == '#')
                 state = 0;
-        }
-        else {
+        } else {
             if (c == '\n' || c == '#') {
                 termfn:
                 buf[i++] = 0;
@@ -79,8 +77,7 @@ static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx)
                 state = 0;
                 s[sizeof(s)-1] = c;
                 continue;
-            }
-            else {
+            } else {
                 buf[i++] = c;
                 if (i >= sizeof(buf)-1)
                     goto termfn;

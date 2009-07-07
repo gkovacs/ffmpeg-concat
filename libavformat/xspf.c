@@ -67,8 +67,7 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx)
             if (s[0] == t[0] && s[1] == t[1] && s[2] == t[2] && s[3] == t[3] && s[4] == t[4] &&
                 s[5] == t[5] && s[6] == t[6] && s[7] == t[7] && s[8] == t[8] && s[9] == t[9])
                 state = 1;
-        }
-        else {
+        } else {
             if (c == '<') {
                 termfn:
                 buf[i++] = 0;
@@ -79,8 +78,7 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx)
                 state = 0;
                 s[sizeof(s)-1] = c;
                 continue;
-            }
-            else {
+            } else {
                 buf[i++] = c;
                 if (i >= sizeof(buf)-1)
                     goto termfn;
