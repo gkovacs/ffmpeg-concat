@@ -87,6 +87,8 @@ static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx)
             }
         }
     }
+    if (!flist) // no files have been found
+        return AVERROR_EOF;
     flist[j] = 0;
     ctx->pelist_size = j;
     ff_playlist_relative_paths(flist, ctx->workingdir);
@@ -105,7 +107,10 @@ static int pls_read_header(AVFormatContext *s,
 {
     int i;
     PlaylistContext *ctx = ff_playlist_alloc_context(s->filename);
-    pls_list_files(s->pb, ctx);
+    if (pls_list_files(s->pb, ctx)) {
+        fprintf(stderr, "no playlist items found in %s\n", s->filename);
+        return AVERROR_EOF;
+    }
     s->priv_data = ctx;
     for (i = 0; i < ctx->pe_curidxs_size; ++i) {
         ff_playlist_populate_context(ctx, s, i);
