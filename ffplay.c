@@ -1578,9 +1578,22 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
     }
     */
     AVCodecContext *dec;
-    if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO && is->ic->streams[pkt->stream_index]->codec->codec)
+    if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO) {
         dec = is->ic->streams[pkt->stream_index]->codec;
-    else {
+        if (!dec->codec) {
+            AVCodec *codec = avcodec_find_decoder(dec->codec_id);
+            if (!codec) {
+                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
+                        dec->codec_id, pkt->stream_index);
+                return AVERROR(EINVAL);
+            }
+            if (avcodec_open(dec, codec) < 0) {
+                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
+                        pkt->stream_index);
+                return AVERROR(EINVAL);
+            }
+        }
+    } else {
         dec = is->audio_st->codec;
         fprintf(stderr, "audio stream not yet set\n");
     }
