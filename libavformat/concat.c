@@ -39,8 +39,9 @@ static int concat_read_header(AVFormatContext *s,
     return 0;
 }
 
-void concat_init_demuxer(AVInputFormat *cdm)
+AVInputFormat* concat_alloc_demuxer(void)
 {
+    AVInputFormat *cdm = av_malloc(sizeof(*cdm));
     cdm->name           = "concat";
     cdm->long_name      = NULL_IF_CONFIG_SMALL("CONCAT format");
     cdm->priv_data_size = sizeof(PlaylistContext);
@@ -59,6 +60,7 @@ void concat_init_demuxer(AVInputFormat *cdm)
     cdm->read_seek2     = ff_concatgen_read_seek;
     cdm->metadata_conv  = NULL;
     cdm->next           = NULL;
+    return cdm;
 }
 
 #if CONFIG_CONCAT_DEMUXER

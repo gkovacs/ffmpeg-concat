@@ -28,7 +28,7 @@
 
 //int concat_read_header(AVFormatContext *s, AVFormatParameters *ap);
 
-void concat_init_demuxer();
+AVInputFormat* concat_alloc_demuxer(void);
 
 #endif /* AVFORMAT_CONCAT_H */
 
