@@ -428,6 +428,7 @@ retry:
 
     /* skip if the header was thrashed */
     if (ret < 0){
+        av_log(NULL, AV_LOG_ERROR, "prior header\n");
         av_log(s->avctx, AV_LOG_ERROR, "header damaged\n");
         return -1;
     }
