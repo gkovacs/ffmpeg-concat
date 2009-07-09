@@ -1343,15 +1343,17 @@ static int video_thread(void *arg)
     int cur_stream;
     AVStream *video_st;
     AVCodecContext *dec;
-    PlaylistContext *playlist_ctx = 0;
+    PlaylistContext *playlist_ctx;
+    int playidx = 0;
     video_st = is->video_st;
 //   video_st = is->ic->streams[pkt->stream_index];
 //    is->video_st = video_st;
 //    is->video_stream = pkt->stream_index;
 
-    if (!strncmp(is->ic->iformat->name, "m3u", 4))
+    if (!strncmp(is->ic->iformat->name, "m3u", 4)) {
         isconcat = 1;
         playlist_ctx = is->ic->priv_data;
+    }
     for(;;) {
 
         
@@ -1382,17 +1384,27 @@ static int video_thread(void *arg)
         len1 = avcodec_decode_video2(video_st->codec,
                                     frame, &got_picture,
                                     pkt);
+        if (!pkt) {
+            fprintf(stderr, "no packet\n");
+//            continue;
+        }
+
         if (len1 <= 0 || !frame || !got_picture) {
 //            printf("fail\n\nfail\n\nfail\n\nfail\n\n");
             if (isconcat) {
-                if (playlist_ctx->pelist[playlist_ctx->pe_curidxs[pkt->stream_index]]->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
+                if (playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
 //    if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
-        video_st = playlist_ctx->pelist[playlist_ctx->pe_curidxs[pkt->stream_index]]->ic->streams[pkt->stream_index];
+//                    video_st = is->ic->streams[pkt->stream_index];
+        video_st = playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index];
         is->video_st = video_st;
         is->video_stream = pkt->stream_index;
+//        is->iformat = playlist_ctx->pelist[playidx]->ic->iformat;
+//        is->ic = playlist_ctx->pelist[playidx]->ic;
         
         dec = video_st->codec;
         if (!dec->codec) {
+            
+            fprintf(stderr, "\n\n\n\nswitched streams\n\n\n\n");
             AVCodec *codec = avcodec_find_decoder(dec->codec_id);
             if (!codec) {
                 fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
@@ -1425,12 +1437,23 @@ static int video_thread(void *arg)
             pts= 0;
         pts *= av_q2d(is->video_st->time_base);
 
-            if (len1 < 0) {
-                av_free_packet(pkt);
-                continue;
+        
+            if (isconcat && len1 < 0) {
+                if (playidx < playlist_ctx->pelist_size) {
+                    av_free_packet(pkt);
+                    ++playidx;
+//                    goto tryagain;
+                    continue;
+                }
 //                goto getpktagain;
 //                goto tryagain;
-    }
+            }
+         
+                
+                    
+                
+
+//    }
         if (got_picture) {
             if (output_picture2(is, frame, pts) < 0)
                 goto the_end;
