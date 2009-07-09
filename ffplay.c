@@ -1440,8 +1440,8 @@ static int video_thread(void *arg)
         pts *= av_q2d(is->video_st->time_base);
 
         
-            if (isconcat && (len1 < 0/* || !frame || !got_picture*/)) {
-                if (playidx < playlist_ctx->pelist_size - 1 && pkt && playlist_ctx && playlist_ctx->pelist && playlist_ctx->pelist[playidx] && playlist_ctx->pelist[playidx]->ic && playlist_ctx->pelist[playidx]->ic->streams && playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index]) {
+            if (isconcat && (len1 <= 0 || !frame /*|| !got_picture*/)) {
+                if (playidx < playlist_ctx->pelist_size - 1 /*&& pkt && playlist_ctx && playlist_ctx->pelist && playlist_ctx->pelist[playidx] && playlist_ctx->pelist[playidx]->ic && playlist_ctx->pelist[playidx]->ic->streams && playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index] */) {
                     if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
                     ++playidx;
         is->video_st = playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index];
@@ -1450,10 +1450,11 @@ static int video_thread(void *arg)
 //        is->iformat = playlist_ctx->pelist[playidx]->ic->iformat;
 //        is->ic = playlist_ctx->pelist[playidx]->ic;
 
+        fprintf(stderr, "\n\n\n\nstream switching has occurred!!!\n\n\n\n");
 //        dec = video_st->codec;
         if (!is->video_st->codec->codec) {
 
-            fprintf(stderr, "\n\n\n\nswitched streams\n\n\n\n");
+            fprintf(stderr, "\n\n\n\ncodec switching has occurred!!!\n\n\n\n");
             AVCodec *codec = avcodec_find_decoder(is->video_st->codec->codec_id);
             if (!codec) {
                 fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
