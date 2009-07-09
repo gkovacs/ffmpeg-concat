@@ -1348,13 +1348,19 @@ static int video_thread(void *arg)
 
     for(;;) {
 
+        
 //        AVStream *video_st = is->video_st;
 //        fprintf(stderr, "video thread running\n");
         while (is->paused && !is->videoq.abort_request) {
             SDL_Delay(10);
         }
+
+        getpktagain:
+
         if (packet_queue_get(&is->videoq, pkt, 1) < 0)
             break;
+
+        tryagain:
 
         if(pkt->data == flush_pkt.data){
             avcodec_flush_buffers(video_st->codec);
@@ -1364,18 +1370,19 @@ static int video_thread(void *arg)
         /* NOTE: ipts is the PTS of the _first_ picture beginning in
            this packet, if any */
 
-
+        
 
         video_st->codec->reordered_opaque= pkt->pts;
         len1 = avcodec_decode_video2(video_st->codec,
                                     frame, &got_picture,
                                     pkt);
         if (len1 <= 0 || !frame || !got_picture) {
-            printf("fail\n\nfail\n\nfail\n\nfail\n\n");
+//            printf("fail\n\nfail\n\nfail\n\nfail\n\n");
     if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
         video_st = is->ic->streams[pkt->stream_index];
         is->video_st = video_st;
         is->video_stream = pkt->stream_index;
+        
         dec = is->ic->streams[pkt->stream_index]->codec;
         if (!dec->codec) {
             AVCodec *codec = avcodec_find_decoder(dec->codec_id);
@@ -1389,13 +1396,15 @@ static int video_thread(void *arg)
                         pkt->stream_index);
                 return AVERROR(EINVAL);
             }
-//            continue;
+            frame= avcodec_alloc_frame();
+            goto tryagain;
         }
     } else {
         dec = is->video_st->codec;
         fprintf(stderr, "video stream not yet set\n");
 //        continue;
     }
+//}
         }
             
 
@@ -1408,13 +1417,12 @@ static int video_thread(void *arg)
             pts= 0;
         pts *= av_q2d(is->video_st->time_base);
 
-//            if (len1 < 0)
-//                break;
+            if (len1 < 0)
+                goto getpktagain;
+//                goto tryagain;
         if (got_picture) {
             if (output_picture2(is, frame, pts) < 0)
                 goto the_end;
-//            else
-//                printf("fail\n\nfail\n\nfail\n\nfail\n\n");
         }
         // failed
         
