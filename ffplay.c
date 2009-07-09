@@ -31,6 +31,7 @@
 #include "libavcodec/opt.h"
 
 #include "cmdutils.h"
+#include "libavformat/playlist.h"
 
 #include <SDL.h>
 #include <SDL_thread.h>
@@ -1334,6 +1335,7 @@ static int output_picture2(VideoState *is, AVFrame *src_frame, double pts1)
 static int video_thread(void *arg)
 {
     VideoState *is = arg;
+    char isconcat = 0;
     AVPacket pkt1, *pkt = &pkt1;
     int len1, got_picture;
     AVFrame *frame= avcodec_alloc_frame();
@@ -1341,11 +1343,15 @@ static int video_thread(void *arg)
     int cur_stream;
     AVStream *video_st;
     AVCodecContext *dec;
+    PlaylistContext *playlist_ctx = 0;
     video_st = is->video_st;
 //   video_st = is->ic->streams[pkt->stream_index];
 //    is->video_st = video_st;
 //    is->video_stream = pkt->stream_index;
 
+    if (!strncmp(is->ic->iformat->name, "m3u", 4))
+        isconcat = 1;
+        playlist_ctx = is->ic->priv_data;
     for(;;) {
 
         
@@ -1378,13 +1384,14 @@ static int video_thread(void *arg)
                                     pkt);
         if (len1 <= 0 || !frame || !got_picture) {
 //            printf("fail\n\nfail\n\nfail\n\nfail\n\n");
-            if (!strncmp(is->ic->iformat->name, "m3u", 4)) {
-    if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
-        video_st = is->ic->streams[pkt->stream_index];
+            if (isconcat) {
+                if (playlist_ctx->pelist[playlist_ctx->pe_curidxs[pkt->stream_index]]->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
+//    if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
+        video_st = playlist_ctx->pelist[playlist_ctx->pe_curidxs[pkt->stream_index]]->ic->streams[pkt->stream_index];
         is->video_st = video_st;
         is->video_stream = pkt->stream_index;
         
-        dec = is->ic->streams[pkt->stream_index]->codec;
+        dec = video_st->codec;
         if (!dec->codec) {
             AVCodec *codec = avcodec_find_decoder(dec->codec_id);
             if (!codec) {
