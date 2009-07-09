@@ -1342,7 +1342,7 @@ static int video_thread(void *arg)
     double pts;
     int cur_stream;
     AVStream *video_st;
-    AVCodecContext *dec;
+//    AVCodecContext *dec;
     PlaylistContext *playlist_ctx;
     int playidx = 0;
     video_st = is->video_st;
@@ -1450,17 +1450,17 @@ static int video_thread(void *arg)
 //        is->iformat = playlist_ctx->pelist[playidx]->ic->iformat;
 //        is->ic = playlist_ctx->pelist[playidx]->ic;
 
-        dec = video_st->codec;
-        if (!dec->codec) {
+//        dec = video_st->codec;
+        if (!video_st->codec->codec) {
 
             fprintf(stderr, "\n\n\n\nswitched streams\n\n\n\n");
-            AVCodec *codec = avcodec_find_decoder(dec->codec_id);
+            AVCodec *codec = avcodec_find_decoder(video_st->codec->codec_id);
             if (!codec) {
                 fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
-                        dec->codec_id, pkt->stream_index);
+                        video_st->codec->codec_id, pkt->stream_index);
                 return AVERROR(EINVAL);
             }
-            if (avcodec_open(dec, codec) < 0) {
+            if (avcodec_open(video_st->codec, codec) < 0) {
                 fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
                         pkt->stream_index);
                 return AVERROR(EINVAL);
@@ -1469,7 +1469,7 @@ static int video_thread(void *arg)
             goto tryagain;
         }
                     } else {
-        dec = is->video_st->codec;
+        video_st->codec = is->video_st->codec;
         fprintf(stderr, "video stream not yet set\n");
 //        continue;
     }
