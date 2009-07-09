@@ -1346,6 +1346,7 @@ static int video_thread(void *arg)
     PlaylistContext *playlist_ctx;
     int playidx = 0;
     video_st = is->video_st;
+//    char mustinit = 1;
 //   video_st = is->ic->streams[pkt->stream_index];
 //    is->video_st = video_st;
 //    is->video_stream = pkt->stream_index;
@@ -1439,9 +1440,9 @@ static int video_thread(void *arg)
         pts *= av_q2d(is->video_st->time_base);
 
         
-            if (isconcat && len1 < 0) {
-                if (playidx < playlist_ctx->pelist_size) {
-                    
+            if (isconcat && (len1 < 0/* || !frame || !got_picture*/)) {
+                if (playidx < playlist_ctx->pelist_size - 1 && pkt && playlist_ctx && playlist_ctx->pelist && playlist_ctx->pelist[playidx] && playlist_ctx->pelist[playidx]->ic && playlist_ctx->pelist[playidx]->ic->streams && playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index]) {
+                    if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
                     ++playidx;
         video_st = playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index];
         is->video_st = video_st;
@@ -1466,14 +1467,16 @@ static int video_thread(void *arg)
             }
             frame= avcodec_alloc_frame();
             goto tryagain;
-        } else {
+        }
+                    } else {
         dec = is->video_st->codec;
         fprintf(stderr, "video stream not yet set\n");
 //        continue;
     }
-//                    goto tryagain;
-                    av_free_packet(pkt);
-                    continue;
+                    goto tryagain;
+//        if (pkt)
+//                    av_free_packet(pkt);
+//                    continue;
                 }
 //                goto getpktagain;
 //                goto tryagain;
