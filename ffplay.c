@@ -1345,6 +1345,7 @@ static int video_thread(void *arg)
 //    AVCodecContext *dec;
     PlaylistContext *playlist_ctx;
     int playidx = 0;
+    int pktgetv;
 //    video_st = is->video_st;
 //    char mustinit = 1;
 //   video_st = is->ic->streams[pkt->stream_index];
@@ -1366,8 +1367,12 @@ static int video_thread(void *arg)
 
         getpktagain:
 
-        if (packet_queue_get(&is->videoq, pkt, 1) < 0)
+        if ((pktgetv = packet_queue_get(&is->videoq, pkt, 1)) < 0) {
+           
             break;
+        }
+ fprintf(stderr, "packet_queue_get is %d\n", pktgetv);
+            
 
         tryagain:
 
@@ -1440,7 +1445,7 @@ static int video_thread(void *arg)
         pts *= av_q2d(is->video_st->time_base);
 
         
-            if (isconcat && (len1 <= 0 || !frame /*|| !got_picture*/)) {
+            if (isconcat && (len1 <= 0 || !frame || !got_picture)) {
                 if (playidx < playlist_ctx->pelist_size - 1 /*&& pkt && playlist_ctx && playlist_ctx->pelist && playlist_ctx->pelist[playidx] && playlist_ctx->pelist[playidx]->ic && playlist_ctx->pelist[playidx]->ic->streams && playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index] */) {
                     if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
                     ++playidx;

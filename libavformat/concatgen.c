@@ -29,6 +29,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     int stream_index;
     PlaylistContext *ctx;
     AVFormatContext *ic;
+    char have_switched_streams = 0;
     ctx = s->priv_data;
     stream_index = 0;
     retr:
@@ -51,7 +52,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     }
     // TODO switch from AVERROR_EOF to AVERROR_EOS
     // -32 AVERROR_EOF for avi, -51 for ogg
-    else if (ret < 0 && ctx->pe_curidxs[stream_index] < ctx->pelist_size - 1) {
+    else if (ret < 0 && !have_switched_streams && ctx->pe_curidxs[stream_index] < ctx->pelist_size - 1) {
         // TODO account for out-of-sync audio/video by using per-stream offsets
         // using streams[]->duration slightly overestimates offset
 //        playld->dts_offset += ic->streams[0]->duration;
@@ -67,12 +68,14 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         pkt = av_malloc(sizeof(AVPacket));
 //        for (i = 0; i < playld->pe_curidxs_size; ++i) {
             ff_playlist_populate_context(ctx, s, stream_index);
+            have_switched_streams = 1;
 //        }
         goto retr;
     }
     else {
         printf("avpacket ret is %d\n", ret);
     }
+    if (have_switched_streams) return INT_MAX;
     return ret;
 }
 
