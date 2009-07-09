@@ -1341,11 +1341,11 @@ static int video_thread(void *arg)
     AVFrame *frame= avcodec_alloc_frame();
     double pts;
     int cur_stream;
-    AVStream *video_st;
+//    AVStream *video_st;
 //    AVCodecContext *dec;
     PlaylistContext *playlist_ctx;
     int playidx = 0;
-    video_st = is->video_st;
+//    video_st = is->video_st;
 //    char mustinit = 1;
 //   video_st = is->ic->streams[pkt->stream_index];
 //    is->video_st = video_st;
@@ -1372,7 +1372,7 @@ static int video_thread(void *arg)
         tryagain:
 
         if(pkt->data == flush_pkt.data){
-            avcodec_flush_buffers(video_st->codec);
+            avcodec_flush_buffers(is->video_st->codec);
             continue;
         }
 //        fprintf(stderr, "video thread running\n");
@@ -1381,8 +1381,8 @@ static int video_thread(void *arg)
 
         
 
-        video_st->codec->reordered_opaque= pkt->pts;
-        len1 = avcodec_decode_video2(video_st->codec,
+        is->video_st->codec->reordered_opaque= pkt->pts;
+        len1 = avcodec_decode_video2(is->video_st->codec,
                                     frame, &got_picture,
                                     pkt);
         if (!pkt) {
@@ -1444,23 +1444,23 @@ static int video_thread(void *arg)
                 if (playidx < playlist_ctx->pelist_size - 1 && pkt && playlist_ctx && playlist_ctx->pelist && playlist_ctx->pelist[playidx] && playlist_ctx->pelist[playidx]->ic && playlist_ctx->pelist[playidx]->ic->streams && playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index]) {
                     if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
                     ++playidx;
-        video_st = playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index];
-        is->video_st = video_st;
+        is->video_st = playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index];
+//        is->video_st = video_st;
         is->video_stream = pkt->stream_index;
 //        is->iformat = playlist_ctx->pelist[playidx]->ic->iformat;
 //        is->ic = playlist_ctx->pelist[playidx]->ic;
 
 //        dec = video_st->codec;
-        if (!video_st->codec->codec) {
+        if (!is->video_st->codec->codec) {
 
             fprintf(stderr, "\n\n\n\nswitched streams\n\n\n\n");
-            AVCodec *codec = avcodec_find_decoder(video_st->codec->codec_id);
+            AVCodec *codec = avcodec_find_decoder(is->video_st->codec->codec_id);
             if (!codec) {
                 fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
-                        video_st->codec->codec_id, pkt->stream_index);
+                        is->video_st->codec->codec_id, pkt->stream_index);
                 return AVERROR(EINVAL);
             }
-            if (avcodec_open(video_st->codec, codec) < 0) {
+            if (avcodec_open(is->video_st->codec, codec) < 0) {
                 fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
                         pkt->stream_index);
                 return AVERROR(EINVAL);
@@ -1469,7 +1469,7 @@ static int video_thread(void *arg)
             goto tryagain;
         }
                     } else {
-        video_st->codec = is->video_st->codec;
+//        video_st->codec = is->video_st->codec;
         fprintf(stderr, "video stream not yet set\n");
 //        continue;
     }
