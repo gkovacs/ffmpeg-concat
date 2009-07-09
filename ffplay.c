@@ -1378,6 +1378,7 @@ static int video_thread(void *arg)
                                     pkt);
         if (len1 <= 0 || !frame || !got_picture) {
 //            printf("fail\n\nfail\n\nfail\n\nfail\n\n");
+            if (!strncmp(is->ic->iformat->name, "m3u", 4)) {
     if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
         video_st = is->ic->streams[pkt->stream_index];
         is->video_st = video_st;
@@ -1406,7 +1407,7 @@ static int video_thread(void *arg)
     }
 //}
         }
-            
+        }
 
         if(   (decoder_reorder_pts || pkt->dts == AV_NOPTS_VALUE)
            && frame->reordered_opaque != AV_NOPTS_VALUE)
@@ -1417,9 +1418,12 @@ static int video_thread(void *arg)
             pts= 0;
         pts *= av_q2d(is->video_st->time_base);
 
-            if (len1 < 0)
-                goto getpktagain;
+            if (len1 < 0) {
+                av_free_packet(pkt);
+                continue;
+//                goto getpktagain;
 //                goto tryagain;
+    }
         if (got_picture) {
             if (output_picture2(is, frame, pts) < 0)
                 goto the_end;
