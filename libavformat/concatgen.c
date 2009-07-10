@@ -38,6 +38,11 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     if (pkt) {
         stream_index = pkt->stream_index;
         ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
+//        if (!have_switched_streams)
+            pkt->switchstreams = 0;
+//        else
+//            pkt->switchstreams = 1;
+            pkt->priv = 0;
     }
     if (ret >= 0) {
         if (pkt) {
@@ -65,17 +70,23 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         }
         ++ctx->pe_curidxs[stream_index];
 //        pkt->destruct(pkt);
-        pkt = av_malloc(sizeof(AVPacket));
+
+//        pkt = av_malloc(sizeof(AVPacket));
+
 //        for (i = 0; i < playld->pe_curidxs_size; ++i) {
             ff_playlist_populate_context(ctx, s, stream_index);
             have_switched_streams = 1;
 //        }
+//            pkt->switchstreams = 1;
         goto retr;
     }
     else {
         printf("avpacket ret is %d\n", ret);
     }
-    if (have_switched_streams) return INT_MAX;
+//    fprintf(stderr, "pkt switchstreams is %d\n", pkt->switchstreams);
+//    if (have_switched_streams) return INT_MAX;
+    pkt->switchstreams = 0;
+    pkt->priv = 0;
     return ret;
 }
 

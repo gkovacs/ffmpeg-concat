@@ -320,7 +320,7 @@ static int packet_queue_get(PacketQueue *q, AVPacket *pkt, int block)
 
         pkt1 = q->first_pkt;
         if (pkt1) {
-            q->first_pkt = pkt1->next;
+            q->first_pkt = pkt1->next;            
             if (!q->first_pkt)
                 q->last_pkt = NULL;
             q->nb_packets--;
@@ -1346,6 +1346,7 @@ static int video_thread(void *arg)
     PlaylistContext *playlist_ctx;
     int playidx = 0;
     int pktgetv;
+    char pktst = 0;
 //    video_st = is->video_st;
 //    char mustinit = 1;
 //   video_st = is->ic->streams[pkt->stream_index];
@@ -1371,8 +1372,17 @@ static int video_thread(void *arg)
            
             break;
         }
- fprintf(stderr, "packet_queue_get is %d\n", pktgetv);
-            
+
+        if (pkt) {
+            fprintf(stderr, "have packet\n");
+            pktst = pkt->switchstreams;
+            fprintf(stderr, "pktst is %d\n", pkt->switchstreams);
+            fprintf(stderr, "pktpriv is %ld\n", pkt->priv);
+        }
+
+// fprintf(stderr, "packet_queue_get is %d\n", pktgetv);
+
+//        pktst = pkt->switchstreams;
 
         tryagain:
 
@@ -1384,16 +1394,23 @@ static int video_thread(void *arg)
         /* NOTE: ipts is the PTS of the _first_ picture beginning in
            this packet, if any */
 
-        
+
 
         is->video_st->codec->reordered_opaque= pkt->pts;
         len1 = avcodec_decode_video2(is->video_st->codec,
                                     frame, &got_picture,
                                     pkt);
+        /*
         if (!pkt) {
             fprintf(stderr, "no packet\n");
 //            continue;
         }
+        else {
+            fprintf(stderr, "have packet\n");
+            pktst = pkt->switchstreams;
+            fprintf(stderr, "pktst is %d\n", pktst);
+        }
+         */
 /*
 //        if (len1 <= 0 || !frame || !got_picture) {
 //            printf("fail\n\nfail\n\nfail\n\nfail\n\n");
@@ -1445,7 +1462,8 @@ static int video_thread(void *arg)
         pts *= av_q2d(is->video_st->time_base);
 
         
-            if (isconcat && (len1 <= 0 || !frame || !got_picture)) {
+            if (isconcat && (/*len1 <= 0 || !frame || !got_picture ||*/ pktst == 1)) {
+                fprintf(stderr, "\n\n\n\ntrying stream switching!!!\n\n\n\n");
                 if (playidx < playlist_ctx->pelist_size - 1 /*&& pkt && playlist_ctx && playlist_ctx->pelist && playlist_ctx->pelist[playidx] && playlist_ctx->pelist[playidx]->ic && playlist_ctx->pelist[playidx]->ic->streams && playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index] */) {
                     if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
                     ++playidx;
@@ -1457,7 +1475,9 @@ static int video_thread(void *arg)
 
         fprintf(stderr, "\n\n\n\nstream switching has occurred!!!\n\n\n\n");
 //        dec = video_st->codec;
-        if (!is->video_st->codec->codec) {
+        is->video_st->codec = 0;
+//        is->video_st->codec->codec = 0;
+        if (1 /*!is->video_st->codec->codec*/) {
 
             fprintf(stderr, "\n\n\n\ncodec switching has occurred!!!\n\n\n\n");
             AVCodec *codec = avcodec_find_decoder(is->video_st->codec->codec_id);
@@ -2277,6 +2297,10 @@ static int decode_thread(void *arg)
             SDL_Delay(100); /* wait for user event */
             continue;
         }
+
+        fprintf(stderr, "in decode_thread pkt switchstreams %d\n", pkt->switchstreams);
+        fprintf(stderr, "in decode_thread pkt priv %d\n", pkt->priv);
+
         if (pkt->stream_index == is->audio_stream) {
             packet_queue_put(&is->audioq, pkt);
         } else if (pkt->stream_index == is->video_stream) {
