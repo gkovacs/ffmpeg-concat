@@ -44,6 +44,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
 //            pkt->switchstreams = 1;
 //            pkt->priv = 0;
         pkt->stream = ic->streams[pkt->stream_index];
+        fprintf(stderr, "in concatgen_read_packet pkt stream %ld\n", pkt->stream);
     }
     if (ret >= 0) {
         if (pkt) {

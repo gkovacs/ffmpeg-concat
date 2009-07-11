@@ -1753,6 +1753,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 {
     AVPacket *pkt_temp = &is->audio_pkt_temp;
     AVPacket *pkt = &is->audio_pkt;
+//    AVCodecContext *dec;
 //    printf("audio stream index is %d\n", pkt->stream_index);
 //    printf("audio stream is %ld\n", is->audio_st);
 //    printf("audio strea2 is %ld\n", is->ic->streams[pkt->stream_index]);
@@ -1766,30 +1767,61 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
         fprintf(stderr, "audio strea2-type is %ld\n", is->ic->streams[pkt->stream_index]->codec->codec_type);
     }
     */
-    AVCodecContext *dec;
-    if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO) {
-        dec = is->ic->streams[pkt->stream_index]->codec;
-        if (!dec->codec) {
-            AVCodec *codec = avcodec_find_decoder(dec->codec_id);
+
+//    if (pkt->stream != is->ic->streams[pkt->stream_index])
+//        return 0;
+
+//    is->audio_st = pkt->stream;
+//    is->audio_stream = pkt->stream_index;
+//    dec = is->audio_st->codec;
+
+
+
+
+
+
+    int n, len1, data_size;
+    double pts;
+
+    for(;;) {
+
+
+
+        if (!pkt || !pkt->stream)
+            goto nextpkt;
+
+//   if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO) {
+//        dec = is->ic->streams[pkt->stream_index]->codec;
+    tryagain:
+//    if (pkt->stream_index == is->audio_stream) {
+//        dec = pkt->stream->codec;
+    is->audio_st = pkt->stream;
+    is->audio_stream = pkt->stream_index;
+        if (!is->audio_st->codec->codec) {
+            AVCodec *codec = avcodec_find_decoder(is->audio_st->codec->codec_id);
             if (!codec) {
                 fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
-                        dec->codec_id, pkt->stream_index);
+                        is->audio_st->codec->codec_id, pkt->stream_index);
                 return AVERROR(EINVAL);
             }
-            if (avcodec_open(dec, codec) < 0) {
+            if (avcodec_open(is->audio_st->codec, codec) < 0) {
                 fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
                         pkt->stream_index);
                 return AVERROR(EINVAL);
             }
         }
-    } else {
-        dec = is->audio_st->codec;
-        fprintf(stderr, "audio stream not yet set\n");
-    }
-    int n, len1, data_size;
-    double pts;
+//    } else {
+//        dec = is->audio_st->codec;
+//        fprintf(stderr, "audio stream not yet set\n");
+//        goto tryagain;
+//    }
 
-    for(;;) {
+
+
+
+
+
+
 //        fprintf(stderr, "audio thread running1\n");
         /* NOTE: the audio packet can contain several frames */
         while (pkt_temp->size > 0) {
@@ -1801,15 +1833,16 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                 fprintf(stderr, "audio stream not yet set 2\n");
             }
             */
-            fprintf(stderr, "using codec id %d\n", dec->codec_id);
+            fprintf(stderr, "using codec id %d\n", is->audio_st->codec->codec_id);
             data_size = sizeof(is->audio_buf1);
-            len1 = avcodec_decode_audio3(dec,
+            len1 = avcodec_decode_audio3(is->audio_st->codec,
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
             if (len1 < 0) {
                 fprintf(stderr, "audio decoding error\n");
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
+                goto tryagain;
                 break;
             }
 
@@ -1818,24 +1851,24 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             if (data_size <= 0)
                 continue;
 //fprintf(stderr, "audio thread running2\n");
-            if (dec->sample_fmt != is->audio_src_fmt) {
+            if (is->audio_st->codec->sample_fmt != is->audio_src_fmt) {
                 if (is->reformat_ctx)
                     av_audio_convert_free(is->reformat_ctx);
                 is->reformat_ctx= av_audio_convert_alloc(SAMPLE_FMT_S16, 1,
-                                                         dec->sample_fmt, 1, NULL, 0);
+                                                         is->audio_st->codec->sample_fmt, 1, NULL, 0);
                 if (!is->reformat_ctx) {
                     fprintf(stderr, "Cannot convert %s sample format to %s sample format\n",
-                        avcodec_get_sample_fmt_name(dec->sample_fmt),
+                        avcodec_get_sample_fmt_name(is->audio_st->codec->sample_fmt),
                         avcodec_get_sample_fmt_name(SAMPLE_FMT_S16));
                         break;
                 }
-                is->audio_src_fmt= dec->sample_fmt;
+                is->audio_src_fmt= is->audio_st->codec->sample_fmt;
             }
 //fprintf(stderr, "audio thread running3\n");
             if (is->reformat_ctx) {
                 const void *ibuf[6]= {is->audio_buf1};
                 void *obuf[6]= {is->audio_buf2};
-                int istride[6]= {av_get_bits_per_sample_format(dec->sample_fmt)/8};
+                int istride[6]= {av_get_bits_per_sample_format(is->audio_st->codec->sample_fmt)/8};
                 int ostride[6]= {2};
                 int len= data_size/istride[0];
                 if (av_audio_convert(is->reformat_ctx, obuf, ostride, ibuf, istride, len)<0) {
@@ -1853,9 +1886,9 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             /* if no pts, then compute it */
             pts = is->audio_clock;
             *pts_ptr = pts;
-            n = 2 * dec->channels;
+            n = 2 * is->audio_st->codec->channels;
             is->audio_clock += (double)data_size /
-                (double)(n * dec->sample_rate);
+                (double)(n * is->audio_st->codec->sample_rate);
 #if defined(DEBUG_SYNC)
             {
                 static double last_clock;
@@ -1867,6 +1900,8 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 #endif
             return data_size;
         }
+
+        nextpkt:
 
         /* free the current packet */
         if (pkt->data)
@@ -1880,7 +1915,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
         if (packet_queue_get(&is->audioq, pkt, 1) < 0)
             return -1;
         if(pkt->data == flush_pkt.data){
-            avcodec_flush_buffers(dec);
+            avcodec_flush_buffers(is->audio_st->codec);
             continue;
         }
 
@@ -2317,7 +2352,7 @@ static int decode_thread(void *arg)
             continue;
         }
 
-        fprintf(stderr, "in decode_thread pkt stream %ld\n", (long)pkt->stream);
+        fprintf(stderr, "in decode_thread pkt stream %ld\n", pkt->stream);
 //        fprintf(stderr, "in decode_thread pkt switchstreams %d\n", pkt->switchstreams);
 //        fprintf(stderr, "in decode_thread pkt priv %d\n", pkt->priv);
 

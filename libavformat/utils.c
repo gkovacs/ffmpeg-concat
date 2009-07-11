@@ -573,7 +573,7 @@ int av_read_packet(AVFormatContext *s, AVPacket *pkt)
             break;
         }
 
-        fprintf(stderr, "in av_read_packet pkt stream %ld\n", (long)pkt->stream);
+        fprintf(stderr, "in av_read_packet pkt stream %ld\n", pkt->stream);
 //        fprintf(stderr, "in av_read_packet pkt switchstreams %d\n", pkt->switchstreams);
 //        fprintf(stderr, "in av_read_packet pkt priv %d\n", pkt->priv);
 
