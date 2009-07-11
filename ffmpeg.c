@@ -1259,8 +1259,8 @@ static int output_packet(AVInputStream *ist, int ist_index,
     AVPacket avpkt;
     if (ist && is && pkt && is->nb_streams > pkt->stream_index && is->streams && is->streams[pkt->stream_index] && is->streams[pkt->stream_index]->codec) {
         fprintf(stdout, "stream index modified to %d\n", pkt->stream_index);
-//        ist->st = is->streams[pkt->stream_index];
-        ist->st = pkt->stream;
+        ist->st = is->streams[pkt->stream_index];
+//        ist->st = pkt->stream;
         /*
         if (!ist->st->codec->codec) {
             AVCodec *codec = avcodec_find_decoder(ist->st->codec->codec_id);
