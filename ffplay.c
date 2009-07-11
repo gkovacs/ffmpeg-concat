@@ -1375,9 +1375,11 @@ static int video_thread(void *arg)
 
         if (pkt) {
             fprintf(stderr, "have packet\n");
-            pktst = pkt->switchstreams;
-            fprintf(stderr, "pktst is %d\n", pkt->switchstreams);
-            fprintf(stderr, "pktpriv is %ld\n", pkt->priv);
+            fprintf(stderr, "pkt stream is %ld", pkt->stream);
+            is->video_st = pkt->stream;
+//            pktst = pkt->switchstreams;
+//            fprintf(stderr, "pktst is %d\n", pkt->switchstreams);
+//            fprintf(stderr, "pktpriv is %ld\n", pkt->priv);
         }
 
 // fprintf(stderr, "packet_queue_get is %d\n", pktgetv);
@@ -2298,8 +2300,9 @@ static int decode_thread(void *arg)
             continue;
         }
 
-        fprintf(stderr, "in decode_thread pkt switchstreams %d\n", pkt->switchstreams);
-        fprintf(stderr, "in decode_thread pkt priv %d\n", pkt->priv);
+        fprintf(stderr, "in decode_thread pkt stream %ld\n", (long)pkt->stream);
+//        fprintf(stderr, "in decode_thread pkt switchstreams %d\n", pkt->switchstreams);
+//        fprintf(stderr, "in decode_thread pkt priv %d\n", pkt->priv);
 
         if (pkt->stream_index == is->audio_stream) {
             packet_queue_put(&is->audioq, pkt);

@@ -39,10 +39,11 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         stream_index = pkt->stream_index;
         ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
 //        if (!have_switched_streams)
-            pkt->switchstreams = 0;
+//            pkt->switchstreams = 0;
 //        else
 //            pkt->switchstreams = 1;
-            pkt->priv = 0;
+//            pkt->priv = 0;
+        pkt->stream = ic->streams[pkt->stream_index];
     }
     if (ret >= 0) {
         if (pkt) {
@@ -85,8 +86,8 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     }
 //    fprintf(stderr, "pkt switchstreams is %d\n", pkt->switchstreams);
 //    if (have_switched_streams) return INT_MAX;
-    pkt->switchstreams = 0;
-    pkt->priv = 0;
+//    pkt->switchstreams = 0;
+//    pkt->priv = 0;
     return ret;
 }
 
