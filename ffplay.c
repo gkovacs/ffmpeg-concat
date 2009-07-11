@@ -1801,9 +1801,14 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
         }
 */
 
+tryagain:
+        if (pkt && pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_AUDIO) {
+            is->audio_st = pkt->stream;
+            is->audio_stream = pkt->stream_index;
+        }
 //   if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO) {
 //        dec = is->ic->streams[pkt->stream_index]->codec;
-    tryagain:
+    
 //    if (pkt->stream_index == is->audio_stream) {
 //        dec = pkt->stream->codec;
 
@@ -1857,8 +1862,8 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                 fprintf(stderr, "audio decoding error\n");
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
-//                goto tryagain;
-                is->audio_st = is->ic->streams[pkt->stream_index];
+                goto tryagain;
+//                is->audio_st = is->ic->streams[pkt->stream_index];
 //                goto tryagain;
                 break;
             }
