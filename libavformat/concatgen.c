@@ -38,6 +38,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     if (pkt) {
         stream_index = pkt->stream_index;
         ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
+
 //        if (!have_switched_streams)
 //            pkt->switchstreams = 0;
 //        else

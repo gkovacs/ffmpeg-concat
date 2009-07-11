@@ -1753,6 +1753,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 {
     AVPacket *pkt_temp = &is->audio_pkt_temp;
     AVPacket *pkt = &is->audio_pkt;
+    AVStream *curst = is->audio_st;
 //    AVCodecContext *dec;
 //    printf("audio stream index is %d\n", pkt->stream_index);
 //    printf("audio stream is %ld\n", is->audio_st);
@@ -1787,34 +1788,6 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 
 
 
-        if (!pkt || !pkt->stream)
-            goto nextpkt;
-
-//   if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO) {
-//        dec = is->ic->streams[pkt->stream_index]->codec;
-    tryagain:
-//    if (pkt->stream_index == is->audio_stream) {
-//        dec = pkt->stream->codec;
-    is->audio_st = pkt->stream;
-    is->audio_stream = pkt->stream_index;
-        if (!is->audio_st->codec->codec) {
-            AVCodec *codec = avcodec_find_decoder(is->audio_st->codec->codec_id);
-            if (!codec) {
-                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
-                        is->audio_st->codec->codec_id, pkt->stream_index);
-                return AVERROR(EINVAL);
-            }
-            if (avcodec_open(is->audio_st->codec, codec) < 0) {
-                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
-                        pkt->stream_index);
-                return AVERROR(EINVAL);
-            }
-        }
-//    } else {
-//        dec = is->audio_st->codec;
-//        fprintf(stderr, "audio stream not yet set\n");
-//        goto tryagain;
-//    }
 
 
 
@@ -1838,11 +1811,47 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             len1 = avcodec_decode_audio3(is->audio_st->codec,
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
+
+
+//        if (!pkt_temp || !pkt_temp->stream)
+//            goto nextpkt;
+
+//   if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO) {
+//        dec = is->ic->streams[pkt->stream_index]->codec;
+    tryagain:
+//    if (pkt->stream_index == is->audio_stream) {
+//        dec = pkt->stream->codec;
+        if (pkt->stream != curst) {
+
+            fprintf(stderr, "curst changed to %ld\n", pkt_temp->stream);
+            curst = pkt_temp->stream;
+    is->audio_st = pkt_temp->stream;
+    is->audio_stream = pkt_temp->stream_index;
+        if (!is->audio_st->codec->codec) {
+            AVCodec *codec = avcodec_find_decoder(is->audio_st->codec->codec_id);
+            if (!codec) {
+                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
+                        is->audio_st->codec->codec_id, pkt->stream_index);
+                return AVERROR(EINVAL);
+            }
+            if (avcodec_open(is->audio_st->codec, codec) < 0) {
+                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
+                        pkt->stream_index);
+                return AVERROR(EINVAL);
+            }
+        }
+        }
+//    } else {
+//        dec = is->audio_st->codec;
+//        fprintf(stderr, "audio stream not yet set\n");
+//        goto tryagain;
+//    }
+
             if (len1 < 0) {
                 fprintf(stderr, "audio decoding error\n");
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
-                goto tryagain;
+//                goto tryagain;
                 break;
             }
 
