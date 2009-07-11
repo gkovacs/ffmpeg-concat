@@ -960,9 +960,14 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 if (pkt->size) {
                 got_packet:
             if (stream)
-            pkt->stream = stream;
-                if (stream_index)
+                pkt->stream = stream;
+            else
+                pkt->stream = st;
+            if (stream_index)
                 pkt->stream_index = stream_index;
+            else
+//                pkt->stream_index = 0;
+                pkt->stream_index = st->index;
                 fprintf(stderr, "av_read_frame_internal stream %ld\n", pkt->stream);
 //            pkt->stream = s->cur_st;
 //            pkt->switchstreams = switchstreams;
@@ -998,9 +1003,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 //            fprintf(stderr, "in av_read_frame_internal pkt switchstreams %d\n", cur_pkt.switchstreams);
 //            fprintf(stderr, "in av_read_frame_internal pkt priv %d\n", cur_pkt.priv);
 //            switchstreams = cur_pkt.switchstreams;
-            priv = cur_pkt.priv;
-            stream_index = cur_pkt.stream_index;
-            stream = cur_pkt.stream;
+
             if (ret < 0) {
                 if (ret == AVERROR(EAGAIN))
                     return ret;
@@ -1013,8 +1016,13 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                                         NULL, 0,
                                         AV_NOPTS_VALUE, AV_NOPTS_VALUE,
                                         AV_NOPTS_VALUE);
-                        if (pkt->size)
+                        if (pkt->size) {
+            priv = cur_pkt.priv;
+            stream_index = cur_pkt.stream_index;
+            stream = cur_pkt.stream;
                             goto got_packet;
+                        }
+                            
                     }
                 }
                 /* no more packets: really terminate parsing */

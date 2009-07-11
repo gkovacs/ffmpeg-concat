@@ -1795,8 +1795,11 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 
 
 
-        if (!pkt || !pkt->stream || !pkt->stream->codec)
+        if (!pkt || !pkt->stream || !pkt->stream->codec) {
+            fprintf(stderr, "skipping packet\n");
             goto nextpkt;
+        }
+            
 
 //   if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO) {
 //        dec = is->ic->streams[pkt->stream_index]->codec;
@@ -1804,8 +1807,9 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 //    if (pkt->stream_index == is->audio_stream) {
 //        dec = pkt->stream->codec;
 
-//    is->audio_st = pkt->stream;
-//    is->audio_stream = pkt->stream_index;
+    is->audio_st = pkt->stream;
+//        is->audio_st = is->ic->streams[pkt->stream_index];
+    is->audio_stream = pkt->stream_index;
 
     /*
         if (!is->audio_st->codec->codec) {
