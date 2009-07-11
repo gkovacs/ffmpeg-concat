@@ -1761,6 +1761,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 {
     AVPacket *pkt_temp = &is->audio_pkt_temp;
     AVPacket *pkt = &is->audio_pkt;
+    char tryswitchalready = 0;
 //    AVCodecContext *dec;
 //    printf("audio stream index is %d\n", pkt->stream_index);
 //    printf("audio stream is %ld\n", is->audio_st);
@@ -1802,10 +1803,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 */
 
 tryagain:
-        if (pkt && pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_AUDIO) {
-            is->audio_st = pkt->stream;
-            is->audio_stream = pkt->stream_index;
-        }
+
 //   if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO) {
 //        dec = is->ic->streams[pkt->stream_index]->codec;
     
@@ -1855,6 +1853,7 @@ tryagain:
             */
 //            fprintf(stderr, "using codec id %d\n", is->audio_st->codec->codec_id);
             data_size = sizeof(is->audio_buf1);
+            decagain:
             len1 = avcodec_decode_audio3(is->audio_st->codec,
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
@@ -1862,10 +1861,24 @@ tryagain:
                 fprintf(stderr, "audio decoding error\n");
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
-                goto tryagain;
+//                goto tryagain;
 //                is->audio_st = is->ic->streams[pkt->stream_index];
 //                goto tryagain;
-                break;
+
+                if (pkt && pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_AUDIO) {
+                    is->audio_st = pkt->stream;
+        //            is->audio_stream = pkt->stream_index;
+                } else {
+                    is->audio_st = is->ic->streams[pkt->stream_index];
+                }
+                if (!tryswitchalready) {
+                    tryswitchalready = 1;
+                    goto decagain;
+                } else {
+                    tryswitchalready = 0;
+                    break;
+                }
+
             }
 
             pkt_temp->data += len1;
