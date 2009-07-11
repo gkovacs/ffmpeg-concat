@@ -1380,6 +1380,7 @@ static int video_thread(void *arg)
 //            pktst = pkt->switchstreams;
 //            fprintf(stderr, "pktst is %d\n", pkt->switchstreams);
 //            fprintf(stderr, "pktpriv is %ld\n", pkt->priv);
+            /*
                     if (!is->video_st->codec->codec) {
 
             fprintf(stderr, "\n\n\n\ncodec switching has occurred!!!\n\n\n\n");
@@ -1396,7 +1397,7 @@ static int video_thread(void *arg)
             }
 //            frame= avcodec_alloc_frame();
 //            goto tryagain;
-        }
+        }*/
         }
 
 // fprintf(stderr, "packet_queue_get is %d\n", pktgetv);

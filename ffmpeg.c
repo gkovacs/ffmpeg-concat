@@ -1260,6 +1260,7 @@ static int output_packet(AVInputStream *ist, int ist_index,
     if (ist && is && pkt && is->nb_streams > pkt->stream_index && is->streams && is->streams[pkt->stream_index] && is->streams[pkt->stream_index]->codec) {
         fprintf(stdout, "stream index modified to %d\n", pkt->stream_index);
         ist->st = is->streams[pkt->stream_index];
+        /*
         if (!ist->st->codec->codec) {
             AVCodec *codec = avcodec_find_decoder(ist->st->codec->codec_id);
             if (!codec) {
@@ -1273,6 +1274,7 @@ static int output_packet(AVInputStream *ist, int ist_index,
                 return AVERROR(EINVAL);
             }
         }
+        */
     }
 
     if(ist->next_pts == AV_NOPTS_VALUE)
