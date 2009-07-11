@@ -1380,7 +1380,7 @@ static int video_thread(void *arg)
 //            pktst = pkt->switchstreams;
 //            fprintf(stderr, "pktst is %d\n", pkt->switchstreams);
 //            fprintf(stderr, "pktpriv is %ld\n", pkt->priv);
-            /*
+            
                     if (!is->video_st->codec->codec) {
 
             fprintf(stderr, "\n\n\n\ncodec switching has occurred!!!\n\n\n\n");
@@ -1397,7 +1397,7 @@ static int video_thread(void *arg)
             }
 //            frame= avcodec_alloc_frame();
 //            goto tryagain;
-        }*/
+        }
         }
         else {
             av_free_packet(pkt);
@@ -1835,9 +1835,35 @@ tryagain:
 //    }
 */
 
+                if (pkt_temp && pkt_temp->stream && pkt_temp->stream->codec) {
+                    if (!pkt_temp->stream->codec->codec) {
+                        AVCodec *codec = avcodec_find_decoder(pkt->stream->codec->codec_id);
+                        if (!codec) {
+                            fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
+                                    pkt_temp->stream->codec->codec_id, pkt->stream_index);
+                            return AVERROR(EINVAL);
+                        }
+                        if (avcodec_open(pkt_temp->stream->codec, codec) < 0) {
+                            fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
+                                    pkt_temp->stream_index);
+                            return AVERROR(EINVAL);
+                        }
+                        is->audio_st = pkt_temp->stream;
+                        is->audio_stream = pkt_temp->stream_index;
+                        is->audio_src_fmt = is->audio_st->codec->sample_fmt;
 
+//                        goto decagain;
+                    }
+                }
 
-
+                fprintf(stderr, "audio decoding error\n");
+                fprintf(stderr, "ade pkt %ld\n", pkt_temp);
+                if (pkt_temp) { fprintf(stderr, "ade pkt stream %ld\n", pkt_temp->stream);
+                if (pkt_temp->stream) { fprintf(stderr, "ade pkt stream codec %ld\n", pkt_temp->stream->codec);
+                if (pkt_temp->stream->codec) { fprintf(stderr, "ade pkt stream codec codec_type %d\n", pkt->stream->codec->codec_type);
+                fprintf(stderr, "ade pkt stream codec codec_id %d\n", pkt_temp->stream->codec->codec_id);
+                }}}
+                fflush(stderr);
 
 
 //        fprintf(stderr, "audio thread running1\n");
@@ -1858,19 +1884,26 @@ tryagain:
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
             if (len1 < 0) {
-                fprintf(stderr, "audio decoding error\n");
+
+
+
+
+
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
 //                goto tryagain;
 //                is->audio_st = is->ic->streams[pkt->stream_index];
 //                goto tryagain;
 
-                if (pkt && pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_AUDIO) {
-                    is->audio_st = pkt->stream;
+//                if (pkt_temp && pkt_temp->stream && pkt_temp->stream->codec && pkt_temp->stream->codec->codec_type == CODEC_TYPE_AUDIO) {
+//                    is->audio_st = pkt_temp->stream;
         //            is->audio_stream = pkt->stream_index;
-                } else {
-                    is->audio_st = is->ic->streams[pkt->stream_index];
-                }
+//                } //else {
+//                    is->audio_st = is->ic->streams[pkt->stream_index];
+//                }
+
+                break;
+                /*
                 if (!tryswitchalready) {
                     tryswitchalready = 1;
                     goto decagain;
@@ -1878,8 +1911,10 @@ tryagain:
                     tryswitchalready = 0;
                     break;
                 }
+                 */
 
             }
+            tryswitchalready = 0;
 
             pkt_temp->data += len1;
             pkt_temp->size -= len1;
