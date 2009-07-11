@@ -1795,7 +1795,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 
 
 
-        if (!pkt || !pkt->stream)
+        if (!pkt || !pkt->stream || !pkt->stream->codec)
             goto nextpkt;
 
 //   if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_AUDIO) {
@@ -1803,8 +1803,11 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
     tryagain:
 //    if (pkt->stream_index == is->audio_stream) {
 //        dec = pkt->stream->codec;
-    is->audio_st = pkt->stream;
-    is->audio_stream = pkt->stream_index;
+
+//    is->audio_st = pkt->stream;
+//    is->audio_stream = pkt->stream_index;
+
+    /*
         if (!is->audio_st->codec->codec) {
             AVCodec *codec = avcodec_find_decoder(is->audio_st->codec->codec_id);
             if (!codec) {
@@ -1823,7 +1826,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 //        fprintf(stderr, "audio stream not yet set\n");
 //        goto tryagain;
 //    }
-
+*/
 
 
 
@@ -1841,7 +1844,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                 fprintf(stderr, "audio stream not yet set 2\n");
             }
             */
-            fprintf(stderr, "using codec id %d\n", is->audio_st->codec->codec_id);
+//            fprintf(stderr, "using codec id %d\n", is->audio_st->codec->codec_id);
             data_size = sizeof(is->audio_buf1);
             len1 = avcodec_decode_audio3(is->audio_st->codec,
                                         (int16_t *)is->audio_buf1, &data_size,
@@ -1850,7 +1853,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                 fprintf(stderr, "audio decoding error\n");
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
-                goto tryagain;
+//                goto tryagain;
                 break;
             }
 
@@ -2351,6 +2354,7 @@ static int decode_thread(void *arg)
         }
         ret = av_read_frame(ic, pkt);
 //        fprintf(stderr, "read frame\n");
+        fprintf(stderr, "in decode_thread pkt stream %ld\n", pkt->stream);
         if (ret < 0) {
             if (ret == AVERROR_EOF)
                 eof=1;
@@ -2360,7 +2364,7 @@ static int decode_thread(void *arg)
             continue;
         }
 
-        fprintf(stderr, "in decode_thread pkt stream %ld\n", pkt->stream);
+
 //        fprintf(stderr, "in decode_thread pkt switchstreams %d\n", pkt->switchstreams);
 //        fprintf(stderr, "in decode_thread pkt priv %d\n", pkt->priv);
 

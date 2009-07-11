@@ -118,7 +118,7 @@ int ff_playlist_populate_context(PlaylistContext *ctx,
     int i;
     AVFormatContext *ic;
     AVFormatParameters *nap;
-    printf("playlist_populate_context called\n");
+    fprintf(stderr, "playlist_populate_context called\n");
 //    ctx->pelist[ctx->pe_curidxs[stream_index]] = av_malloc(sizeof(*(ctx->pelist[ctx->pe_curidxs[stream_index]])));
     ff_playlist_init_playelem(ctx->pelist[ctx->pe_curidxs[stream_index]]);
     ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;

@@ -44,15 +44,15 @@ int ff_concatgen_read_packet(AVFormatContext *s,
 //        else
 //            pkt->switchstreams = 1;
 //            pkt->priv = 0;
-//        pkt->stream = ic->streams[pkt->stream_index];
-        pkt->stream = 0;
-        fprintf(stderr, "in concatgen_read_packet pkt stream %ld\n", pkt->stream);
+        pkt->stream = ic->streams[pkt->stream_index];
+//        pkt->stream = 0;
+//        fprintf(stderr, "in concatgen_read_packet pkt stream %ld\n", pkt->stream);
     }
     if (ret >= 0) {
         if (pkt) {
             int64_t time_offset;
             time_offset = av_rescale_q(ctx->time_offsets[pkt->stream_index], AV_TIME_BASE_Q, ic->streams[stream_index]->time_base);
-            printf("%s conv stream time from %ld to %d/%d is %ld\n", ic->iformat->name, ctx->time_offsets[pkt->stream_index], ic->streams[stream_index]->time_base.num, ic->streams[stream_index]->time_base.den, time_offset);
+            fprintf(stderr, "%s conv stream time from %ld to %d/%d is %ld\n", ic->iformat->name, ctx->time_offsets[pkt->stream_index], ic->streams[stream_index]->time_base.num, ic->streams[stream_index]->time_base.den, time_offset);
             // TODO changing either dts or pts leads to timing issues on h264
             pkt->dts += time_offset;
             if (!ic->streams[pkt->stream_index]->codec->has_b_frames)
