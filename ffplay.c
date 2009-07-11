@@ -1373,7 +1373,7 @@ static int video_thread(void *arg)
             break;
         }
 
-        if (pkt) {
+        if (pkt && pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_VIDEO) {
             fprintf(stderr, "have packet\n");
             fprintf(stderr, "pkt stream is %ld", pkt->stream);
             is->video_st = pkt->stream;
@@ -1399,6 +1399,13 @@ static int video_thread(void *arg)
 //            goto tryagain;
         }*/
         }
+        else {
+            av_free_packet(pkt);
+            frame= avcodec_alloc_frame();
+            
+             continue;
+        }
+           
 
 // fprintf(stderr, "packet_queue_get is %d\n", pktgetv);
 

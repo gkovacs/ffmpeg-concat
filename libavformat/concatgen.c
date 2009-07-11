@@ -29,21 +29,23 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     int stream_index;
     PlaylistContext *ctx;
     AVFormatContext *ic;
-    char have_switched_streams = 0;
+//    char have_switched_streams = 0;
     ctx = s->priv_data;
     stream_index = 0;
     retr:
     ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
     ret = ic->iformat->read_packet(ic, pkt);
     if (pkt) {
-        stream_index = pkt->stream_index;
+        stream_index = pkt->stream_index; // UGLY HACK - FIXME
+
         ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
 //        if (!have_switched_streams)
 //            pkt->switchstreams = 0;
 //        else
 //            pkt->switchstreams = 1;
 //            pkt->priv = 0;
-        pkt->stream = ic->streams[pkt->stream_index];
+//        pkt->stream = ic->streams[pkt->stream_index];
+        pkt->stream = 0;
         fprintf(stderr, "in concatgen_read_packet pkt stream %ld\n", pkt->stream);
     }
     if (ret >= 0) {
@@ -59,7 +61,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     }
     // TODO switch from AVERROR_EOF to AVERROR_EOS
     // -32 AVERROR_EOF for avi, -51 for ogg
-    else if (ret < 0 && !have_switched_streams && ctx->pe_curidxs[stream_index] < ctx->pelist_size - 1) {
+    else if (ret < 0 && ctx->pe_curidxs[stream_index] < ctx->pelist_size - 1) {
         // TODO account for out-of-sync audio/video by using per-stream offsets
         // using streams[]->duration slightly overestimates offset
 //        playld->dts_offset += ic->streams[0]->duration;
@@ -77,7 +79,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
 
 //        for (i = 0; i < playld->pe_curidxs_size; ++i) {
             ff_playlist_populate_context(ctx, s, stream_index);
-            have_switched_streams = 1;
+//            have_switched_streams = 1;
 //        }
 //            pkt->switchstreams = 1;
         goto retr;
@@ -89,6 +91,8 @@ int ff_concatgen_read_packet(AVFormatContext *s,
 //    if (have_switched_streams) return INT_MAX;
 //    pkt->switchstreams = 0;
 //    pkt->priv = 0;
+//    if (pkt)
+//        pkt->stream = ic->streams[pkt->stream_index];
     return ret;
 }
 
