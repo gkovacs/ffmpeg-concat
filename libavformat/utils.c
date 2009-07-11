@@ -556,6 +556,9 @@ int av_read_packet(AVFormatContext *s, AVPacket *pkt)
                 s->streams[i]->probe_packets = 0;
             continue;
         }
+
+
+
         st= s->streams[pkt->stream_index];
 
         switch(st->codec->codec_type){
@@ -570,12 +573,24 @@ int av_read_packet(AVFormatContext *s, AVPacket *pkt)
             break;
         }
 
+        fprintf(stderr, "in av_read_packet pkt switchstreams %d\n", pkt->switchstreams);
+        fprintf(stderr, "in av_read_packet pkt priv %d\n", pkt->priv);
+
+        
         if(!pktl && (st->codec->codec_id != CODEC_ID_PROBE ||
                      !st->probe_packets))
             return ret;
+        
+
+
+        fprintf(stderr, "in dokogna pkt switchstreams %d\n", pkt->switchstreams);
+        fprintf(stderr, "in dokogna pkt priv %d\n", pkt->priv);
 
         add_to_pktbuf(&s->raw_packet_buffer, pkt, &s->raw_packet_buffer_end);
         s->raw_packet_buffer_remaining_size -= pkt->size;
+
+        fprintf(stderr, "in shadl pkt switchstreams %d\n", pkt->switchstreams);
+        fprintf(stderr, "in shadl pkt priv %d\n", pkt->priv);
 
         if(st->codec->codec_id == CODEC_ID_PROBE){
             AVProbeData *pd = &st->probe_data;
@@ -595,6 +610,8 @@ int av_read_packet(AVFormatContext *s, AVPacket *pkt)
                 }
             }
         }
+        fprintf(stderr, "in kindl pkt switchstreams %d\n", pkt->switchstreams);
+        fprintf(stderr, "in kindl pkt priv %d\n", pkt->priv);
     }
 }
 
@@ -907,8 +924,11 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
 
 static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 {
+    fprintf(stderr, "av_read_frame_internal called\n");
     AVStream *st;
     int len, ret, i;
+    char switchstreams;
+    void *priv;
 
     av_init_packet(pkt);
 
@@ -942,6 +962,10 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 /* return packet if any */
                 if (pkt->size) {
                 got_packet:
+            pkt->switchstreams = switchstreams;
+                pkt->priv = priv;
+            fprintf(stderr, "in av_read_frame_internal pkt switchstreams %d\n", pkt->switchstreams);
+            fprintf(stderr, "in av_read_frame_internal pkt priv %d\n", pkt->priv);
                     pkt->duration = 0;
                     pkt->stream_index = st->index;
                     pkt->pts = st->parser->pts;
@@ -967,6 +991,10 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             AVPacket cur_pkt;
             /* read next packet */
             ret = av_read_packet(s, &cur_pkt);
+//            fprintf(stderr, "in av_read_frame_internal pkt switchstreams %d\n", cur_pkt.switchstreams);
+//            fprintf(stderr, "in av_read_frame_internal pkt priv %d\n", cur_pkt.priv);
+            switchstreams = cur_pkt.switchstreams;
+            priv = cur_pkt.priv;
             if (ret < 0) {
                 if (ret == AVERROR(EAGAIN))
                     return ret;
@@ -1040,6 +1068,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 
 int av_read_frame(AVFormatContext *s, AVPacket *pkt)
 {
+    fprintf(stderr, "av_read_frame called\n");
     AVPacketList *pktl;
     int eof=0;
     const int genpts= s->flags & AVFMT_FLAG_GENPTS;
