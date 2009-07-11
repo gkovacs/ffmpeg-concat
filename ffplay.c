@@ -1380,6 +1380,23 @@ static int video_thread(void *arg)
 //            pktst = pkt->switchstreams;
 //            fprintf(stderr, "pktst is %d\n", pkt->switchstreams);
 //            fprintf(stderr, "pktpriv is %ld\n", pkt->priv);
+                    if (!is->video_st->codec->codec) {
+
+            fprintf(stderr, "\n\n\n\ncodec switching has occurred!!!\n\n\n\n");
+            AVCodec *codec = avcodec_find_decoder(is->video_st->codec->codec_id);
+            if (!codec) {
+                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
+                        is->video_st->codec->codec_id, pkt->stream_index);
+                return AVERROR(EINVAL);
+            }
+            if (avcodec_open(is->video_st->codec, codec) < 0) {
+                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
+                        pkt->stream_index);
+                return AVERROR(EINVAL);
+            }
+//            frame= avcodec_alloc_frame();
+//            goto tryagain;
+        }
         }
 
 // fprintf(stderr, "packet_queue_get is %d\n", pktgetv);
@@ -1463,7 +1480,7 @@ static int video_thread(void *arg)
             pts= 0;
         pts *= av_q2d(is->video_st->time_base);
 
-        
+        #if 0
             if (isconcat && (/*len1 <= 0 || !frame || !got_picture ||*/ pktst == 1)) {
                 fprintf(stderr, "\n\n\n\ntrying stream switching!!!\n\n\n\n");
                 if (playidx < playlist_ctx->pelist_size - 1 /*&& pkt && playlist_ctx && playlist_ctx->pelist && playlist_ctx->pelist[playidx] && playlist_ctx->pelist[playidx]->ic && playlist_ctx->pelist[playidx]->ic->streams && playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index] */) {
@@ -1509,7 +1526,7 @@ static int video_thread(void *arg)
 //                goto getpktagain;
 //                goto tryagain;
             }
-         
+        #endif
                 
                     
                 
