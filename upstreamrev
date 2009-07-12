@@ -1,12 +1,12 @@
 ffmpeg:
-svn: 19400
-git: 4870db73039eb89db1aacce8cf60359be2d2fdf8
-committer: mru
-commitdate: Sun, 12 Jul 2009 00:17:42 +0000
-commitlog: configure: allow bulk-disabled things to be re-enabled by dependents
+svn: 19419
+git: faa53067a35c09644d3915edbbc85bc0f6675e30
+committer: diego
+commitdate: Sun, 12 Jul 2009 22:31:05 +0000
+commitlog: Make (de)muxers for format variants select the main format (de)muxer. It makes little sense to enable the variant without the main format.
 
 libswscale:
-svn: 19400
+svn: 19419
 git: f3ae90a5d9f9e01b326c031803b977be3d5369c0
 committer: ramiro
 commitdate: Thu, 9 Jul 2009 02:27:39 +0000
