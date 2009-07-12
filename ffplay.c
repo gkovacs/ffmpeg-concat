@@ -1775,6 +1775,8 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             if (len1 < 0) {
                 if (pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_AUDIO)
                     is->audio_st = pkt->stream;
+                else if (pkt_temp->stream && pkt_temp->stream->codec && pkt_temp->stream->codec->codec_type == CODEC_TYPE_AUDIO)
+                    is->audio_st = pkt_temp->stream;
                 else
                     is->audio_st = is->ic->streams[pkt->stream_index];
                 /* if error, we skip the frame */
