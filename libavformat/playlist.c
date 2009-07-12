@@ -222,7 +222,8 @@ void ff_playlist_relative_paths(char **flist, const char *workingdir)
 
 PlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
 {
-    if (ic && ic->iformat && ic->iformat->long_name && ic->priv_data && !strncmp(ic->iformat->long_name, "CONCAT", 6))
+    if (ic && ic->iformat && ic->iformat->long_name && ic->priv_data &&
+        !strncmp(ic->iformat->long_name, "CONCAT", 6))
         return ic->priv_data;
     else
         return NULL;
@@ -230,10 +231,10 @@ PlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
 
 AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index)
 {
-//    if (ctx->pe_curidxs[stream_index] < ctx->pelist_size - 1)
-//        ++ctx->pe_curidxs[stream_index];
-//    if (*pe_idx < ctx->pelist_size - 1)
-//        *pe_idx++;
-//    return ctx->pelist[ctx->pe_curidxs[stream_index]]->ic->streams[stream_index];
-    return ctx->pelist[pe_idx]->ic->streams[stream_index];
+    if (ctx && pe_idx < ctx->pelist_size && ctx->pelist && ctx->pelist[pe_idx] &&
+        ctx->pelist[pe_idx]->ic && stream_index < ctx->pelist[pe_idx]->ic->nb_streams &&
+        ctx->pelist[pe_idx]->ic->streams && ctx->pelist[pe_idx]->ic->streams[stream_index])
+        return ctx->pelist[pe_idx]->ic->streams[stream_index];
+    else
+        return NULL;
 }

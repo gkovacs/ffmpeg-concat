@@ -1598,18 +1598,15 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
             if (len1 < 0) {
-                ++st_idx;
-                if (pl_ctx) {
-                    if (pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_AUDIO)
-                        is->audio_st = pkt->stream;
-                    else if (pkt_temp->stream && pkt_temp->stream->codec && pkt_temp->stream->codec->codec_type == CODEC_TYPE_AUDIO)
-                        is->audio_st = pkt_temp->stream;
-                    else
-                        is->audio_st = ff_playlist_get_stream(pl_ctx, st_idx, pkt->stream_index);
-//                        is->audio_st = is->ic->streams[pkt->stream_index];
-                }
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
+                if (pl_ctx && pkt) {
+                    AVStream *propst = ff_playlist_get_stream(pl_ctx, st_idx+1, pkt->stream_index);
+                    if (propst && propst->codec && propst->codec->codec_type == CODEC_TYPE_AUDIO) {
+                        is->audio_st = propst;
+                        ++st_idx;
+                    }
+                }
                 if (pl_ctx && !tryswitchalready) {
                     tryswitchalready = 1;
                     goto tryagain;
