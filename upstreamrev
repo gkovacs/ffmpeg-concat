@@ -1,13 +1,13 @@
 ffmpeg:
-svn: 19360
-git: 3b38e9f3b90dd9abaf1ff071c9bd374b7f742c70
-committer: reimar
-commitdate: Mon, 6 Jul 2009 17:08:32 +0000
-commitlog: Check for packet_lenght 0, it is already treated as invalid by the padding check, but that resulted in a confusing/wrong error message.
+svn: 19400
+git: 4870db73039eb89db1aacce8cf60359be2d2fdf8
+committer: mru
+commitdate: Sun, 12 Jul 2009 00:17:42 +0000
+commitlog: configure: allow bulk-disabled things to be re-enabled by dependents
 
 libswscale:
-svn: 19360
-git: 868da632ab136cebff1eee8beabc119480d66546
-committer: diego
-commitdate: Sun, 5 Jul 2009 20:10:59 +0000
-commitlog: The AltiVec code in libswscale no longer is under GPL. Remove one erroneous preprocessor check for CONFIG_GPL in the AltiVec code.
+svn: 19400
+git: f3ae90a5d9f9e01b326c031803b977be3d5369c0
+committer: ramiro
+commitdate: Thu, 9 Jul 2009 02:27:39 +0000
+commitlog: Remove dependency from swscale_internal.h to lavu/internal.h, it is no longer needed for DECLARE_ALIGNED. Remove dependency from swscale-example.c to swscale_internal.h by duplicating the necessary code. The duplicated code is a hack and should be removed once a cleaner pixel format information system exists. swscale-example.c is example code on how to use the library and therefore shouldn't rely on internal headers.
