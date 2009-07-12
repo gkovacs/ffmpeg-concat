@@ -36,6 +36,7 @@ OBJS-$(CONFIG_VDPAU)                   += vdpau.o
 
 # decoders/encoders/hardware accelerators
 OBJS-$(CONFIG_AAC_DECODER)             += aac.o aactab.o mpeg4audio.o aac_parser.o aac_ac3_parser.o
+OBJS-$(CONFIG_AAC_ENCODER)             += aacenc.o aaccoder.o aacpsy.o aactab.o psymodel.o iirfilter.o mdct.o fft.o mpeg4audio.o
 OBJS-$(CONFIG_AASC_DECODER)            += aasc.o msrledec.o
 OBJS-$(CONFIG_AC3_DECODER)             += eac3dec.o ac3dec.o ac3tab.o ac3dec_data.o ac3.o
 OBJS-$(CONFIG_AC3_ENCODER)             += ac3enc.o ac3tab.o ac3.o
@@ -382,24 +383,26 @@ OBJS-$(CONFIG_OGG_MUXER)               += xiph.o flacdec.o flacdata.o flac.o
 OBJS-$(CONFIG_RTP_MUXER)               += mpegvideo.o
 
 # external codec libraries
-OBJS-$(CONFIG_LIBAMR_NB)               += libamr.o
-OBJS-$(CONFIG_LIBAMR_WB)               += libamr.o
-OBJS-$(CONFIG_LIBDIRAC_DECODER)        += libdiracdec.o
-OBJS-$(CONFIG_LIBDIRAC_ENCODER)        += libdiracenc.o libdirac_libschro.o
-OBJS-$(CONFIG_LIBFAAC)                 += libfaac.o
-OBJS-$(CONFIG_LIBFAAD)                 += libfaad.o
-OBJS-$(CONFIG_LIBGSM)                  += libgsm.o
-OBJS-$(CONFIG_LIBMP3LAME)              += libmp3lame.o
-OBJS-$(CONFIG_LIBOPENCORE_AMRNB)       += libopencore-amr.o
-OBJS-$(CONFIG_LIBOPENCORE_AMRWB)       += libopencore-amr.o
-OBJS-$(CONFIG_LIBOPENJPEG)             += libopenjpeg.o
-OBJS-$(CONFIG_LIBSCHROEDINGER_DECODER) += libschroedingerdec.o libschroedinger.o libdirac_libschro.o
-OBJS-$(CONFIG_LIBSCHROEDINGER_ENCODER) += libschroedingerenc.o libschroedinger.o libdirac_libschro.o
-OBJS-$(CONFIG_LIBSPEEX)                += libspeexdec.o
-OBJS-$(CONFIG_LIBTHEORA)               += libtheoraenc.o
-OBJS-$(CONFIG_LIBVORBIS)               += libvorbis.o
-OBJS-$(CONFIG_LIBX264)                 += libx264.o
-OBJS-$(CONFIG_LIBXVID)                 += libxvidff.o libxvid_rc.o
+OBJS-$(CONFIG_LIBDIRAC_DECODER)           += libdiracdec.o
+OBJS-$(CONFIG_LIBDIRAC_ENCODER)           += libdiracenc.o libdirac_libschro.o
+OBJS-$(CONFIG_LIBFAAC_ENCODER)            += libfaac.o
+OBJS-$(CONFIG_LIBFAAD_DECODER)            += libfaad.o
+OBJS-$(CONFIG_LIBGSM_DECODER)             += libgsm.o
+OBJS-$(CONFIG_LIBGSM_ENCODER)             += libgsm.o
+OBJS-$(CONFIG_LIBGSM_MS_DECODER)          += libgsm.o
+OBJS-$(CONFIG_LIBGSM_MS_ENCODER)          += libgsm.o
+OBJS-$(CONFIG_LIBMP3LAME_ENCODER)         += libmp3lame.o
+OBJS-$(CONFIG_LIBOPENCORE_AMRNB_DECODER)  += libopencore-amr.o
+OBJS-$(CONFIG_LIBOPENCORE_AMRNB_ENCODER)  += libopencore-amr.o
+OBJS-$(CONFIG_LIBOPENCORE_AMRWB_ENCODER)  += libopencore-amr.o
+OBJS-$(CONFIG_LIBOPENJPEG_DECODER)        += libopenjpeg.o
+OBJS-$(CONFIG_LIBSCHROEDINGER_DECODER)    += libschroedingerdec.o libschroedinger.o libdirac_libschro.o
+OBJS-$(CONFIG_LIBSCHROEDINGER_ENCODER)    += libschroedingerenc.o libschroedinger.o libdirac_libschro.o
+OBJS-$(CONFIG_LIBSPEEX_DECODER)           += libspeexdec.o
+OBJS-$(CONFIG_LIBTHEORA_ENCODER)          += libtheoraenc.o
+OBJS-$(CONFIG_LIBVORBIS_ENCODER)          += libvorbis.o
+OBJS-$(CONFIG_LIBX264_ENCODER)            += libx264.o
+OBJS-$(CONFIG_LIBXVID_ENCODER)            += libxvidff.o libxvid_rc.o
 
 # parsers
 OBJS-$(CONFIG_AAC_PARSER)              += aac_parser.o aac_ac3_parser.o mpeg4audio.o

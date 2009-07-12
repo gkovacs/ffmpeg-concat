@@ -195,7 +195,7 @@ void avcodec_register_all(void)
     REGISTER_ENCDEC  (ZMBV, zmbv);
 
     /* audio codecs */
-    REGISTER_DECODER (AAC, aac);
+    REGISTER_ENCDEC  (AAC, aac);
     REGISTER_ENCDEC  (AC3, ac3);
     REGISTER_ENCDEC  (ALAC, alac);
     REGISTER_DECODER (APE, ape);
@@ -303,8 +303,6 @@ void avcodec_register_all(void)
     REGISTER_ENCDEC  (XSUB, xsub);
 
     /* external libraries */
-    REGISTER_ENCDEC  (LIBAMR_NB, libamr_nb);
-    REGISTER_ENCDEC  (LIBAMR_WB, libamr_wb);
     REGISTER_ENCDEC  (LIBDIRAC, libdirac);
     REGISTER_ENCODER (LIBFAAC, libfaac);
     REGISTER_DECODER (LIBFAAD, libfaad);
