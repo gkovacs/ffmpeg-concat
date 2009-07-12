@@ -291,7 +291,6 @@ static AVInputFormat *av_probe_input_format2(AVProbeData *pd, int is_opened, int
 
     fmt = NULL;
     for(fmt1 = first_iformat; fmt1 != NULL; fmt1 = fmt1->next) {
-//        printf("checking format %s", fmt1->long_name);
         if (!is_opened == !(fmt1->flags & AVFMT_NOFILE))
             continue;
         score = 0;
@@ -556,9 +555,6 @@ int av_read_packet(AVFormatContext *s, AVPacket *pkt)
                 s->streams[i]->probe_packets = 0;
             continue;
         }
-
-
-
         st= s->streams[pkt->stream_index];
 
         switch(st->codec->codec_type){
@@ -573,21 +569,12 @@ int av_read_packet(AVFormatContext *s, AVPacket *pkt)
             break;
         }
 
-        fprintf(stderr, "in av_read_packet pkt stream %ld\n", pkt->stream);
-//        fprintf(stderr, "in av_read_packet pkt switchstreams %d\n", pkt->switchstreams);
-//        fprintf(stderr, "in av_read_packet pkt priv %d\n", pkt->priv);
-
-        
         if(!pktl && (st->codec->codec_id != CODEC_ID_PROBE ||
                      !st->probe_packets))
             return ret;
-        
-
-
 
         add_to_pktbuf(&s->raw_packet_buffer, pkt, &s->raw_packet_buffer_end);
         s->raw_packet_buffer_remaining_size -= pkt->size;
-
 
         if(st->codec->codec_id == CODEC_ID_PROBE){
             AVProbeData *pd = &st->probe_data;
@@ -921,7 +908,6 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 {
     AVStream *st;
     int len, ret, i;
-    void *priv;
     int stream_index;
     AVStream *stream;
     stream_index = 0;
@@ -1007,7 +993,6 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                             stream = cur_pkt.stream;
                             goto got_packet;
                         }
-                            
                     }
                 }
                 /* no more packets: really terminate parsing */
@@ -1067,13 +1052,10 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 
 int av_read_frame(AVFormatContext *s, AVPacket *pkt)
 {
-    fprintf(stderr, "av_read_frame called\n");
     AVPacketList *pktl;
     int eof=0;
     const int genpts= s->flags & AVFMT_FLAG_GENPTS;
-//    if (s->iformat && s->iformat->name == "m3u" && pkt) {
-//        fprintf(stderr, "meosakln %ld\n", (long)pkt->priv);
-//    }
+
     for(;;){
         pktl = s->packet_buffer;
         if (pktl) {
