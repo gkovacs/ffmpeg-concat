@@ -29,24 +29,16 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     int stream_index;
     PlaylistContext *ctx;
     AVFormatContext *ic;
-//    char have_switched_streams = 0;
+    char have_switched_streams = 0;
     ctx = s->priv_data;
     stream_index = 0;
     retr:
     ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
     ret = ic->iformat->read_packet(ic, pkt);
     if (pkt) {
-        stream_index = pkt->stream_index; // UGLY HACK - FIXME
-
+        stream_index = pkt->stream_index;
         ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
-//        if (!have_switched_streams)
-//            pkt->switchstreams = 0;
-//        else
-//            pkt->switchstreams = 1;
-//            pkt->priv = 0;
         pkt->stream = ic->streams[pkt->stream_index];
-//        pkt->stream = 0;
-//        fprintf(stderr, "in concatgen_read_packet pkt stream %ld\n", pkt->stream);
     }
     if (ret >= 0) {
         if (pkt) {
@@ -58,41 +50,20 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             if (!ic->streams[pkt->stream_index]->codec->has_b_frames)
                 pkt->pts = pkt->dts + 1;
         }
-    }
+    } else if (ret < 0 && !have_switched_streams && ctx->pe_curidxs[stream_index] < ctx->pelist_size - 1) {
     // TODO switch from AVERROR_EOF to AVERROR_EOS
     // -32 AVERROR_EOF for avi, -51 for ogg
-    else if (ret < 0 && ctx->pe_curidxs[stream_index] < ctx->pelist_size - 1) {
-        // TODO account for out-of-sync audio/video by using per-stream offsets
-        // using streams[]->duration slightly overestimates offset
-//        playld->dts_offset += ic->streams[0]->duration;
-        // using streams[]->cur_dts slightly overestimates offset
-//        playld->dts_offset += ic->streams[0]->cur_dts;
-//        playld->dts_offset += playld->dts_prevpacket;
         printf("switching streams\n");
         for (i = 0; i < ic->nb_streams && i < ctx->pe_curidxs_size; ++i) {
             ctx->time_offsets[i] += ff_playlist_get_duration(ic, i);
         }
         ++ctx->pe_curidxs[stream_index];
-//        pkt->destruct(pkt);
-
-//        pkt = av_malloc(sizeof(AVPacket));
-
-//        for (i = 0; i < playld->pe_curidxs_size; ++i) {
-            ff_playlist_populate_context(ctx, s, stream_index);
-//            have_switched_streams = 1;
-//        }
-//            pkt->switchstreams = 1;
+        ff_playlist_populate_context(ctx, s, stream_index);
+        have_switched_streams = 1;
         goto retr;
+    } else {
+        fprintf(stderr, "avpacket ret is %d\n", ret);
     }
-    else {
-        printf("avpacket ret is %d\n", ret);
-    }
-//    fprintf(stderr, "pkt switchstreams is %d\n", pkt->switchstreams);
-//    if (have_switched_streams) return INT_MAX;
-//    pkt->switchstreams = 0;
-//    pkt->priv = 0;
-//    if (pkt)
-//        pkt->stream = ic->streams[pkt->stream_index];
     return ret;
 }
 
