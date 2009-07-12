@@ -55,7 +55,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     // -32 AVERROR_EOF for avi, -51 for ogg
         av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidxs[stream_index]+1);
         for (i = 0; i < ic->nb_streams && i < ctx->pe_curidxs_size; ++i) {
-            ctx->time_offsets[i] += ff_playlist_get_duration(ic, i);
+            ctx->time_offsets[i] += av_rescale_q(ic->streams[i]->duration, ic->streams[i]->time_base, AV_TIME_BASE_Q);
         }
         ++ctx->pe_curidxs[stream_index];
         ff_playlist_populate_context(ctx, s, stream_index);

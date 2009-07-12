@@ -171,29 +171,6 @@ int ff_playlist_populate_context(PlaylistContext *ctx,
     return 0;
 }
 
-// returns duration in seconds * AV_TIME_BASE
-int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index)
-{
-// TODO storing previous packet pts/dts is ugly hack
-// ic->stream[]->cur_dts correct
-// ic->strea[]->duration correct
-// pkt->pts incorrect (huge negative)
-// pkt->dts correct, depended on by ffmpeg (need to change)
-// ic->stream[]->pts incorrect (0)
-// ic->start_time always 0
-// changing ic->start_time has no effect
-// ic->duration correct, divide by AV_TIME_BASE to get seconds
-// h264 and mpeg1: pkt->dts values incorrect
-    int64_t durn;
-
-//    durn = ic->duration;
-    durn = av_rescale_q(ic->streams[stream_index]->duration, ic->streams[stream_index]->time_base, AV_TIME_BASE_Q);
-
-//    durn = ic->streams[stream_index]->duration; // ogg gives wrong value
-    printf("duration is %ld\n", durn);
-    return durn;
-}
-
 void ff_playlist_relative_paths(char **flist, const char *workingdir)
 {
     while (*flist != 0) { // determine if relative paths
