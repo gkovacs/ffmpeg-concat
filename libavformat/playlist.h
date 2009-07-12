@@ -67,4 +67,16 @@ PlaylistContext* ff_playlist_get_context(AVFormatContext *ic);
 
 AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index);
 
+int ff_concatgen_read_packet(AVFormatContext *s, AVPacket *pkt);
+
+int ff_concatgen_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int flags);
+
+int ff_concatgen_read_timestamp(AVFormatContext *s, int stream_index, int64_t *pos, int64_t pos_limit);
+
+int ff_concatgen_read_close(AVFormatContext *s);
+
+int ff_concatgen_read_play(AVFormatContext *s);
+
+int ff_concatgen_read_pause(AVFormatContext *s);
+
 #endif /* AVFORMAT_PLAYLIST_H */
