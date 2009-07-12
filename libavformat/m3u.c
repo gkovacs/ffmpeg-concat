@@ -92,7 +92,7 @@ static int m3u_read_header(AVFormatContext *s,
 #if CONFIG_M3U_DEMUXER
 AVInputFormat m3u_demuxer = {
     "m3u",
-    NULL_IF_CONFIG_SMALL("M3U format"),
+    NULL_IF_CONFIG_SMALL("CONCAT M3U format"),
     sizeof(PlaylistContext),
     m3u_probe,
     m3u_read_header,

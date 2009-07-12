@@ -119,7 +119,7 @@ static int xspf_read_header(AVFormatContext *s,
 #if CONFIG_XSPF_DEMUXER
 AVInputFormat xspf_demuxer = {
     "xspf",
-    NULL_IF_CONFIG_SMALL("XSPF format"),
+    NULL_IF_CONFIG_SMALL("CONCAT XSPF format"),
     sizeof(PlaylistContext),
     xspf_probe,
     xspf_read_header,

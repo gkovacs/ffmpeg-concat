@@ -118,7 +118,7 @@ static int pls_read_header(AVFormatContext *s,
 #if CONFIG_PLS_DEMUXER
 AVInputFormat pls_demuxer = {
     "pls",
-    NULL_IF_CONFIG_SMALL("PLS format"),
+    NULL_IF_CONFIG_SMALL("CONCAT PLS format"),
     sizeof(PlaylistContext),
     pls_probe,
     pls_read_header,

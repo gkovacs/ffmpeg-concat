@@ -1335,89 +1335,31 @@ static int output_picture2(VideoState *is, AVFrame *src_frame, double pts1)
 static int video_thread(void *arg)
 {
     VideoState *is = arg;
-    char isconcat = 0;
     AVPacket pkt1, *pkt = &pkt1;
     int len1, got_picture;
-    AVFrame *frame= avcodec_alloc_frame();
+    AVFrame *frame;
     double pts;
-    int cur_stream;
-//    AVStream *video_st;
-//    AVCodecContext *dec;
-    PlaylistContext *playlist_ctx;
-    int playidx = 0;
-    int pktgetv;
-    char pktst = 0;
-//    video_st = is->video_st;
-//    char mustinit = 1;
-//   video_st = is->ic->streams[pkt->stream_index];
-//    is->video_st = video_st;
-//    is->video_stream = pkt->stream_index;
-
-    if (!strncmp(is->ic->iformat->name, "m3u", 4)) {
+    char isconcat;
+    frame = avcodec_alloc_frame();
+    if (!strncmp(is->ic->iformat->long_name, "CONCAT", 6))
         isconcat = 1;
-        playlist_ctx = is->ic->priv_data;
-    }
+    else
+        isconcat = 0;
     for(;;) {
-
-        
-//        AVStream *video_st = is->video_st;
-//        fprintf(stderr, "video thread running\n");
         while (is->paused && !is->videoq.abort_request) {
             SDL_Delay(10);
         }
 
-        getpktagain:
-
-        if ((pktgetv = packet_queue_get(&is->videoq, pkt, 1)) < 0) {
-           
+        if (packet_queue_get(&is->videoq, pkt, 1) < 0)
             break;
-        }
 
-        if (pkt && pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_VIDEO) {
-            fprintf(stderr, "have packet\n");
-            fprintf(stderr, "pkt stream is %ld", pkt->stream);
+        if (isconcat && pkt && pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_VIDEO)
             is->video_st = pkt->stream;
-//            pktst = pkt->switchstreams;
-//            fprintf(stderr, "pktst is %d\n", pkt->switchstreams);
-//            fprintf(stderr, "pktpriv is %ld\n", pkt->priv);
-            
-                    if (!is->video_st->codec->codec) {
-
-            fprintf(stderr, "\n\n\n\ncodec switching has occurred!!!\n\n\n\n");
-            AVCodec *codec = avcodec_find_decoder(is->video_st->codec->codec_id);
-            if (!codec) {
-                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
-                        is->video_st->codec->codec_id, pkt->stream_index);
-                return AVERROR(EINVAL);
-            }
-            if (avcodec_open(is->video_st->codec, codec) < 0) {
-                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
-                        pkt->stream_index);
-                return AVERROR(EINVAL);
-            }
-//            frame= avcodec_alloc_frame();
-//            goto tryagain;
-        }
-        }
-        else {
-            av_free_packet(pkt);
-            frame= avcodec_alloc_frame();
-            
-             continue;
-        }
-           
-
-// fprintf(stderr, "packet_queue_get is %d\n", pktgetv);
-
-//        pktst = pkt->switchstreams;
-
-        tryagain:
 
         if(pkt->data == flush_pkt.data){
             avcodec_flush_buffers(is->video_st->codec);
             continue;
         }
-//        fprintf(stderr, "video thread running\n");
         /* NOTE: ipts is the PTS of the _first_ picture beginning in
            this packet, if any */
 
@@ -1427,58 +1369,6 @@ static int video_thread(void *arg)
         len1 = avcodec_decode_video2(is->video_st->codec,
                                     frame, &got_picture,
                                     pkt);
-        /*
-        if (!pkt) {
-            fprintf(stderr, "no packet\n");
-//            continue;
-        }
-        else {
-            fprintf(stderr, "have packet\n");
-            pktst = pkt->switchstreams;
-            fprintf(stderr, "pktst is %d\n", pktst);
-        }
-         */
-/*
-//        if (len1 <= 0 || !frame || !got_picture) {
-//            printf("fail\n\nfail\n\nfail\n\nfail\n\n");
-//            if (isconcat) {
-//                if (playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
-//    if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
-//                    video_st = is->ic->streams[pkt->stream_index];
-        video_st = playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index];
-        is->video_st = video_st;
-        is->video_stream = pkt->stream_index;
-//        is->iformat = playlist_ctx->pelist[playidx]->ic->iformat;
-//        is->ic = playlist_ctx->pelist[playidx]->ic;
-        
-        dec = video_st->codec;
-        if (!dec->codec) {
-            
-            fprintf(stderr, "\n\n\n\nswitched streams\n\n\n\n");
-            AVCodec *codec = avcodec_find_decoder(dec->codec_id);
-            if (!codec) {
-                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
-                        dec->codec_id, pkt->stream_index);
-                return AVERROR(EINVAL);
-            }
-            if (avcodec_open(dec, codec) < 0) {
-                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
-                        pkt->stream_index);
-                return AVERROR(EINVAL);
-            }
-            frame= avcodec_alloc_frame();
-            goto tryagain;
-        }
-    } else {
-        dec = is->video_st->codec;
-        fprintf(stderr, "video stream not yet set\n");
-//        continue;
-    }
-//}
-//        }
-//        }
- */
-
         if(   (decoder_reorder_pts || pkt->dts == AV_NOPTS_VALUE)
            && frame->reordered_opaque != AV_NOPTS_VALUE)
             pts= frame->reordered_opaque;
@@ -1487,92 +1377,11 @@ static int video_thread(void *arg)
         else
             pts= 0;
         pts *= av_q2d(is->video_st->time_base);
-
-        #if 0
-            if (isconcat && (/*len1 <= 0 || !frame || !got_picture ||*/ pktst == 1)) {
-                fprintf(stderr, "\n\n\n\ntrying stream switching!!!\n\n\n\n");
-                if (playidx < playlist_ctx->pelist_size - 1 /*&& pkt && playlist_ctx && playlist_ctx->pelist && playlist_ctx->pelist[playidx] && playlist_ctx->pelist[playidx]->ic && playlist_ctx->pelist[playidx]->ic->streams && playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index] */) {
-                    if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
-                    ++playidx;
-        is->video_st = playlist_ctx->pelist[playidx]->ic->streams[pkt->stream_index];
-//        is->video_st = video_st;
-        is->video_stream = pkt->stream_index;
-//        is->iformat = playlist_ctx->pelist[playidx]->ic->iformat;
-//        is->ic = playlist_ctx->pelist[playidx]->ic;
-
-        fprintf(stderr, "\n\n\n\nstream switching has occurred!!!\n\n\n\n");
-//        dec = video_st->codec;
-        is->video_st->codec = 0;
-//        is->video_st->codec->codec = 0;
-        if (1 /*!is->video_st->codec->codec*/) {
-
-            fprintf(stderr, "\n\n\n\ncodec switching has occurred!!!\n\n\n\n");
-            AVCodec *codec = avcodec_find_decoder(is->video_st->codec->codec_id);
-            if (!codec) {
-                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
-                        is->video_st->codec->codec_id, pkt->stream_index);
-                return AVERROR(EINVAL);
-            }
-            if (avcodec_open(is->video_st->codec, codec) < 0) {
-                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
-                        pkt->stream_index);
-                return AVERROR(EINVAL);
-            }
-            frame= avcodec_alloc_frame();
-            goto tryagain;
-        }
-                    } else {
-//        video_st->codec = is->video_st->codec;
-        fprintf(stderr, "video stream not yet set\n");
-//        continue;
-    }
-                    goto tryagain;
-//        if (pkt)
-//                    av_free_packet(pkt);
-//                    continue;
-                }
-//                goto getpktagain;
-//                goto tryagain;
-            }
-        #endif
-                
-                    
-                
-
-//    }
         if (got_picture) {
             if (output_picture2(is, frame, pts) < 0)
                 goto the_end;
         }
         // failed
-        
-        /*
-    if (is->ic->streams[pkt->stream_index]->codec->codec_type == CODEC_TYPE_VIDEO) {
-        video_st = is->ic->streams[pkt->stream_index];
-        is->video_st = video_st;
-        is->video_stream = pkt->stream_index;
-        dec = is->ic->streams[pkt->stream_index]->codec;
-        if (!dec->codec) {
-            AVCodec *codec = avcodec_find_decoder(dec->codec_id);
-            if (!codec) {
-                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
-                        dec->codec_id, pkt->stream_index);
-                return AVERROR(EINVAL);
-            }
-            if (avcodec_open(dec, codec) < 0) {
-                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
-                        pkt->stream_index);
-                return AVERROR(EINVAL);
-            }
-            continue;
-        }
-    } else {
-        dec = is->video_st->codec;
-        fprintf(stderr, "video stream not yet set\n");
-        continue;
-    }
-         */
-
         av_free_packet(pkt);
         if (step)
             if (cur_stream)
@@ -1763,7 +1572,12 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
     AVPacket *pkt = &is->audio_pkt;
     int n, len1, data_size;
     double pts;
+    char isconcat;
     char tryswitchalready = 0;
+    if (!strncmp(is->ic->iformat->long_name, "CONCAT", 6))
+        isconcat = 1;
+    else
+        isconcat = 0;
     for(;;) {
         tryagain:
         while (pkt_temp->size > 0) {
@@ -1773,22 +1587,22 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
             if (len1 < 0) {
-                if (pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_AUDIO)
-                    is->audio_st = pkt->stream;
-                else if (pkt_temp->stream && pkt_temp->stream->codec && pkt_temp->stream->codec->codec_type == CODEC_TYPE_AUDIO)
-                    is->audio_st = pkt_temp->stream;
-                else
-                    is->audio_st = is->ic->streams[pkt->stream_index];
+                if (isconcat) {
+                    if (pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_AUDIO)
+                        is->audio_st = pkt->stream;
+                    else if (pkt_temp->stream && pkt_temp->stream->codec && pkt_temp->stream->codec->codec_type == CODEC_TYPE_AUDIO)
+                        is->audio_st = pkt_temp->stream;
+                    else
+                        is->audio_st = is->ic->streams[pkt->stream_index];
+                }
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
-                if (!tryswitchalready) {
+                if (isconcat && !tryswitchalready) {
                     tryswitchalready = 1;
                     goto tryagain;
                 }
-                else {
-                    tryswitchalready = 0;
-                    break;
-                }
+                tryswitchalready = 0;
+                break;
             }
             tryswitchalready = 0;
 
