@@ -63,6 +63,8 @@ int64_t ff_playlist_get_duration(AVFormatContext *ic, int stream_index);
 
 void ff_playlist_relative_paths(char **flist, const char *workingdir);
 
-PlaylistContext* get_playlist_context(AVFormatContext *ic);
+PlaylistContext* ff_playlist_get_context(AVFormatContext *ic);
+
+AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index);
 
 #endif /* AVFORMAT_PLAYLIST_H */

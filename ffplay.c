@@ -1341,8 +1341,10 @@ static int video_thread(void *arg)
     AVFrame *frame;
     double pts;
     PlaylistContext *pl_ctx;
+    int st_idx = 0;
+    char tryswitchalready = 0;
     frame = avcodec_alloc_frame();
-    pl_ctx = get_playlist_context(is->ic);
+    pl_ctx = ff_playlist_get_context(is->ic);
     for(;;) {
         while (is->paused && !is->videoq.abort_request) {
             SDL_Delay(10);
@@ -1351,8 +1353,7 @@ static int video_thread(void *arg)
         if (packet_queue_get(&is->videoq, pkt, 1) < 0)
             break;
 
-        if (pl_ctx && pkt && pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_VIDEO)
-            is->video_st = pkt->stream;
+        tryagain:
 
         if(pkt->data == flush_pkt.data){
             avcodec_flush_buffers(is->video_st->codec);
@@ -1360,10 +1361,29 @@ static int video_thread(void *arg)
         }
         /* NOTE: ipts is the PTS of the _first_ picture beginning in
            this packet, if any */
+
         is->video_st->codec->reordered_opaque= pkt->pts;
+
         len1 = avcodec_decode_video2(is->video_st->codec,
                                     frame, &got_picture,
                                     pkt);
+
+        if (pl_ctx && pkt && !tryswitchalready) {
+            tryswitchalready = 1;
+//            AVStream *propst = ff_playlist_get_stream(pl_ctx, st_idx+1, pkt->stream_index);
+//            if (propst && propst->codec && propst->codec->codec_type == CODEC_TYPE_VIDEO) {
+//                is->video_st = propst;
+//                ++st_idx;
+//            }
+            if (pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_VIDEO) {
+                if (is->video_st != pkt->stream) {
+                    is->video_st = pkt->stream;
+                    goto tryagain;
+                }
+            }
+        }
+        tryswitchalready = 0;
+
         if(   (decoder_reorder_pts || pkt->dts == AV_NOPTS_VALUE)
            && frame->reordered_opaque != AV_NOPTS_VALUE)
             pts= frame->reordered_opaque;
@@ -1566,10 +1586,10 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
     AVPacket *pkt = &is->audio_pkt;
     int n, len1, data_size;
     double pts;
-    int st_idx;
+    int st_idx = 0;
     PlaylistContext *pl_ctx;
     char tryswitchalready = 0;
-    pl_ctx = get_playlist_context(is->ic);
+    pl_ctx = ff_playlist_get_context(is->ic);
     for(;;) {
         while (pkt_temp->size > 0) {
             tryagain:
@@ -1578,13 +1598,15 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
             if (len1 < 0) {
+                ++st_idx;
                 if (pl_ctx) {
                     if (pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_AUDIO)
                         is->audio_st = pkt->stream;
                     else if (pkt_temp->stream && pkt_temp->stream->codec && pkt_temp->stream->codec->codec_type == CODEC_TYPE_AUDIO)
                         is->audio_st = pkt_temp->stream;
                     else
-                        is->audio_st = is->ic->streams[pkt->stream_index];
+                        is->audio_st = ff_playlist_get_stream(pl_ctx, st_idx, pkt->stream_index);
+//                        is->audio_st = is->ic->streams[pkt->stream_index];
                 }
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
