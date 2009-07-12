@@ -40,31 +40,28 @@ void ff_playlist_init_playelem(PlayElem *pe)
         av_log(pe->ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
     pe->fmt = pe->ic->iformat;
     if (!pe->fmt) {
-        fprintf(stderr, "pefmt not set\n");
+        av_log(pe->ic, AV_LOG_ERROR, "Input format not set\n");
     }
     err = av_find_stream_info(pe->ic);
     if (err < 0) {
-        av_log(pe->ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
+        av_log(pe->ic, AV_LOG_ERROR, "Could not find stream info\n");
     }
     if(pe->ic->pb) {
         pe->ic->pb->eof_reached = 0;
     }
     else {
-        av_log(NULL, AV_LOG_ERROR, "failed pe ic pb not set\n");
-    }
-    if(!pe->fmt) {
-        av_log(NULL, AV_LOG_ERROR, "failed pe ic fmt not set\n");
+        av_log(pe->ic, AV_LOG_ERROR, "ByteIOContext not set\n");
     }
     for (i = 0; i < pe->ic->nb_streams; ++i) {
         AVCodec *codec = avcodec_find_decoder(pe->ic->streams[i]->codec->codec_id);
         if (!codec) {
-            fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
-                    pe->ic->streams[i]->codec->codec_id, i);
+            av_log(pe->ic->streams[i]->codec, AV_LOG_ERROR, "Decoder (codec id %d) not found for input stream #%d\n",
+                   pe->ic->streams[i]->codec->codec_id, i);
             return AVERROR(EINVAL);
         }
         if (avcodec_open(pe->ic->streams[i]->codec, codec) < 0) {
-            fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
-                    i);
+            av_log(pe->ic->streams[i]->codec, AV_LOG_ERROR, "Error while opening decoder for input stream #%d\n",
+                   i);
             return AVERROR(EINVAL);
         }
     }
@@ -119,8 +116,6 @@ int ff_playlist_populate_context(PlaylistContext *ctx,
     int i;
     AVFormatContext *ic;
     AVFormatParameters *nap;
-    fprintf(stderr, "playlist_populate_context called\n");
-//    ctx->pelist[ctx->pe_curidxs[stream_index]] = av_malloc(sizeof(*(ctx->pelist[ctx->pe_curidxs[stream_index]])));
     ff_playlist_init_playelem(ctx->pelist[ctx->pe_curidxs[stream_index]]);
     ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
     nap = ctx->pelist[ctx->pe_curidxs[stream_index]]->ap;
