@@ -57,8 +57,7 @@ void ff_playlist_init_playelem(PlayElem *pe)
     }
     
     for (i = 0; i < pe->ic->nb_streams; ++i) {
-        pe->ic->streams[i]->codec->codec = 0;
-        /*
+//        pe->ic->streams[i]->codec->codec = 0;
         AVCodec *codec = avcodec_find_decoder(pe->ic->streams[i]->codec->codec_id);
         if (!codec) {
             fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
@@ -70,7 +69,6 @@ void ff_playlist_init_playelem(PlayElem *pe)
                     i);
             return AVERROR(EINVAL);
         }
-        */
     }
     
 }

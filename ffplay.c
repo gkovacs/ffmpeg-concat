@@ -1834,7 +1834,7 @@ tryagain:
 //        goto tryagain;
 //    }
 */
-
+/*
                 if (pkt && pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_AUDIO) {
                     if (!pkt->stream->codec->codec) {
                         AVCodec *codec = avcodec_find_decoder(pkt->stream->codec->codec_id);
@@ -1857,7 +1857,7 @@ tryagain:
                         is->audio_stream = is->audio_st->index;
                         is->audio_src_fmt = is->audio_st->codec->sample_fmt;
                 }
-
+*/
 /*
                 fprintf(stderr, "audio decoding error\n");
                 fprintf(stderr, "ade pkt %ld\n", pkt);
@@ -1890,8 +1890,8 @@ tryagain:
 
 
 
-
-
+                is->audio_st = pkt->stream;
+//                is->audio_st = is->ic->streams[pkt->stream_index];
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
 //                goto tryagain;
