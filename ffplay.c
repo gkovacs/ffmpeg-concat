@@ -1574,10 +1574,9 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
     else
         isconcat = 0;
     for(;;) {
-        tryagain:
         while (pkt_temp->size > 0) {
+            tryagain:
             data_size = sizeof(is->audio_buf1);
-            decagain:
             len1 = avcodec_decode_audio3(is->audio_st->codec,
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
