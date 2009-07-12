@@ -55,7 +55,6 @@ void ff_playlist_init_playelem(PlayElem *pe)
     if(!pe->fmt) {
         av_log(NULL, AV_LOG_ERROR, "failed pe ic fmt not set\n");
     }
-    
     for (i = 0; i < pe->ic->nb_streams; ++i) {
         AVCodec *codec = avcodec_find_decoder(pe->ic->streams[i]->codec->codec_id);
         if (!codec) {
@@ -69,7 +68,7 @@ void ff_playlist_init_playelem(PlayElem *pe)
             return AVERROR(EINVAL);
         }
     }
-    
+
 }
 
 PlaylistContext* ff_playlist_alloc_context(const char *filename)
