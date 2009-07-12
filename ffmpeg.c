@@ -1257,26 +1257,8 @@ static int output_packet(AVInputStream *ist, int ist_index,
     AVSubtitle subtitle, *subtitle_to_free;
     int got_subtitle;
     AVPacket avpkt;
-    if (ist && is && pkt && is->nb_streams > pkt->stream_index && is->streams && is->streams[pkt->stream_index] && is->streams[pkt->stream_index]->codec) {
-        fprintf(stdout, "stream index modified to %d\n", pkt->stream_index);
+    if (ist && is && pkt && is->nb_streams > pkt->stream_index && is->streams && is->streams[pkt->stream_index] && is->streams[pkt->stream_index]->codec)
         ist->st = is->streams[pkt->stream_index];
-//        ist->st = pkt->stream;
-        /*
-        if (!ist->st->codec->codec) {
-            AVCodec *codec = avcodec_find_decoder(ist->st->codec->codec_id);
-            if (!codec) {
-                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d.%d\n",
-                        ist->st->codec->codec_id, ist->file_index, ist->index);
-                return AVERROR(EINVAL);
-            }
-            if (avcodec_open(ist->st->codec, codec) < 0) {
-                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d.%d\n",
-                        ist->file_index, ist->index);
-                return AVERROR(EINVAL);
-            }
-        }
-        */
-    }
 
     if(ist->next_pts == AV_NOPTS_VALUE)
         ist->next_pts= ist->pts;
