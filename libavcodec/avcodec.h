@@ -3715,7 +3715,7 @@ int av_parse_video_frame_rate(AVRational *frame_rate, const char *str);
 #define AVERROR_NOTSUPP     AVERROR(ENOSYS)  /**< Operation not supported. */
 #define AVERROR_NOENT       AVERROR(ENOENT)  /**< No such file or directory. */
 #define AVERROR_EOF         AVERROR(EPIPE)   /**< End of file. */
-#define AVERROR_EOS         AVERROR(EAGAIN)   /**< End of stream. */
+//#define AVERROR_EOS         AVERROR(EAGAIN)   /**< End of stream. */
 #define AVERROR_PATCHWELCOME    -MKTAG('P','A','W','E') /**< Not yet implemented in FFmpeg. Patches welcome. */
 
 /**
