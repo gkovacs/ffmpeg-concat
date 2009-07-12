@@ -919,13 +919,13 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
 
 static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 {
-//    fprintf(stderr, "av_read_frame_internal stream %ld\n", s->cur_st);
     AVStream *st;
     int len, ret, i;
-    char switchstreams;
     void *priv;
-    int stream_index = 0;
-    AVStream *stream = 0;
+    int stream_index;
+    AVStream *stream;
+    stream_index = 0;
+    stream = 0;
 
     av_init_packet(pkt);
 
@@ -959,23 +959,14 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 /* return packet if any */
                 if (pkt->size) {
                 got_packet:
-            if (stream)
-                pkt->stream = stream;
-            else
-                pkt->stream = st;
-            if (stream_index)
-                pkt->stream_index = stream_index;
-            else
-//                pkt->stream_index = 0;
-                pkt->stream_index = st->index;
-                fprintf(stderr, "av_read_frame_internal stream %ld\n", pkt->stream);
-//            pkt->stream = s->cur_st;
-//            pkt->switchstreams = switchstreams;
-//                pkt->priv = priv;
-//            fprintf(stderr, "in av_read_frame_internal pkt switchstreams %d\n", pkt->switchstreams);
-//            fprintf(stderr, "in av_read_frame_internal pkt priv %d\n", pkt->priv);
+                    if (stream && stream->codec && stream->codec->codec) {
+                        pkt->stream = stream;
+                        pkt->stream_index = stream_index;
+                    } else {
+                        pkt->stream = st;
+                        pkt->stream_index = st->index;
+                    }
                     pkt->duration = 0;
-//                    pkt->stream_index = st->index;
                     pkt->pts = st->parser->pts;
                     pkt->dts = st->parser->dts;
                     pkt->pos = st->parser->pos;
@@ -999,11 +990,6 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             AVPacket cur_pkt;
             /* read next packet */
             ret = av_read_packet(s, &cur_pkt);
-            
-//            fprintf(stderr, "in av_read_frame_internal pkt switchstreams %d\n", cur_pkt.switchstreams);
-//            fprintf(stderr, "in av_read_frame_internal pkt priv %d\n", cur_pkt.priv);
-//            switchstreams = cur_pkt.switchstreams;
-
             if (ret < 0) {
                 if (ret == AVERROR(EAGAIN))
                     return ret;
@@ -1017,9 +1003,8 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                                         AV_NOPTS_VALUE, AV_NOPTS_VALUE,
                                         AV_NOPTS_VALUE);
                         if (pkt->size) {
-            priv = cur_pkt.priv;
-            stream_index = cur_pkt.stream_index;
-            stream = cur_pkt.stream;
+                            stream_index = cur_pkt.stream_index;
+                            stream = cur_pkt.stream;
                             goto got_packet;
                         }
                             
