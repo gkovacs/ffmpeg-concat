@@ -31,7 +31,6 @@
 #include "libavcodec/opt.h"
 
 #include "cmdutils.h"
-#include "libavformat/playlist.h"
 
 #include <SDL.h>
 #include <SDL_thread.h>
@@ -320,7 +319,7 @@ static int packet_queue_get(PacketQueue *q, AVPacket *pkt, int block)
 
         pkt1 = q->first_pkt;
         if (pkt1) {
-            q->first_pkt = pkt1->next;            
+            q->first_pkt = pkt1->next;
             if (!q->first_pkt)
                 q->last_pkt = NULL;
             q->nb_packets--;
@@ -1362,9 +1361,6 @@ static int video_thread(void *arg)
         }
         /* NOTE: ipts is the PTS of the _first_ picture beginning in
            this packet, if any */
-
-
-
         is->video_st->codec->reordered_opaque= pkt->pts;
         len1 = avcodec_decode_video2(is->video_st->codec,
                                     frame, &got_picture,
@@ -1381,7 +1377,6 @@ static int video_thread(void *arg)
             if (output_picture2(is, frame, pts) < 0)
                 goto the_end;
         }
-        // failed
         av_free_packet(pkt);
         if (step)
             if (cur_stream)
@@ -1658,9 +1653,6 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 #endif
             return data_size;
         }
-
-        nextpkt:
-
         /* free the current packet */
         if (pkt->data)
             av_free_packet(pkt);
@@ -2031,7 +2023,7 @@ static int decode_thread(void *arg)
         goto fail;
     }
 
-    for(;;) { // set breakpoint here
+    for(;;) {
         if (is->abort_request)
             break;
         if (is->paused != is->last_paused) {
@@ -2050,7 +2042,6 @@ static int decode_thread(void *arg)
         }
 #endif
         if (is->seek_req) {
-//            fprintf(stderr, "seeking needed\n");
             int64_t seek_target= is->seek_pos;
             int64_t seek_min= is->seek_rel > 0 ? seek_target - is->seek_rel + 2: INT64_MIN;
             int64_t seek_max= is->seek_rel < 0 ? seek_target - is->seek_rel - 2: INT64_MAX;
@@ -2084,11 +2075,9 @@ static int decode_thread(void *arg)
             is->subtitleq.size > MAX_SUBTITLEQ_SIZE) {
             /* wait 10 ms */
             SDL_Delay(10);
-//            fprintf(stderr, "packet queue full\n");
             continue;
         }
         if(url_feof(ic->pb) || eof) {
-//            fprintf(stderr, "end of file\n");
             if(is->video_stream >= 0){
                 av_init_packet(pkt);
                 pkt->data=NULL;
@@ -2100,8 +2089,6 @@ static int decode_thread(void *arg)
             continue;
         }
         ret = av_read_frame(ic, pkt);
-//        fprintf(stderr, "read frame\n");
-        fprintf(stderr, "in decode_thread pkt stream %ld\n", pkt->stream);
         if (ret < 0) {
             if (ret == AVERROR_EOF)
                 eof=1;
@@ -2110,11 +2097,6 @@ static int decode_thread(void *arg)
             SDL_Delay(100); /* wait for user event */
             continue;
         }
-
-
-//        fprintf(stderr, "in decode_thread pkt switchstreams %d\n", pkt->switchstreams);
-//        fprintf(stderr, "in decode_thread pkt priv %d\n", pkt->priv);
-
         if (pkt->stream_index == is->audio_stream) {
             packet_queue_put(&is->audioq, pkt);
         } else if (pkt->stream_index == is->video_stream) {
@@ -2127,7 +2109,6 @@ static int decode_thread(void *arg)
     }
     /* wait until the end */
     while (!is->abort_request) {
-        fprintf(stderr, "waiting for end\n");
         SDL_Delay(100);
     }
 
