@@ -21,6 +21,18 @@
 
 #include "playlist.h"
 
+static int ff_concatgen_read_packet(AVFormatContext *s, AVPacket *pkt);
+
+static int ff_concatgen_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int flags);
+
+static int ff_concatgen_read_timestamp(AVFormatContext *s, int stream_index, int64_t *pos, int64_t pos_limit);
+
+static int ff_concatgen_read_close(AVFormatContext *s);
+
+static int ff_concatgen_read_play(AVFormatContext *s);
+
+static int ff_concatgen_read_pause(AVFormatContext *s);
+
 /* The ffmpeg codecs we support, and the IDs they have in the file */
 static const AVCodecTag codec_xspf_tags[] = {
     { 0, 0 },

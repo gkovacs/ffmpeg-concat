@@ -24,7 +24,7 @@
 #ifndef AVFORMAT_CONCAT_H
 #define AVFORMAT_CONCAT_H
 
-AVInputFormat* concat_alloc_demuxer(void);
+
 
 #endif /* AVFORMAT_CONCAT_H */
 
