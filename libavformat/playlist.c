@@ -219,3 +219,11 @@ void ff_playlist_relative_paths(char **flist, const char *workingdir)
         ++flist;
     }
 }
+
+PlaylistContext *get_playlist_context(AVFormatContext *ic)
+{
+    if (ic && ic->iformat && ic->iformat->long_name && ic->priv_data && !strncmp(ic->iformat->long_name, "CONCAT", 6))
+        return ic->priv_data;
+    else
+        return NULL;
+}

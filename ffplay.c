@@ -30,6 +30,8 @@
 #include "libavcodec/colorspace.h"
 #include "libavcodec/opt.h"
 
+#include "libavformat/playlist.h"
+
 #include "cmdutils.h"
 
 #include <SDL.h>
@@ -1338,12 +1340,9 @@ static int video_thread(void *arg)
     int len1, got_picture;
     AVFrame *frame;
     double pts;
-    char isconcat;
+    PlaylistContext *pl_ctx;
     frame = avcodec_alloc_frame();
-    if (!strncmp(is->ic->iformat->long_name, "CONCAT", 6))
-        isconcat = 1;
-    else
-        isconcat = 0;
+    pl_ctx = get_playlist_context(is->ic);
     for(;;) {
         while (is->paused && !is->videoq.abort_request) {
             SDL_Delay(10);
@@ -1352,7 +1351,7 @@ static int video_thread(void *arg)
         if (packet_queue_get(&is->videoq, pkt, 1) < 0)
             break;
 
-        if (isconcat && pkt && pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_VIDEO)
+        if (pl_ctx && pkt && pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_VIDEO)
             is->video_st = pkt->stream;
 
         if(pkt->data == flush_pkt.data){
@@ -1567,12 +1566,10 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
     AVPacket *pkt = &is->audio_pkt;
     int n, len1, data_size;
     double pts;
-    char isconcat;
+    int st_idx;
+    PlaylistContext *pl_ctx;
     char tryswitchalready = 0;
-    if (!strncmp(is->ic->iformat->long_name, "CONCAT", 6))
-        isconcat = 1;
-    else
-        isconcat = 0;
+    pl_ctx = get_playlist_context(is->ic);
     for(;;) {
         while (pkt_temp->size > 0) {
             tryagain:
@@ -1581,7 +1578,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
             if (len1 < 0) {
-                if (isconcat) {
+                if (pl_ctx) {
                     if (pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_AUDIO)
                         is->audio_st = pkt->stream;
                     else if (pkt_temp->stream && pkt_temp->stream->codec && pkt_temp->stream->codec->codec_type == CODEC_TYPE_AUDIO)
@@ -1591,7 +1588,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                 }
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
-                if (isconcat && !tryswitchalready) {
+                if (pl_ctx && !tryswitchalready) {
                     tryswitchalready = 1;
                     goto tryagain;
                 }
