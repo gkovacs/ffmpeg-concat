@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "concatgen.h"
+#include "playlist.h"
 
 int ff_concatgen_read_packet(AVFormatContext *s,
                              AVPacket *pkt)

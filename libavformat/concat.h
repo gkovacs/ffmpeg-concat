@@ -19,14 +19,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "concatgen.h"
+#include "playlist.h"
 
 #ifndef AVFORMAT_CONCAT_H
 #define AVFORMAT_CONCAT_H
-
-//int concat_probe(AVProbeData *p);
-
-//int concat_read_header(AVFormatContext *s, AVFormatParameters *ap);
 
 AVInputFormat* concat_alloc_demuxer(void);
 

@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "concatgen.h"
+#include "playlist.h"
 
 /* The ffmpeg codecs we support, and the IDs they have in the file */
 static const AVCodecTag codec_xspf_tags[] = {
