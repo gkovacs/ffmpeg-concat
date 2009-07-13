@@ -21,6 +21,7 @@
 
 /** @file pls.c
  *  @brief XSPF playlist demuxer
+ *  @author Geza Kovacs ( gkovacs mit edu )
  */
 
 #include "avformat.h"

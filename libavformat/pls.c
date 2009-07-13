@@ -21,6 +21,7 @@
 
 /** @file pls.c
  *  @brief PLS playlist demuxer
+ *  @author Geza Kovacs ( gkovacs mit edu )
  */
 
 #include "playlist.h"

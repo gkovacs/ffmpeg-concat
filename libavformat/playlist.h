@@ -21,6 +21,7 @@
 
 /** @file playlist.h
  *  @brief General components used by playlist formats
+ *  @author Geza Kovacs ( gkovacs mit edu )
  *  @details These functions are used to initialize and manipulate playlists
  *  (PlaylistContext) and their individual playlist elements (PlayElem), each
  *  of which encapsulates its own AVFormatContext. This abstraction used for

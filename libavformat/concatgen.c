@@ -21,6 +21,7 @@
 
 /** @file concatgen.c
  *  @brief Generic functions used by playlist/concatenation demuxers
+ *  @author Geza Kovacs ( gkovacs mit edu )
  *  @details These functions are used to read packets and seek streams
  *  for concat-type demuxers, abstracting away the playlist element switching
  *  process.

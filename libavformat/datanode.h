@@ -1,5 +1,5 @@
 /*
- * Format to represent ini (and later xml) as doubly linked 2D data nodes
+ * Format to represent ini and xml files as doubly linked 2D data nodes
  * Copyright (c) 2009 Geza Kovacs
  *
  * This file is part of FFmpeg.
@@ -17,6 +17,11 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+/** @file datanode.h
+ *  @brief Format to represent ini and xml files as doubly linked 2D data nodes
+ *  @author Geza Kovacs ( gkovacs mit edu )
  */
 
 #ifndef AVFORMAT_DATANODE_H

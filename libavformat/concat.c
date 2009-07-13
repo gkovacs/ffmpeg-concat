@@ -21,6 +21,7 @@
 
 /** @file concat.c
  *  @brief Minimal playlist/concatenation demuxer
+ *  @author Geza Kovacs ( gkovacs mit edu )
  *  @details This is a minimal concat-type demuxer that can be constructed
  *  by allocating a PlayElem for each playlist item and setting its filename,
  *  then allocating a PlaylistContext, creating a list of PlayElem, and setting
