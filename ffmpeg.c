@@ -2876,7 +2876,7 @@ static void opt_input_file(const char *filename)
             ic = av_malloc(sizeof(*ic));
 //            ic = avformat_alloc_context();
             printf("need to generate playlist ctx\n");
-            playlist_ctx = ff_playlist_alloc_context(filename);
+            playlist_ctx = ff_playlist_alloc_context();
             playlist_ctx->pelist_size = 1;
             playlist_ctx->pelist = av_malloc(playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
             memset(playlist_ctx->pelist, 0, playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
@@ -2889,7 +2889,7 @@ static void opt_input_file(const char *filename)
             ic->iformat = ff_concat_alloc_demuxer();
             ic->priv_data = playlist_ctx;
             for (i = 0; i < playlist_ctx->pe_curidxs_size; ++i) {
-                ff_playlist_populate_context(playlist_ctx, ic, i);
+                ff_playlist_populate_context(ic, i);
             }
             nb_input_files = 1;
             input_files[0] = ic;

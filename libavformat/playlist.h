@@ -52,11 +52,28 @@ typedef struct PlaylistContext {
     int64_t *time_offsets; /**< Time offsets, in 10^-6 seconds, for each multimedia stream */
 } PlaylistContext;
 
+/** @fn void ff_playlist_init_playelem(PlayElem* pe)
+ *  @brief Opens file, codecs, and streams associated with PlayElem.
+ *  @param pe PlayElem to open. It should already be allocated.
+ */
+
 void ff_playlist_init_playelem(PlayElem* pe);
 
-PlaylistContext* ff_playlist_alloc_context();
 
-int ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index);
+/** @fn PlaylistContext* ff_playlist_alloc_context(void)
+ *  @brief Allocates and returns a PlaylistContext.
+ *  @return Allocated PlaylistContext.
+ */
+
+PlaylistContext* ff_playlist_alloc_context(void);
+
+/** @fn void ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index)
+ *  @brief Opens the current PlayElem from the PlaylistContext.
+ *  @param s AVFormatContext of the master demuxer, which contains the PlaylistContext.
+ *  @param stream_index Index of multimedia stream (video, audio, or subtitle).
+ */
+
+void ff_playlist_populate_context(AVFormatContext *s, int stream_index);
 
 PlaylistContext* ff_playlist_get_context(AVFormatContext *ic);
 

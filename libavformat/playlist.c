@@ -68,7 +68,7 @@ void ff_playlist_init_playelem(PlayElem *pe)
 
 }
 
-PlaylistContext* ff_playlist_alloc_context()
+PlaylistContext* ff_playlist_alloc_context(void)
 {
     int i;
     PlaylistContext *ctx = av_malloc(sizeof(*ctx));
@@ -82,16 +82,14 @@ PlaylistContext* ff_playlist_alloc_context()
     return ctx;
 }
 
-int ff_playlist_populate_context(PlaylistContext *ctx,
-                                 AVFormatContext *s,
+void ff_playlist_populate_context(AVFormatContext *s,
                                  int stream_index)
 {
     int i;
     AVFormatContext *ic;
-    AVFormatParameters *nap;
+    PlaylistContext *ctx = s->priv_data;
     ff_playlist_init_playelem(ctx->pelist[ctx->pe_curidxs[stream_index]]);
     ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
-    nap = ctx->pelist[ctx->pe_curidxs[stream_index]]->ap;
     ic->iformat->read_header(ic, 0);
     s->nb_streams = ic->nb_streams;
     for (i = 0; i < ic->nb_streams; ++i) {
@@ -99,7 +97,6 @@ int ff_playlist_populate_context(PlaylistContext *ctx,
     }
     s->packet_buffer = ic->packet_buffer;
     s->packet_buffer_end = ic->packet_buffer_end;
-    return 0;
 }
 
 void ff_playlist_relative_paths(char **flist, const char *workingdir)

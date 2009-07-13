@@ -58,7 +58,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             ctx->time_offsets[i] += av_rescale_q(ic->streams[i]->duration, ic->streams[i]->time_base, AV_TIME_BASE_Q);
         }
         ++ctx->pe_curidxs[stream_index];
-        ff_playlist_populate_context(ctx, s, stream_index);
+        ff_playlist_populate_context(s, stream_index);
         have_switched_streams = 1;
         goto retr;
     } else {
