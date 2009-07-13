@@ -1619,13 +1619,13 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                         if (!propst->codec->codec) {
                             AVCodec *codec = avcodec_find_decoder(propst->codec->codec_id);
                             if (!codec) {
-                                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
-                                        propst->codec->codec_id, propst->index);
+                                av_log(propst->codec, AV_LOG_ERROR, "Decoder (codec id %d) not found for input stream #%d\n",
+                                       propst->codec->codec_id, propst->index);
                                 return AVERROR(EINVAL);
                             }
                             if (avcodec_open(propst->codec, codec) < 0) {
-                                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
-                                        propst->index);
+                                av_log(propst->codec, AV_LOG_ERROR, "Error while opening decoder for input stream #%d\n",
+                                       propst->index);
                                 return AVERROR(EINVAL);
                             }
                         }
