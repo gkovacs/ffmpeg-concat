@@ -114,6 +114,12 @@ PlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
         return NULL;
 }
 
+void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx)
+{
+    if (ic && ctx)
+        ic->priv_data = ctx;
+}
+
 AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index)
 {
     if (ctx && pe_idx < ctx->pelist_size && ctx->pelist && ctx->pelist[pe_idx] &&

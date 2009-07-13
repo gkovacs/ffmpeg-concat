@@ -2888,9 +2888,8 @@ static void opt_input_file(const char *filename)
     if (concatenate_video_files) { // need to specify -conc before -i
         int filenamelen = strlen(filename);
         if (!playlist_ctx) {
-            ic = av_malloc(sizeof(*ic));
-//            ic = avformat_alloc_context();
-            printf("need to generate playlist ctx\n");
+            ic = avformat_alloc_context();
+            av_log(ic, AV_LOG_DEBUG, "Generating playlist ctx\n");
             playlist_ctx = ff_playlist_alloc_context();
             playlist_ctx->pelist_size = 1;
             playlist_ctx->pelist = av_malloc(playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
@@ -2902,14 +2901,14 @@ static void opt_input_file(const char *filename)
             av_strlcpy(ic->filename, filename, sizeof(ic->filename));
             ic->nb_streams = 2;
             ic->iformat = ff_concat_alloc_demuxer();
-            ic->priv_data = playlist_ctx;
+            ff_playlist_set_context(ic, playlist_ctx);
             ff_playlist_populate_context(ic);
             nb_input_files = 1;
             input_files[0] = ic;
             goto configcodecs;
         }
         else {
-            printf("adding new file to playlist\n");
+            av_log(ic, AV_LOG_DEBUG, "Adding file %s to playlist\n", filename);
             ++playlist_ctx->pelist_size;
             playlist_ctx->pelist = av_realloc(playlist_ctx->pelist, playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
             playlist_ctx->pelist[playlist_ctx->pelist_size-1] = av_malloc(sizeof(*(playlist_ctx->pelist[playlist_ctx->pelist_size-1])));
