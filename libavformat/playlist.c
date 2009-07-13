@@ -97,7 +97,50 @@ int ff_playlist_populate_context(PlaylistContext *ctx,
     for (i = 0; i < ic->nb_streams; ++i) {
         s->streams[i] = ic->streams[i];
     }
+    // TODO remove this ugly hack
+    s->av_class = ic->av_class;
+    s->oformat = ic->oformat;
+    s->pb = ic->pb;
+    s->timestamp = ic->timestamp;
+    s->year = ic->year;
+    s->track = ic->track;
+    s->ctx_flags = ic->ctx_flags;
     s->packet_buffer = ic->packet_buffer;
+    s->start_time = ic->start_time;
+    s->duration = ic->duration;
+    s->file_size = ic->file_size;
+    s->bit_rate = ic->bit_rate;
+    s->cur_st = ic->cur_st;
+    s->cur_ptr_deprecated = ic->cur_ptr_deprecated;
+    s->cur_len_deprecated = ic->cur_len_deprecated;
+    s->cur_pkt_deprecated = ic->cur_pkt_deprecated;
+    s->data_offset = ic->data_offset;
+    s->index_built = ic->index_built;
+    s->mux_rate = ic->mux_rate;
+    s->packet_size = ic->packet_size;
+    s->preload = ic->preload;
+    s->max_delay = ic->max_delay;
+    s->loop_output = ic->loop_output;
+    s->flags = ic->flags;
+    s->loop_input = ic->loop_input;
+    s->probesize = ic->probesize;
+    s->max_analyze_duration = ic->max_analyze_duration;
+    s->key = ic->key;
+    s->keylen = ic->keylen;
+    s->nb_programs = ic->nb_programs;
+    s->programs = ic->programs;
+    s->video_codec_id = ic->video_codec_id;
+    s->audio_codec_id = ic->audio_codec_id;
+    s->subtitle_codec_id = ic->subtitle_codec_id;
+    s->max_index_size = ic->max_index_size;
+    s->max_picture_buffer = ic->max_picture_buffer;
+    s->nb_chapters = ic->nb_chapters;
+    s->chapters = ic->chapters;
+    s->debug = ic->debug;
+    s->raw_packet_buffer = ic->raw_packet_buffer;
+    s->raw_packet_buffer_end = ic->raw_packet_buffer_end;
+    s->packet_buffer_end = ic->packet_buffer_end;
+    s->metadata = ic->metadata;
     return 0;
 }
 
