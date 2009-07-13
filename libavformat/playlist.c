@@ -33,7 +33,6 @@
 
 void ff_playlist_init_playelem(PlayElem *pe)
 {
-    int i;
     int err;
     pe->ic = av_malloc(sizeof(*(pe->ic)));
     pe->ap = av_malloc(sizeof(*(pe->ap)));
@@ -47,19 +46,15 @@ void ff_playlist_init_playelem(PlayElem *pe)
     if (err < 0)
         av_log(pe->ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
     pe->fmt = pe->ic->iformat;
-    if (!pe->fmt) {
+    if (!pe->fmt)
         av_log(pe->ic, AV_LOG_ERROR, "Input format not set\n");
-    }
     err = av_find_stream_info(pe->ic);
-    if (err < 0) {
+    if (err < 0)
         av_log(pe->ic, AV_LOG_ERROR, "Could not find stream info\n");
-    }
-    if(pe->ic->pb) {
+    if (pe->ic->pb)
         pe->ic->pb->eof_reached = 0;
-    }
-    else {
+    else
         av_log(pe->ic, AV_LOG_ERROR, "ByteIOContext not set\n");
-    }
 }
 
 PlaylistContext* ff_playlist_alloc_context(void)
@@ -83,32 +78,10 @@ void ff_playlist_populate_context(AVFormatContext *s)
     ic = ctx->pelist[ctx->pe_curidx]->ic;
     ic->iformat->read_header(ic, 0);
     s->nb_streams = ic->nb_streams;
-    for (i = 0; i < ic->nb_streams; ++i) {
+    for (i = 0; i < ic->nb_streams; ++i)
         s->streams[i] = ic->streams[i];
-    }
     s->packet_buffer = ic->packet_buffer;
     s->packet_buffer_end = ic->packet_buffer_end;
-}
-
-void ff_playlist_relative_paths(char **flist, const char *workingdir)
-{
-    while (*flist != 0) { // determine if relative paths
-        FILE *file;
-        char *fullfpath;
-        int wdslen = strlen(workingdir);
-        int flslen = strlen(*flist);
-        fullfpath = av_malloc(sizeof(char) * (wdslen+flslen+2));
-        av_strlcpy(fullfpath, workingdir, wdslen+1);
-        fullfpath[wdslen] = '/';
-        fullfpath[wdslen+1] = 0;
-        av_strlcat(fullfpath, *flist, wdslen+flslen+2);
-        file = fopen(fullfpath, "r");
-        if (file) {
-            fclose(file);
-            *flist = fullfpath;
-        }
-        ++flist;
-    }
 }
 
 PlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
@@ -134,4 +107,24 @@ AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_in
         return ctx->pelist[pe_idx]->ic->streams[stream_index];
     else
         return NULL;
+}
+
+// converts list of mixed absolute and relative paths into all absolute paths
+void ff_playlist_relative_paths(char **flist, const char *workingdir)
+{
+    while (*flist != 0) { // determine if relative paths
+        char *fullfpath;
+        int wdslen = strlen(workingdir);
+        int flslen = strlen(*flist);
+        fullfpath = av_malloc(sizeof(char) * (wdslen+flslen+2));
+        av_strlcpy(fullfpath, workingdir, wdslen+1);
+        fullfpath[wdslen] = '/';
+        fullfpath[wdslen+1] = 0;
+        av_strlcat(fullfpath, *flist, wdslen+flslen+2);
+        if ((FILE *file = fopen(fullfpath, "r"))) {
+            fclose(file);
+            *flist = fullfpath;
+        }
+        ++flist;
+    }
 }

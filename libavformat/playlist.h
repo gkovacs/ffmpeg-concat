@@ -97,6 +97,4 @@ void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx);
  */
 AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index);
 
-AVInputFormat* ff_concat_alloc_demuxer(void);
-
 #endif /* AVFORMAT_PLAYLIST_H */
