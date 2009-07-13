@@ -68,7 +68,7 @@ void ff_playlist_init_playelem(PlayElem *pe)
 
 }
 
-PlaylistContext* ff_playlist_alloc_context(const char *filename)
+PlaylistContext* ff_playlist_alloc_context()
 {
     int i;
     PlaylistContext *ctx = av_malloc(sizeof(*ctx));
@@ -79,34 +79,7 @@ PlaylistContext* ff_playlist_alloc_context(const char *filename)
     ctx->time_offsets = av_malloc(sizeof(*(ctx->time_offsets)) * ctx->pe_curidxs_size);
     for (i = 0; i < ctx->pe_curidxs_size; ++i)
         ctx->time_offsets[i] = 0;
-    ff_split_wd_fn(filename,
-                   &ctx->workingdir,
-                   &ctx->filename);
     return ctx;
-}
-
-void ff_split_wd_fn(const char *filepath,
-                    char **workingdir,
-                    char **filename)
-{
-    char *ofp;
-    char *cofp;
-    char *lslash = filepath;
-    ofp = filepath;
-    cofp = filepath;
-    while (*filepath != 0) {
-        if (*filepath == '/' || *filepath == '\\')
-            lslash = filepath+1;
-        ++filepath;
-    }
-    *workingdir = av_malloc((lslash-ofp)+1);
-    *filename = av_malloc((filepath-lslash)+1);
-    while (cofp < lslash)
-        (*workingdir)[cofp-ofp] = *(cofp++);
-    (*workingdir)[cofp-ofp] = 0;
-    while (cofp < filepath)
-        (*filename)[cofp-lslash] = *(cofp++);
-    (*filename)[cofp-lslash] = 0;
 }
 
 int ff_playlist_populate_context(PlaylistContext *ctx,
@@ -135,11 +108,11 @@ void ff_playlist_relative_paths(char **flist, const char *workingdir)
         char *fullfpath;
         int wdslen = strlen(workingdir);
         int flslen = strlen(*flist);
-        fullfpath = av_malloc(sizeof(char) * (wdslen+flslen+1));
-        av_strlcpy(fullfpath, workingdir, wdslen);
-        av_strlcpy(fullfpath+wdslen, *flist, flslen+1);
-        fullfpath[wdslen-1] = '/';
-        fullfpath[wdslen+flslen] = 0;
+        fullfpath = av_malloc(sizeof(char) * (wdslen+flslen+2));
+        av_strlcpy(fullfpath, workingdir, wdslen+1);
+        fullfpath[wdslen] = '/';
+        fullfpath[wdslen+1] = 0;
+        av_strlcat(fullfpath, *flist, wdslen+flslen+2);
         file = fopen(fullfpath, "r");
         if (file) {
             fclose(file);

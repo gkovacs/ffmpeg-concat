@@ -52,7 +52,7 @@ static int m3u_probe(AVProbeData *p)
         return 0;
 }
 
-static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx)
+static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx, const char *filename)
 {
     char **flist;
     int i, j;
@@ -77,7 +77,7 @@ static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx)
     }
     ctx->pelist_size = i;
     flist[i] = 0;
-    ff_playlist_relative_paths(flist, ctx->workingdir);
+    ff_playlist_relative_paths(flist, dirname(filename));
     ctx->pelist = av_malloc(ctx->pelist_size * sizeof(*(ctx->pelist)));
     memset(ctx->pelist, 0, ctx->pelist_size * sizeof(*(ctx->pelist)));
     for (i = 0; i < ctx->pelist_size; ++i) {
@@ -92,8 +92,8 @@ static int m3u_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
     int i;
-    PlaylistContext *ctx = ff_playlist_alloc_context(s->filename);
-    m3u_list_files(s->pb, ctx);
+    PlaylistContext *ctx = ff_playlist_alloc_context();
+    m3u_list_files(s->pb, ctx, s->filename);
     s->priv_data = ctx;
     for (i = 0; i < ctx->pe_curidxs_size; ++i) {
         ff_playlist_populate_context(ctx, s, i);

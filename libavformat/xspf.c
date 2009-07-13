@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "avformat.h"
+
+
 #include "playlist.h"
 
 static int ff_concatgen_read_packet(AVFormatContext *s, AVPacket *pkt);
@@ -52,7 +55,7 @@ static int xspf_probe(AVProbeData *p)
         return 0;
 }
 
-static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx)
+static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *filename)
 {
     int i, j, c;
     unsigned int buflen;
@@ -101,7 +104,7 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx)
         return AVERROR_EOF;
     flist[j] = 0;
     ctx->pelist_size = j;
-    ff_playlist_relative_paths(flist, ctx->workingdir);
+    ff_playlist_relative_paths(flist, dirname(filename));
     ctx->pelist = av_malloc(ctx->pelist_size * sizeof(*(ctx->pelist)));
     memset(ctx->pelist, 0, ctx->pelist_size * sizeof(*(ctx->pelist)));
     for (i = 0; i < ctx->pelist_size; ++i) {
@@ -116,8 +119,8 @@ static int xspf_read_header(AVFormatContext *s,
                             AVFormatParameters *ap)
 {
     int i;
-    PlaylistContext *ctx = ff_playlist_alloc_context(s->filename);
-    if (xspf_list_files(s->pb, ctx)) {
+    PlaylistContext *ctx = ff_playlist_alloc_context();
+    if (xspf_list_files(s->pb, ctx, s->filename)) {
         fprintf(stderr, "no playlist items found in %s\n", s->filename);
         return AVERROR_EOF;
     }

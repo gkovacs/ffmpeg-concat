@@ -24,6 +24,7 @@
 
 #include "avformat.h"
 #include "riff.h"
+#include <libgen.h>
 
 /** @struct PlayElem
  *  @brief Represents each input file on a playlist
@@ -53,11 +54,9 @@ typedef struct PlaylistContext {
 
 void ff_playlist_init_playelem(PlayElem* pe);
 
-PlaylistContext* ff_playlist_alloc_context(const char *filename);
+PlaylistContext* ff_playlist_alloc_context();
 
 int ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index);
-
-void ff_split_wd_fn(const char *filepath, char **workingdir, char **filename);
 
 void ff_playlist_relative_paths(char **flist, const char *workingdir);
 
