@@ -23,7 +23,7 @@
 #include "playlist.h"
 #include "internal.h"
 
-int ff_playlist_init_playelem(PlayElem *pe)
+void ff_playlist_init_playelem(PlayElem *pe)
 {
     int i;
     int err;
@@ -52,8 +52,6 @@ int ff_playlist_init_playelem(PlayElem *pe)
     else {
         av_log(pe->ic, AV_LOG_ERROR, "ByteIOContext not set\n");
     }
-    return 0;
-
 }
 
 PlaylistContext* ff_playlist_alloc_context(void)

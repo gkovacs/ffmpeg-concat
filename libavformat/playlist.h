@@ -29,7 +29,6 @@
 /** @struct PlayElem
  *  @brief Represents each input file on a playlist
  */
-
 typedef struct PlayElem {
     AVFormatContext *ic; /**< AVFormatContext for this playlist item */
     char *filename; /**< Filename with absolute path of this playlist item */
@@ -40,7 +39,6 @@ typedef struct PlayElem {
 /** @struct PlaylistContext
  *  @brief Represents the playlist and contains PlayElem for each playlist item
  */
-
 typedef struct PlaylistContext {
     PlayElem **pelist; /**< List of PlayElem, with each representing a playlist item */
     int pelist_size; /**< Length of the pelist array (number of playlist items) */
@@ -55,31 +53,41 @@ typedef struct PlaylistContext {
 /** @fn int ff_playlist_init_playelem(PlayElem* pe)
  *  @brief Opens file, codecs, and streams associated with PlayElem.
  *  @param pe PlayElem to open. It should already be allocated.
- *  @return 0 if successful.
  */
-
-int ff_playlist_init_playelem(PlayElem* pe);
-
+void ff_playlist_init_playelem(PlayElem* pe);
 
 /** @fn PlaylistContext* ff_playlist_alloc_context(void)
  *  @brief Allocates and returns a PlaylistContext.
- *  @return Allocated PlaylistContext.
+ *  @return Returns the allocated PlaylistContext.
  */
-
 PlaylistContext* ff_playlist_alloc_context(void);
 
 /** @fn void ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index)
  *  @brief Opens the current PlayElem from the PlaylistContext.
- *  @param s AVFormatContext of the master demuxer, which contains the PlaylistContext.
- *  @param stream_index Index of multimedia stream (video, audio, or subtitle).
+ *  @param s AVFormatContext of the concat-type demuxer, which contains the PlaylistContext.
  */
-
 void ff_playlist_populate_context(AVFormatContext *s);
 
+/** @fn PlaylistContext* ff_playlist_get_context(AVFormatContext *ic)
+ *  @brief Returns PlaylistContext continaed within a concat-type demuxer.
+ *  @param ic AVFormatContext of the concat-type demuxer, which contains the PlaylistContext.
+ *  @return Returnes NULL if failed (not concat-type demuxer or Playlist not yet allocated), or PlaylistContext if succeeded.
+ */
 PlaylistContext* ff_playlist_get_context(AVFormatContext *ic);
 
+/** @fn void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx)
+ *  @brief Sets PlaylistContext for a concat-type demuxer.
+ *  @param ic AVFormatContext of the concat-type demuxer.
+ *  @param ctx PlaylistContext that will be set in the concat-type demuxer.
+ */
 void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx);
 
+/** @fn AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index)
+ *  @brief Obtains a specified stream from a specified item in a PlaylistContext.
+ *  @param ctx PlaylistContext which contains the desired stream.
+ *  @param pe_idx Index that the PlayElem has in the PlaylistContext (playlist item number), PlayElem should already be open.
+ *  @param stream_index Index of the multimedia stream (audio or video) within the PlayElem.
+ */
 AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index);
 
 AVInputFormat* ff_concat_alloc_demuxer(void);
