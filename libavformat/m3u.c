@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/** @file m3u.c
+/** @file libavformat/m3u.c
  *  @author Geza Kovacs ( gkovacs mit edu )
  *
  *  @brief M3U playlist demuxer

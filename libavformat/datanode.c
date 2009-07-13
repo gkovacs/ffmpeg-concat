@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/** @file datanode.c
+/** @file libavformat/datanode.c
  *  @author Geza Kovacs ( gkovacs mit edu )
  *
  *  @brief Format to represent ini and xml files as doubly linked 2D data nodes

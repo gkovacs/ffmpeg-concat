@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/** @file concat.c
+/** @file libavformat/concat.c
  *  @author Geza Kovacs ( gkovacs mit edu )
  *
  *  @brief Minimal playlist/concatenation demuxer

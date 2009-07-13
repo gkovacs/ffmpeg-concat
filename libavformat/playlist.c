@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/** @file playlist.c
+/** @file libavformat/playlist.c
  *  @author Geza Kovacs ( gkovacs mit edu )
  *
  *  @brief General components used by playlist formats

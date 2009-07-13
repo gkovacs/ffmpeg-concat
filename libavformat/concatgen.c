@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/** @file concatgen.c
+/** @file libavformat/concatgen.c
  *  @author Geza Kovacs ( gkovacs mit edu )
  *
  *  @brief Generic functions used by playlist/concatenation demuxers
