@@ -1376,6 +1376,19 @@ static int video_thread(void *arg)
 //                ++st_idx;
 //            }
             if (pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_VIDEO) {
+                if (!pkt->stream->codec->codec) {
+                    AVCodec *codec = avcodec_find_decoder(pkt->stream->codec->codec_id);
+                    if (!codec) {
+                        fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
+                                pkt->stream->codec->codec_id, pkt->stream->index);
+                        return AVERROR(EINVAL);
+                    }
+                    if (avcodec_open(pkt->stream->codec, codec) < 0) {
+                        fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
+                                pkt->stream->index);
+                        return AVERROR(EINVAL);
+                     }
+                }
                 if (is->video_st != pkt->stream) {
                     is->video_st = pkt->stream;
                     goto tryagain;
@@ -1603,6 +1616,19 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                 if (pl_ctx && pkt) {
                     AVStream *propst = ff_playlist_get_stream(pl_ctx, st_idx+1, pkt->stream_index);
                     if (propst && propst->codec && propst->codec->codec_type == CODEC_TYPE_AUDIO) {
+                        if (!propst->codec->codec) {
+                            AVCodec *codec = avcodec_find_decoder(propst->codec->codec_id);
+                            if (!codec) {
+                                fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
+                                        propst->codec->codec_id, propst->index);
+                                return AVERROR(EINVAL);
+                            }
+                            if (avcodec_open(propst->codec, codec) < 0) {
+                                fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
+                                        propst->index);
+                                return AVERROR(EINVAL);
+                            }
+                        }
                         is->audio_st = propst;
                         ++st_idx;
                     }

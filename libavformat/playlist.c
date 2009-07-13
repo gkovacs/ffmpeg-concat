@@ -52,19 +52,6 @@ int ff_playlist_init_playelem(PlayElem *pe)
     else {
         av_log(pe->ic, AV_LOG_ERROR, "ByteIOContext not set\n");
     }
-    for (i = 0; i < pe->ic->nb_streams; ++i) {
-        AVCodec *codec = avcodec_find_decoder(pe->ic->streams[i]->codec->codec_id);
-        if (!codec) {
-            av_log(pe->ic->streams[i]->codec, AV_LOG_ERROR, "Decoder (codec id %d) not found for input stream #%d\n",
-                   pe->ic->streams[i]->codec->codec_id, i);
-            return AVERROR(EINVAL);
-        }
-        if (avcodec_open(pe->ic->streams[i]->codec, codec) < 0) {
-            av_log(pe->ic->streams[i]->codec, AV_LOG_ERROR, "Error while opening decoder for input stream #%d\n",
-                   i);
-            return AVERROR(EINVAL);
-        }
-    }
     return 0;
 
 }
