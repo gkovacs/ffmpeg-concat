@@ -1,12 +1,12 @@
 ffmpeg:
-svn: 19419
-git: faa53067a35c09644d3915edbbc85bc0f6675e30
+svn: 19424
+git: 806496708b491d2f825309f6e3b4f6c6f7c7d085
 committer: diego
-commitdate: Sun, 12 Jul 2009 22:31:05 +0000
-commitlog: Make (de)muxers for format variants select the main format (de)muxer. It makes little sense to enable the variant without the main format.
+commitdate: Mon, 13 Jul 2009 17:16:36 +0000
+commitlog: Only #define lseek to _lseeki64 on MinGW, not MinGW CE. This fixes compilation on WinCE, which does not support _lseeki64. patch by Ismail Dönmez, ismail namtrac org
 
 libswscale:
-svn: 19419
+svn: 19424
 git: f3ae90a5d9f9e01b326c031803b977be3d5369c0
 committer: ramiro
 commitdate: Thu, 9 Jul 2009 02:27:39 +0000
