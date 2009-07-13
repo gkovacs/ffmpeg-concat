@@ -52,10 +52,8 @@ typedef struct PlayElem {
  */
 typedef struct PlaylistContext {
     PlayElem **pelist; /**< List of PlayElem, with each representing a playlist item */
-    int pelist_size; /**< Length of the pelist array (number of playlist items) */
+    int pelist_size; /**< Number of PlayElem stored in pelist */
     int pe_curidx; /**< Index of the PlayElem that packets are being read from */
-    char *workingdir; /**< Directory in which the playlist file is stored in */
-    char *filename; /**< Filename (not path) of the playlist file */
     int time_offsets_size; /**< Number of time offsets (number of multimedia streams), 2 with audio and video. */
     int64_t *time_offsets; /**< Time offsets, in 10^-6 seconds, for each multimedia stream */
 } PlaylistContext;

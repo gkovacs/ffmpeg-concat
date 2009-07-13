@@ -116,6 +116,7 @@ AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_in
 void ff_playlist_relative_paths(char **flist, const char *workingdir)
 {
     while (*flist != 0) { // determine if relative paths
+        FILE *file;
         char *fullfpath;
         int wdslen = strlen(workingdir);
         int flslen = strlen(*flist);
@@ -124,7 +125,7 @@ void ff_playlist_relative_paths(char **flist, const char *workingdir)
         fullfpath[wdslen] = '/';
         fullfpath[wdslen+1] = 0;
         av_strlcat(fullfpath, *flist, wdslen+flslen+2);
-        if ((FILE *file = fopen(fullfpath, "r"))) {
+        if ((file = fopen(fullfpath, "r"))) {
             fclose(file);
             *flist = fullfpath;
         }
