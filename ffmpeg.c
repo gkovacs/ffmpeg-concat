@@ -2888,9 +2888,7 @@ static void opt_input_file(const char *filename)
             ic->nb_streams = 2;
             ic->iformat = ff_concat_alloc_demuxer();
             ic->priv_data = playlist_ctx;
-            for (i = 0; i < playlist_ctx->pe_curidxs_size; ++i) {
-                ff_playlist_populate_context(ic, i);
-            }
+            ff_playlist_populate_context(ic);
             nb_input_files = 1;
             input_files[0] = ic;
             goto configcodecs;

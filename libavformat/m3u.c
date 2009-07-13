@@ -97,9 +97,7 @@ static int m3u_read_header(AVFormatContext *s,
     PlaylistContext *ctx = ff_playlist_alloc_context();
     m3u_list_files(s->pb, ctx, s->filename);
     s->priv_data = ctx;
-    for (i = 0; i < ctx->pe_curidxs_size; ++i) {
-        ff_playlist_populate_context(s, i);
-    }
+    ff_playlist_populate_context(s);
     return 0;
 }
 

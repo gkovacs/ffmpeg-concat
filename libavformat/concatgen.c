@@ -33,11 +33,11 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     ctx = s->priv_data;
     stream_index = 0;
     retr:
-    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
+    ic = ctx->pelist[ctx->pe_curidx]->ic;
     ret = ic->iformat->read_packet(ic, pkt);
     if (pkt) {
         stream_index = pkt->stream_index;
-        ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
+        ic = ctx->pelist[ctx->pe_curidx]->ic;
         pkt->stream = ic->streams[pkt->stream_index];
     }
     if (ret >= 0) {
@@ -50,15 +50,15 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             if (!ic->streams[pkt->stream_index]->codec->has_b_frames)
                 pkt->pts = pkt->dts + 1;
         }
-    } else if (ret < 0 && !have_switched_streams && ctx->pe_curidxs[stream_index] < ctx->pelist_size - 1) {
+    } else if (ret < 0 && !have_switched_streams && ctx->pe_curidx < ctx->pelist_size - 1) {
     // TODO switch from AVERROR_EOF to AVERROR_EOS
     // -32 AVERROR_EOF for avi, -51 for ogg
-        av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidxs[stream_index]+1);
-        for (i = 0; i < ic->nb_streams && i < ctx->pe_curidxs_size; ++i) {
+        av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
+        for (i = 0; i < ic->nb_streams && i < ctx->time_offsets_size; ++i) {
             ctx->time_offsets[i] += av_rescale_q(ic->streams[i]->duration, ic->streams[i]->time_base, AV_TIME_BASE_Q);
         }
-        ++ctx->pe_curidxs[stream_index];
-        ff_playlist_populate_context(s, stream_index);
+        ++ctx->pe_curidx;
+        ff_playlist_populate_context(s);
         have_switched_streams = 1;
         goto retr;
     } else {
@@ -75,7 +75,7 @@ int ff_concatgen_read_seek(AVFormatContext *s,
     PlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
-    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
+    ic = ctx->pelist[ctx->pe_curidx]->ic;
     return ic->iformat->read_seek(ic, stream_index, pts, flags);
 }
 
@@ -87,7 +87,7 @@ int ff_concatgen_read_timestamp(AVFormatContext *s,
     PlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
-    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
+    ic = ctx->pelist[ctx->pe_curidx]->ic;
     if (ic->iformat->read_timestamp)
         return ic->iformat->read_timestamp(ic, stream_index, pos, pos_limit);
     return 0;
@@ -98,7 +98,7 @@ int ff_concatgen_read_close(AVFormatContext *s)
     PlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
-    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
+    ic = ctx->pelist[ctx->pe_curidx]->ic;
     if (ic->iformat->read_close)
         return ic->iformat->read_close(ic);
     return 0;
@@ -109,7 +109,7 @@ int ff_concatgen_read_play(AVFormatContext *s)
     PlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
-    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
+    ic = ctx->pelist[ctx->pe_curidx]->ic;
     return av_read_play(ic);
 }
 
@@ -118,6 +118,6 @@ int ff_concatgen_read_pause(AVFormatContext *s)
     PlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
-    ic = ctx->pelist[ctx->pe_curidxs[0]]->ic;
+    ic = ctx->pelist[ctx->pe_curidx]->ic;
     return av_read_pause(ic);
 }

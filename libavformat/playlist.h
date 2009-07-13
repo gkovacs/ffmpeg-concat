@@ -44,20 +44,21 @@ typedef struct PlayElem {
 typedef struct PlaylistContext {
     PlayElem **pelist; /**< List of PlayElem, with each representing a playlist item */
     int pelist_size; /**< Length of the pelist array (number of playlist items) */
-    int *pe_curidxs; /**< Index of the PlayElem that each multimedia stream (video and audio) is currently on */
-    int pe_curidxs_size; /**< Length of pe_curidxs array (number of multimedia streams) currently set to 2 (video and audio) */
+    int pe_curidx; /**< Index of the PlayElem that packets are being read from */
     AVChapter **chlist; /**< List of chapters, with each playlist element representing a chapter */
     char *workingdir; /**< Directory in which the playlist file is stored in */
     char *filename; /**< Filename (not path) of the playlist file */
+    int time_offsets_size; /**< Number of time offsets (number of multimedia streams), 2 with audio and video. */
     int64_t *time_offsets; /**< Time offsets, in 10^-6 seconds, for each multimedia stream */
 } PlaylistContext;
 
-/** @fn void ff_playlist_init_playelem(PlayElem* pe)
+/** @fn int ff_playlist_init_playelem(PlayElem* pe)
  *  @brief Opens file, codecs, and streams associated with PlayElem.
  *  @param pe PlayElem to open. It should already be allocated.
+ *  @return 0 if successful.
  */
 
-void ff_playlist_init_playelem(PlayElem* pe);
+int ff_playlist_init_playelem(PlayElem* pe);
 
 
 /** @fn PlaylistContext* ff_playlist_alloc_context(void)
@@ -73,7 +74,7 @@ PlaylistContext* ff_playlist_alloc_context(void);
  *  @param stream_index Index of multimedia stream (video, audio, or subtitle).
  */
 
-void ff_playlist_populate_context(AVFormatContext *s, int stream_index);
+void ff_playlist_populate_context(AVFormatContext *s);
 
 PlaylistContext* ff_playlist_get_context(AVFormatContext *ic);
 

@@ -23,7 +23,7 @@
 #include "playlist.h"
 #include "internal.h"
 
-void ff_playlist_init_playelem(PlayElem *pe)
+int ff_playlist_init_playelem(PlayElem *pe)
 {
     int i;
     int err;
@@ -65,6 +65,7 @@ void ff_playlist_init_playelem(PlayElem *pe)
             return AVERROR(EINVAL);
         }
     }
+    return 0;
 
 }
 
@@ -72,24 +73,21 @@ PlaylistContext* ff_playlist_alloc_context(void)
 {
     int i;
     PlaylistContext *ctx = av_malloc(sizeof(*ctx));
-    ctx->pe_curidxs_size = 2; // TODO don't assume we have just 2 streams
-    ctx->pe_curidxs = av_malloc(sizeof(*(ctx->pe_curidxs)) * ctx->pe_curidxs_size);
-    for (i = 0; i < ctx->pe_curidxs_size; ++i)
-        ctx->pe_curidxs[i] = 0;
-    ctx->time_offsets = av_malloc(sizeof(*(ctx->time_offsets)) * ctx->pe_curidxs_size);
-    for (i = 0; i < ctx->pe_curidxs_size; ++i)
+    ctx->pe_curidx = 0;
+    ctx->time_offsets_size = 2; // TODO don't assume we have just 2 streams
+    ctx->time_offsets = av_malloc(sizeof(*(ctx->time_offsets)) * ctx->time_offsets_size);
+    for (i = 0; i < ctx->time_offsets_size; ++i)
         ctx->time_offsets[i] = 0;
     return ctx;
 }
 
-void ff_playlist_populate_context(AVFormatContext *s,
-                                 int stream_index)
+void ff_playlist_populate_context(AVFormatContext *s)
 {
     int i;
     AVFormatContext *ic;
     PlaylistContext *ctx = s->priv_data;
-    ff_playlist_init_playelem(ctx->pelist[ctx->pe_curidxs[stream_index]]);
-    ic = ctx->pelist[ctx->pe_curidxs[stream_index]]->ic;
+    ff_playlist_init_playelem(ctx->pelist[ctx->pe_curidx]);
+    ic = ctx->pelist[ctx->pe_curidx]->ic;
     ic->iformat->read_header(ic, 0);
     s->nb_streams = ic->nb_streams;
     for (i = 0; i < ic->nb_streams; ++i) {
