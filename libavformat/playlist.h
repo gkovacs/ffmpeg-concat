@@ -58,8 +58,6 @@ PlaylistContext* ff_playlist_alloc_context();
 
 int ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index);
 
-void ff_playlist_relative_paths(char **flist, const char *workingdir);
-
 PlaylistContext* ff_playlist_get_context(AVFormatContext *ic);
 
 AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index);
