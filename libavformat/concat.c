@@ -1,5 +1,5 @@
 /*
- * Standard playlist/concatenation demuxer
+ * Minimal playlist/concatenation demuxer
  * Copyright (c) 2009 Geza Kovacs
  *
  * This file is part of FFmpeg.
@@ -19,6 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/** @file concat.c
+ *  @brief Minimal playlist/concatenation demuxer
+ *  @details This is a minimal concat-type demuxer that can be constructed
+ *  by allocating a PlayElem for each playlist item and setting its filename,
+ *  then allocating a PlaylistContext, creating a list of PlayElem, and setting
+ *  the PlaylistContext in the AVFormatContext.
+ */
+
 #include "playlist.h"
 
 static int ff_concatgen_read_packet(AVFormatContext *s, AVPacket *pkt);
@@ -33,27 +41,27 @@ static int ff_concatgen_read_play(AVFormatContext *s);
 
 static int ff_concatgen_read_pause(AVFormatContext *s);
 
-/* The ffmpeg codecs we support, and the IDs they have in the file */
+// The FFmpeg codecs we support, and the IDs they have in the file
 static const AVCodecTag codec_concat_tags[] = {
     { 0, 0 },
 };
 
+// concat demuxer should only be manually constructed in ffmpeg
 static int concat_probe(AVProbeData *p)
 {
-    // concat demuxer should only be manually constructed in ffmpeg
     return 0;
 }
 
+// PlaylistD should be constructed externally
 static int concat_read_header(AVFormatContext *s,
-                       AVFormatParameters *ap)
+                              AVFormatParameters *ap)
 {
-    // PlaylistD should be constructed externally
     return 0;
 }
 
 AVInputFormat* ff_concat_alloc_demuxer(void)
 {
-    AVInputFormat *cdm = av_malloc(sizeof(*cdm));
+    AVInputFormat *cdm  = av_malloc(sizeof(*cdm));
     cdm->name           = "concat";
     cdm->long_name      = NULL_IF_CONFIG_SMALL("CONCAT format");
     cdm->priv_data_size = sizeof(PlaylistContext);

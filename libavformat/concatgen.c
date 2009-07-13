@@ -19,6 +19,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/** @file concatgen.c
+ *  @brief Generic functions used by playlist/concatenation demuxers
+ *  @details These functions are used to read packets and seek streams
+ *  for concat-type demuxers, abstracting away the playlist element switching
+ *  process.
+ */
+
 #include "playlist.h"
 
 int ff_concatgen_read_packet(AVFormatContext *s,

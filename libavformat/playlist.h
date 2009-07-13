@@ -19,6 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/** @file playlist.h
+ *  @brief General components used by playlist formats
+ *  @details These functions are used to initialize and manipulate playlists
+ *  (PlaylistContext) and their individual playlist elements (PlayElem), each
+ *  of which encapsulates its own AVFormatContext. This abstraction used for
+ *  implementing file concatenation and support for playlist formats.
+ */
+
 #ifndef AVFORMAT_PLAYLIST_H
 #define AVFORMAT_PLAYLIST_H
 
@@ -27,7 +35,7 @@
 #include <libgen.h>
 
 /** @struct PlayElem
- *  @brief Represents each input file on a playlist
+ *  @brief Represents each input file on a playlist.
  */
 typedef struct PlayElem {
     AVFormatContext *ic; /**< AVFormatContext for this playlist item */
@@ -37,7 +45,7 @@ typedef struct PlayElem {
 } PlayElem;
 
 /** @struct PlaylistContext
- *  @brief Represents the playlist and contains PlayElem for each playlist item
+ *  @brief Represents the playlist and contains PlayElem for each playlist item.
  */
 typedef struct PlaylistContext {
     PlayElem **pelist; /**< List of PlayElem, with each representing a playlist item */

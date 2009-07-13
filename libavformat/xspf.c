@@ -1,5 +1,5 @@
 /*
- * XSPF muxer and demuxer
+ * XSPF playlist demuxer
  * Copyright (c) 2009 Geza Kovacs
  *
  * This file is part of FFmpeg.
@@ -17,6 +17,10 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+/** @file pls.c
+ *  @brief XSPF playlist demuxer
  */
 
 #include "avformat.h"
