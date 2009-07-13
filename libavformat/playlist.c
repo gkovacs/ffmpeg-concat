@@ -20,11 +20,13 @@
  */
 
 /** @file playlist.c
- *  @brief General components used by playlist formats
  *  @author Geza Kovacs ( gkovacs mit edu )
+ *
+ *  @brief General components used by playlist formats
+ *
  *  @details These functions are used to initialize and manipulate playlists
  *  (PlaylistContext) and their individual playlist elements (PlayElem), each
- *  of which encapsulates its own AVFormatContext. This abstraction used for
+ *  of which encapsulates its own AVFormatContext. This abstraction is used for
  *  implementing file concatenation and support for playlist formats.
  */
 

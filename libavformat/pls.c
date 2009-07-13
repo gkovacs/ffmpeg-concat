@@ -20,8 +20,9 @@
  */
 
 /** @file pls.c
- *  @brief PLS playlist demuxer
  *  @author Geza Kovacs ( gkovacs mit edu )
+ *
+ *  @brief PLS playlist demuxer
  */
 
 #include "playlist.h"

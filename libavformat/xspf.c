@@ -20,8 +20,9 @@
  */
 
 /** @file pls.c
- *  @brief XSPF playlist demuxer
  *  @author Geza Kovacs ( gkovacs mit edu )
+ *
+ *  @brief XSPF playlist demuxer
  */
 
 #include "avformat.h"

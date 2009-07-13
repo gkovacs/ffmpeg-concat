@@ -20,8 +20,9 @@
  */
 
 /** @file datanode.c
- *  @brief Format to represent ini and xml files as doubly linked 2D data nodes
  *  @author Geza Kovacs ( gkovacs mit edu )
+ *
+ *  @brief Format to represent ini and xml files as doubly linked 2D data nodes
  */
 
 #include "datanode.h"

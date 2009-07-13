@@ -20,8 +20,9 @@
  */
 
 /** @file m3u.c
- *  @brief M3U playlist demuxer
  *  @author Geza Kovacs ( gkovacs mit edu )
+ *
+ *  @brief M3U playlist demuxer
  */
 
 #include "playlist.h"
