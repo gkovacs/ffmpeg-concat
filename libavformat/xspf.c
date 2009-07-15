@@ -111,14 +111,8 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *f
     if (!flist) // no files have been found
         return AVERROR_EOF;
     flist[j] = 0;
-    ctx->pelist_size = j;
     ff_playlist_relative_paths(flist, dirname(filename));
-    ctx->pelist = av_malloc(ctx->pelist_size * sizeof(*(ctx->pelist)));
-    memset(ctx->pelist, 0, ctx->pelist_size * sizeof(*(ctx->pelist)));
-    for (i = 0; i < ctx->pelist_size; ++i) {
-        ctx->pelist[i] = av_malloc(sizeof(*(ctx->pelist[i])));
-        ctx->pelist[i]->filename = flist[i];
-    }
+    ff_playlist_add_stringlist(ctx, flist, j);
     av_free(flist);
     return 0;
 }
