@@ -39,8 +39,6 @@ static int ff_concatgen_read_play(AVFormatContext *s);
 
 static int ff_concatgen_read_pause(AVFormatContext *s);
 
-static void ff_playlist_relative_paths(char **flist, const char *workingdir);
-
 /* The ffmpeg codecs we support, and the IDs they have in the file */
 static const AVCodecTag codec_m3u_tags[] = {
     { 0, 0 },
@@ -83,7 +81,7 @@ static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx, const char *fi
         flist[i++][q-linebuf] = 0;
     }
     flist[i] = 0;
-    ff_playlist_relative_paths(flist, dirname(filename));
+    ff_playlist_relative_paths(flist, i, dirname(filename));
     ff_playlist_add_stringlist(ctx, flist, i);
     av_free(flist);
     return 0;

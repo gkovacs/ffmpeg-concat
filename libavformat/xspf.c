@@ -42,8 +42,6 @@ static int ff_concatgen_read_play(AVFormatContext *s);
 
 static int ff_concatgen_read_pause(AVFormatContext *s);
 
-static void ff_playlist_relative_paths(char **flist, const char *workingdir);
-
 /* The ffmpeg codecs we support, and the IDs they have in the file */
 static const AVCodecTag codec_xspf_tags[] = {
     { 0, 0 },
@@ -111,7 +109,7 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *f
     if (!flist) // no files have been found
         return AVERROR_EOF;
     flist[j] = 0;
-    ff_playlist_relative_paths(flist, dirname(filename));
+    ff_playlist_relative_paths(flist, j, dirname(filename));
     ff_playlist_add_stringlist(ctx, flist, j);
     av_free(flist);
     return 0;

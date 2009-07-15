@@ -154,7 +154,7 @@ PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep)
         return NULL;
     }
     ctx = ff_playlist_alloc_context();
-    ff_playlist_relative_paths(flist, workingdir);
+    ff_playlist_relative_paths(flist, len, workingdir);
     ff_playlist_add_stringlist(ctx, flist, len);
     return ctx;
 }
@@ -174,22 +174,22 @@ void ff_playlist_add_stringlist(PlaylistContext *ctx, char **flist, int len)
 }
 
 // converts list of mixed absolute and relative paths into all absolute paths
-void ff_playlist_relative_paths(char **flist, const char *workingdir)
+void ff_playlist_relative_paths(char **flist, int len, const char *workingdir)
 {
-    while (*flist != 0) { // determine if relative paths
+    int i;
+    for (i = 0; i < len; ++i) { // determine if relative paths
         FILE *file;
         char *fullfpath;
         int wdslen = strlen(workingdir);
-        int flslen = strlen(*flist);
+        int flslen = strlen(flist[i]);
         fullfpath = av_malloc(sizeof(char) * (wdslen+flslen+2));
         av_strlcpy(fullfpath, workingdir, wdslen+1);
         fullfpath[wdslen] = '/';
         fullfpath[wdslen+1] = 0;
-        av_strlcat(fullfpath, *flist, wdslen+flslen+2);
+        av_strlcat(fullfpath, flist[i], wdslen+flslen+2);
         if ((file = fopen(fullfpath, "r"))) {
             fclose(file);
-            *flist = fullfpath;
+            flist[i] = fullfpath;
         }
-        ++flist;
     }
 }
