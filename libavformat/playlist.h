@@ -98,12 +98,37 @@ void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx);
  */
 AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index);
 
+/** @fn void ff_playlist_relative_paths(char **flist, int len, const char *workingdir)
+ *  @brief Converts a list of mixed relative or absolute paths into all absolute paths.
+ *  @param flist List of null-terminated strings of relative or absolute paths.
+ *  @param len Number of paths in flist.
+ *  @param workingdir Path that strings in flist are relative to.
+ */
 void ff_playlist_relative_paths(char **flist, int len, const char *workingdir);
 
+/** @fn void ff_playlist_split_encodedstring(char *s, char sep, char ***flist_ptr, int *len_ptr)
+ *  @brief Splits a character-delimited string into a list of strings.
+ *  @param s The input character-delimited string ("one,two,three").
+ *  @param sep The delimiter character (',').
+ *  @param flist_ptr Pointer to string list which will be allocated by function.
+ *  @param len_ptr Number of segments the string was split into.
+ */
 void ff_playlist_split_encodedstring(char *s, char sep, char ***flist_ptr, int *len_ptr);
 
+/** @fn PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep)
+ *  @brief Allocates and returns a PlaylistContext with playlist elements specified by a character-delimited string.
+ *  @param s The input character-delimited string ("one,two,three").
+ *  @param sep The delimiter character (',').
+ *  @return Returns the allocated PlaylistContext.
+ */
 PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep);
 
+/** @fn void ff_playlist_add_stringlist(PlaylistContext *ctx, char **flist, int len)
+ *  @brief Adds PlayElem for each element in a string list to a PlaylistContext.
+ *  @param ctx Pre-allocated PlaylistContext to add elements to.
+ *  @param List of null-terminated strings with absolute paths to playlist elements.
+ *  @param len Number of paths in flist.
+ */
 void ff_playlist_add_stringlist(PlaylistContext *ctx, char **flist, int len);
 
 #endif /* AVFORMAT_PLAYLIST_H */
