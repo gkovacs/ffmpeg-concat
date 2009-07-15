@@ -112,6 +112,67 @@ AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_in
         return NULL;
 }
 
+void ff_playlist_split_encodedstring(char *s, char sep, char ***flist_ptr, int *len_ptr)
+{
+    char c, *ts, **flist;
+    int i, len, buflen, *sepidx;
+    buflen = sepidx = len = 0;
+    sepidx = av_fast_realloc(sepidx, &buflen, ++len);
+    sepidx[0] = 0;
+    ts = s;
+    while ((c = *ts++) != 0) {
+        if (c == sep) {
+            sepidx[len] = ts-s;
+            sepidx = av_fast_realloc(sepidx, &buflen, ++len);
+        }
+    }
+    sepidx[len] = ts-s;
+    ts = s;
+    *len_ptr = len;
+    *flist_ptr = flist = av_malloc(sizeof(*flist) * (len+1));
+    flist[len] = 0;
+    for (i = 0; i < len; ++i) {
+        flist[i] = av_malloc(sepidx[i+1]-sepidx[i]);
+        av_strlcpy(flist[i], ts+sepidx[i], sepidx[i+1]-sepidx[i]);
+    }
+    av_free(sepidx);
+}
+
+PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep)
+{
+    PlaylistContext *ctx;
+    char **flist;
+    int i, len;
+    char workingdir[1024];
+    getcwd(workingdir, 1024);
+    workingdir[1023] = 0;
+    ff_playlist_split_encodedstring(s, sep, &flist, &len);
+    if (len <= 1) {
+        for (i = 0; i < len; ++i)
+            av_free(flist[i]);
+        av_free(flist);
+        return NULL;
+    }
+    ctx = ff_playlist_alloc_context();
+    ff_playlist_relative_paths(flist, workingdir);
+    ff_playlist_add_stringlist(ctx, flist, len);
+    return ctx;
+}
+
+void ff_playlist_add_stringlist(PlaylistContext *ctx, char **flist, int len)
+{
+    int i;
+    ctx->pelist_size = len;
+    ctx->pelist = av_malloc(ctx->pelist_size * sizeof(*(ctx->pelist)));
+    memset(ctx->pelist, 0, ctx->pelist_size * sizeof(*(ctx->pelist)));
+    for (i = 0; i < ctx->pelist_size; ++i) {
+        ctx->pelist[i] = av_malloc(sizeof(*(ctx->pelist[i])));
+        memset(ctx->pelist[i], 0, sizeof(*(ctx->pelist[i])));
+        ctx->pelist[i]->filename = flist[i];
+    }
+    ctx->pe_curidx = 0;
+}
+
 // converts list of mixed absolute and relative paths into all absolute paths
 void ff_playlist_relative_paths(char **flist, const char *workingdir)
 {

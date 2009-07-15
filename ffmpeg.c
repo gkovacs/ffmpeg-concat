@@ -2884,7 +2884,6 @@ static void opt_input_file(const char *filename)
     using_stdin |= !strncmp(filename, "pipe:", 5) ||
                     !strcmp(filename, "/dev/stdin");
 
-
     if (concatenate_video_files) { // need to specify -conc before -i
         int filenamelen = strlen(filename);
         if (!playlist_ctx) {
@@ -2918,7 +2917,21 @@ static void opt_input_file(const char *filename)
         }
         return;
     }
-
+    // alternative interface for concat - specify -i item1,item2
+    playlist_ctx = ff_playlist_from_encodedstring(filename, ',');
+    if (playlist_ctx) {
+        av_log(ic, AV_LOG_DEBUG, "Generating playlist from encoded string\n");
+        concatenate_video_files = 1;
+        ic = avformat_alloc_context();
+        av_strlcpy(ic->filename, filename, sizeof(ic->filename));
+        ic->nb_streams = 2;
+        ic->iformat = ff_concat_alloc_demuxer();
+        ff_playlist_set_context(ic, playlist_ctx);
+        ff_playlist_populate_context(ic);
+        nb_input_files = 1;
+        input_files[0] = ic;
+        goto configcodecs;
+    }
 
     /* get default parameters from command line */
     ic = avformat_alloc_context();

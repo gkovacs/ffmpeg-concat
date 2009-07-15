@@ -98,4 +98,10 @@ void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx);
  */
 AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index);
 
+void ff_playlist_split_encodedstring(char *s, char sep, char ***flist_ptr, int *len_ptr);
+
+PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep);
+
+void ff_playlist_add_stringlist(PlaylistContext *ctx, char **flist, int len);
+
 #endif /* AVFORMAT_PLAYLIST_H */
