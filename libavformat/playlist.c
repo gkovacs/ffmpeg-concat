@@ -174,7 +174,6 @@ void ff_playlist_relative_paths(char **flist, int len, const char *workingdir)
 {
     int i;
     for (i = 0; i < len; ++i) { // determine if relative paths
-        ByteIOContext *s;
         char *fullfpath;
         int wdslen = strlen(workingdir);
         int flslen = strlen(flist[i]);
