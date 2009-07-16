@@ -63,7 +63,7 @@ static int xspf_probe(AVProbeData *p)
 
 static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *filename)
 {
-    int i, j, c;
+    int i, j, k, c;
     unsigned int buflen;
     char state;
     char **flist;
@@ -110,7 +110,8 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *f
         return AVERROR_EOF;
     flist[j] = 0;
     ff_playlist_relative_paths(flist, j, dirname(filename));
-    ff_playlist_add_stringlist(ctx, flist, j);
+    for (k = 0; k < j; ++k)
+        ff_playlist_add_path(ctx, flist[k]);
     av_free(flist);
     return 0;
 }

@@ -64,7 +64,7 @@ PlaylistContext* ff_playlist_alloc_context(void)
 {
     int i;
     PlaylistContext *ctx = av_malloc(sizeof(*ctx));
-    ctx->pe_curidx = 0;
+    memset(ctx, 0, sizeof(*ctx));
     ctx->time_offsets_size = 2; // TODO don't assume we have just 2 streams
     ctx->time_offsets = av_malloc(sizeof(*(ctx->time_offsets)) * ctx->time_offsets_size);
     for (i = 0; i < ctx->time_offsets_size; ++i)
@@ -155,22 +155,18 @@ PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep)
     }
     ctx = ff_playlist_alloc_context();
     ff_playlist_relative_paths(flist, len, workingdir);
-    ff_playlist_add_stringlist(ctx, flist, len);
+    for (i = 0; i < len; ++i)
+        ff_playlist_add_path(ctx, flist[i]);
     return ctx;
 }
 
-void ff_playlist_add_stringlist(PlaylistContext *ctx, char **flist, int len)
+void ff_playlist_add_path(PlaylistContext *ctx, char *itempath)
 {
-    int i;
-    ctx->pelist_size = len;
-    ctx->pelist = av_malloc(ctx->pelist_size * sizeof(*(ctx->pelist)));
-    memset(ctx->pelist, 0, ctx->pelist_size * sizeof(*(ctx->pelist)));
-    for (i = 0; i < ctx->pelist_size; ++i) {
-        ctx->pelist[i] = av_malloc(sizeof(*(ctx->pelist[i])));
-        memset(ctx->pelist[i], 0, sizeof(*(ctx->pelist[i])));
-        ctx->pelist[i]->filename = flist[i];
-    }
-    ctx->pe_curidx = 0;
+    ctx->pelist_size++;
+    ctx->pelist = av_realloc(ctx->pelist, ctx->pelist_size * sizeof(PlayElem*));
+    ctx->pelist[ctx->pelist_size-1] = av_malloc(sizeof(*(ctx->pelist[ctx->pelist_size-1])));
+    memset(ctx->pelist[ctx->pelist_size-1], 0, sizeof(*(ctx->pelist[ctx->pelist_size-1])));
+    ctx->pelist[ctx->pelist_size-1]->filename = itempath;
 }
 
 // converts list of mixed absolute and relative paths into all absolute paths

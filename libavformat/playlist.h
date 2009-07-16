@@ -123,12 +123,11 @@ void ff_playlist_split_encodedstring(char *s, char sep, char ***flist_ptr, int *
  */
 PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep);
 
-/** @fn void ff_playlist_add_stringlist(PlaylistContext *ctx, char **flist, int len)
- *  @brief Adds PlayElem for each element in a string list to a PlaylistContext.
+/** @fn void ff_playlist_add_path(PlaylistContext *ctx, char *itempath)
+ *  @brief Adds PlayElem for item located at specified path to a PlaylistContext.
  *  @param ctx Pre-allocated PlaylistContext to add elements to.
- *  @param List of null-terminated strings with absolute paths to playlist elements.
- *  @param len Number of paths in flist.
+ *  @param Absolute path to item for which to add a playlist element.
  */
-void ff_playlist_add_stringlist(PlaylistContext *ctx, char **flist, int len);
+void ff_playlist_add_path(PlaylistContext *ctx, char *itempath);
 
 #endif /* AVFORMAT_PLAYLIST_H */

@@ -60,7 +60,7 @@ static int pls_probe(AVProbeData *p)
 
 static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *filename)
 {
-    int i, j, c;
+    int i, j, k, c;
     unsigned int buflen;
     char state;
     char **flist;
@@ -106,8 +106,10 @@ static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *fi
         return AVERROR_EOF;
     flist[j] = 0;
     ff_playlist_relative_paths(flist, j, dirname(filename));
-    ff_playlist_add_stringlist(ctx, flist, j);
+    for (k = 0; k < j; ++k)
+        ff_playlist_add_path(ctx, flist[k]);
     av_free(flist);
+    return 0;
 }
 
 static int pls_read_header(AVFormatContext *s,

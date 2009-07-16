@@ -61,7 +61,7 @@ static int m3u_probe(AVProbeData *p)
 static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx, const char *filename)
 {
     char **flist;
-    int i, bufsize;
+    int i, k, bufsize;
     i = bufsize = flist = 0;
     while (1) {
         char *q;
@@ -82,7 +82,8 @@ static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx, const char *fi
     }
     flist[i] = 0;
     ff_playlist_relative_paths(flist, i, dirname(filename));
-    ff_playlist_add_stringlist(ctx, flist, i);
+    for (k = 0; k < i; ++k)
+        ff_playlist_add_path(ctx, flist[k]);
     av_free(flist);
     return 0;
 }
