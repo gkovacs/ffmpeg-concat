@@ -174,7 +174,7 @@ void ff_playlist_relative_paths(char **flist, int len, const char *workingdir)
 {
     int i;
     for (i = 0; i < len; ++i) { // determine if relative paths
-        FILE *file;
+        ByteIOContext *s;
         char *fullfpath;
         int wdslen = strlen(workingdir);
         int flslen = strlen(flist[i]);
@@ -183,9 +183,7 @@ void ff_playlist_relative_paths(char **flist, int len, const char *workingdir)
         fullfpath[wdslen] = '/';
         fullfpath[wdslen+1] = 0;
         av_strlcat(fullfpath, flist[i], wdslen+flslen+2);
-        if ((file = fopen(fullfpath, "r"))) {
-            fclose(file);
+        if (url_exist(fullfpath))
             flist[i] = fullfpath;
-        }
     }
 }
