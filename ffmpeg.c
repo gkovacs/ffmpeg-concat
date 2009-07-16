@@ -2885,19 +2885,11 @@ static void opt_input_file(const char *filename)
                     !strcmp(filename, "/dev/stdin");
 
     if (concatenate_video_files) { // need to specify -conc before -i
-        int filenamelen = strlen(filename);
         if (!playlist_ctx) {
             ic = avformat_alloc_context();
             av_log(ic, AV_LOG_DEBUG, "Generating playlist ctx\n");
             playlist_ctx = ff_playlist_alloc_context();
-            playlist_ctx->pelist_size = 1;
-            playlist_ctx->pelist = av_malloc(playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
-            memset(playlist_ctx->pelist, 0, playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
-            playlist_ctx->pelist[playlist_ctx->pelist_size-1] = av_malloc(sizeof(*(playlist_ctx->pelist[playlist_ctx->pelist_size-1])));
-            memset(playlist_ctx->pelist[playlist_ctx->pelist_size-1], 0, sizeof(*(playlist_ctx->pelist[playlist_ctx->pelist_size-1])));
-            playlist_ctx->pelist[playlist_ctx->pelist_size-1]->filename =  av_malloc(sizeof(char) * (filenamelen+1));
-            av_strlcpy(playlist_ctx->pelist[playlist_ctx->pelist_size-1]->filename, filename, filenamelen+1);
-            av_strlcpy(ic->filename, filename, sizeof(ic->filename));
+            ff_playlist_add_path(playlist_ctx, filename);
             ic->nb_streams = 2;
             ic->iformat = ff_concat_alloc_demuxer();
             ff_playlist_set_context(ic, playlist_ctx);
@@ -2908,19 +2900,15 @@ static void opt_input_file(const char *filename)
         }
         else {
             av_log(ic, AV_LOG_DEBUG, "Adding file %s to playlist\n", filename);
-            ++playlist_ctx->pelist_size;
-            playlist_ctx->pelist = av_realloc(playlist_ctx->pelist, playlist_ctx->pelist_size * sizeof(*(playlist_ctx->pelist)));
-            playlist_ctx->pelist[playlist_ctx->pelist_size-1] = av_malloc(sizeof(*(playlist_ctx->pelist[playlist_ctx->pelist_size-1])));
-            memset(playlist_ctx->pelist[playlist_ctx->pelist_size-1], 0, sizeof(*(playlist_ctx->pelist[playlist_ctx->pelist_size-1])));
-            playlist_ctx->pelist[playlist_ctx->pelist_size-1]->filename =  av_realloc(playlist_ctx->pelist[playlist_ctx->pelist_size-1]->filename, sizeof(char) * (filenamelen+1));
-            av_strlcpy(playlist_ctx->pelist[playlist_ctx->pelist_size-1]->filename, filename, filenamelen+1);
+            ff_playlist_add_path(playlist_ctx, filename);
+            return;
         }
-        return;
     }
-    // alternative interface for concat - specify -i item1,item2
+
+    // alternative interface for concat - specify -i item1,item2,item3
     playlist_ctx = ff_playlist_from_encodedstring(filename, ',');
     if (playlist_ctx) {
-        av_log(ic, AV_LOG_DEBUG, "Generating playlist from encoded string\n");
+        av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
         concatenate_video_files = 1;
         ic = avformat_alloc_context();
         av_strlcpy(ic->filename, filename, sizeof(ic->filename));
