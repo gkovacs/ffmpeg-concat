@@ -54,8 +54,7 @@ typedef struct PlaylistContext {
     PlayElem **pelist; /**< List of PlayElem, with each representing a playlist item */
     int pelist_size; /**< Number of PlayElem stored in pelist */
     int pe_curidx; /**< Index of the PlayElem that packets are being read from */
-    int time_offsets_size; /**< Number of time offsets (number of multimedia streams), 2 with audio and video. */
-    int64_t *time_offsets; /**< Time offsets, in 10^-6 seconds, for each multimedia stream */
+    int64_t time_offset; /**< Time offset, in 10^-6 seconds, for all multimedia streams */
 } PlaylistContext;
 
 /** @fn int ff_playlist_init_playelem(PlayElem* pe)
@@ -63,12 +62,6 @@ typedef struct PlaylistContext {
  *  @param pe PlayElem to open. It should already be allocated.
  */
 void ff_playlist_init_playelem(PlayElem* pe);
-
-/** @fn PlaylistContext* ff_playlist_alloc_context(void)
- *  @brief Allocates and returns a PlaylistContext.
- *  @return Returns the allocated PlaylistContext.
- */
-PlaylistContext* ff_playlist_alloc_context(void);
 
 /** @fn void ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index)
  *  @brief Opens the current PlayElem from the PlaylistContext.

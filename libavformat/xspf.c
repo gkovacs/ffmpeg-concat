@@ -120,7 +120,7 @@ static int xspf_read_header(AVFormatContext *s,
                             AVFormatParameters *ap)
 {
     int i;
-    PlaylistContext *ctx = ff_playlist_alloc_context();
+    PlaylistContext *ctx = av_mallocz(sizeof(*ctx));
     if (xspf_list_files(s->pb, ctx, s->filename)) {
         fprintf(stderr, "no playlist items found in %s\n", s->filename);
         return AVERROR_EOF;

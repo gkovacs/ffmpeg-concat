@@ -56,15 +56,6 @@ void ff_playlist_init_playelem(PlayElem *pe)
         av_log(pe->ic, AV_LOG_ERROR, "ByteIOContext not set\n");
 }
 
-PlaylistContext* ff_playlist_alloc_context(void)
-{
-    int i;
-    PlaylistContext *ctx = av_mallocz(sizeof(*ctx));
-    ctx->time_offsets_size = 2; // TODO don't assume we have just 2 streams
-    ctx->time_offsets = av_mallocz(sizeof(*(ctx->time_offsets)) * ctx->time_offsets_size);
-    return ctx;
-}
-
 void ff_playlist_populate_context(AVFormatContext *s)
 {
     int i;
@@ -146,7 +137,7 @@ PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep)
         av_free(flist);
         return NULL;
     }
-    ctx = ff_playlist_alloc_context();
+    ctx = av_mallocz(sizeof(*ctx));
     ff_playlist_relative_paths(flist, len, workingdir);
     for (i = 0; i < len; ++i)
         ff_playlist_add_path(ctx, flist[i]);

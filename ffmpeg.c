@@ -2888,7 +2888,7 @@ static void opt_input_file(const char *filename)
         if (!playlist_ctx) {
             ic = avformat_alloc_context();
             av_log(ic, AV_LOG_DEBUG, "Generating playlist ctx\n");
-            playlist_ctx = ff_playlist_alloc_context();
+            playlist_ctx = av_mallocz(sizeof(*playlist_ctx));
             ff_playlist_add_path(playlist_ctx, filename);
             ic->nb_streams = 2;
             ic->iformat = ff_concat_alloc_demuxer();
