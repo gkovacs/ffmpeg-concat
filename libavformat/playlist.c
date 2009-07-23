@@ -127,9 +127,6 @@ PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep)
     PlaylistContext *ctx;
     char **flist;
     int i, len;
-    char workingdir[1024];
-    getcwd(workingdir, 1024);
-    workingdir[1023] = 0;
     ff_playlist_split_encodedstring(s, sep, &flist, &len);
     if (len <= 1) {
         for (i = 0; i < len; ++i)
@@ -138,7 +135,6 @@ PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep)
         return NULL;
     }
     ctx = av_mallocz(sizeof(*ctx));
-    ff_playlist_relative_paths(flist, len, workingdir);
     for (i = 0; i < len; ++i)
         ff_playlist_add_path(ctx, flist[i]);
     return ctx;
