@@ -38,12 +38,8 @@ void ff_playlist_init_playelem(PlayElem *pe)
 {
     int err;
     pe->ic = av_malloc(sizeof(*(pe->ic)));
-    pe->ap = av_malloc(sizeof(*(pe->ap)));
-    memset(pe->ap, 0, sizeof(*(pe->ap)));
-    pe->ap->width = 0;
-    pe->ap->height = 0;
+    pe->ap = av_mallocz(sizeof(*(pe->ap)));
     pe->ap->time_base = (AVRational){1, 25};
-    pe->ap->pix_fmt = 0;
     pe->fmt = 0;
     err = av_open_input_file(&(pe->ic), pe->filename, pe->fmt, 0, pe->ap);
     if (err < 0)
@@ -63,12 +59,9 @@ void ff_playlist_init_playelem(PlayElem *pe)
 PlaylistContext* ff_playlist_alloc_context(void)
 {
     int i;
-    PlaylistContext *ctx = av_malloc(sizeof(*ctx));
-    memset(ctx, 0, sizeof(*ctx));
+    PlaylistContext *ctx = av_mallocz(sizeof(*ctx));
     ctx->time_offsets_size = 2; // TODO don't assume we have just 2 streams
-    ctx->time_offsets = av_malloc(sizeof(*(ctx->time_offsets)) * ctx->time_offsets_size);
-    for (i = 0; i < ctx->time_offsets_size; ++i)
-        ctx->time_offsets[i] = 0;
+    ctx->time_offsets = av_mallocz(sizeof(*(ctx->time_offsets)) * ctx->time_offsets_size);
     return ctx;
 }
 
@@ -164,8 +157,7 @@ void ff_playlist_add_path(PlaylistContext *ctx, char *itempath)
 {
     ctx->pelist_size++;
     ctx->pelist = av_realloc(ctx->pelist, ctx->pelist_size * sizeof(PlayElem*));
-    ctx->pelist[ctx->pelist_size-1] = av_malloc(sizeof(*(ctx->pelist[ctx->pelist_size-1])));
-    memset(ctx->pelist[ctx->pelist_size-1], 0, sizeof(*(ctx->pelist[ctx->pelist_size-1])));
+    ctx->pelist[ctx->pelist_size-1] = av_mallocz(sizeof(*(ctx->pelist[ctx->pelist_size-1])));
     ctx->pelist[ctx->pelist_size-1]->filename = itempath;
 }
 
