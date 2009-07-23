@@ -43,8 +43,6 @@
 typedef struct PlayElem {
     AVFormatContext *ic; /**< AVFormatContext for this playlist item */
     char *filename; /**< Filename with absolute path of this playlist item */
-    AVInputFormat *fmt; /**< AVInputFormat manually specified for this playlist item */
-    AVFormatParameters *ap; /**< AVFormatParameters for this playlist item */
 } PlayElem;
 
 /** @struct PlaylistContext

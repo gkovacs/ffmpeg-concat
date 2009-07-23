@@ -37,23 +37,13 @@
 void ff_playlist_init_playelem(PlayElem *pe)
 {
     int err;
-    pe->ic = av_malloc(sizeof(*(pe->ic)));
-    pe->ap = av_mallocz(sizeof(*(pe->ap)));
-    pe->ap->time_base = (AVRational){1, 25};
-    pe->fmt = 0;
-    err = av_open_input_file(&(pe->ic), pe->filename, pe->fmt, 0, pe->ap);
+    pe->ic = av_mallocz(sizeof(*(pe->ic)));
+    err = av_open_input_file(&(pe->ic), pe->filename, pe->ic->iformat, 0, NULL);
     if (err < 0)
         av_log(pe->ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
-    pe->fmt = pe->ic->iformat;
-    if (!pe->fmt)
-        av_log(pe->ic, AV_LOG_ERROR, "Input format not set\n");
     err = av_find_stream_info(pe->ic);
     if (err < 0)
         av_log(pe->ic, AV_LOG_ERROR, "Could not find stream info\n");
-    if (pe->ic->pb)
-        pe->ic->pb->eof_reached = 0;
-    else
-        av_log(pe->ic, AV_LOG_ERROR, "ByteIOContext not set\n");
 }
 
 void ff_playlist_populate_context(AVFormatContext *s)
