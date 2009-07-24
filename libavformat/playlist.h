@@ -37,29 +37,22 @@
 #include "riff.h"
 #include <libgen.h>
 
-/** @struct PlayElem
- *  @brief Represents each input file on a playlist.
- */
-typedef struct PlayElem {
-    AVFormatContext *ic; /**< AVFormatContext for this playlist item */
-    char *filename; /**< Filename with absolute path of this playlist item */
-} PlayElem;
-
 /** @struct PlaylistContext
  *  @brief Represents the playlist and contains PlayElem for each playlist item.
  */
 typedef struct PlaylistContext {
-    PlayElem **pelist; /**< List of PlayElem, with each representing a playlist item */
+    char **flist; /**< List of file names for each playlist item */
+    AVFormatContext **icl; /**< List of FormatContext for each playlist items */
     int pelist_size; /**< Number of PlayElem stored in pelist */
     int pe_curidx; /**< Index of the PlayElem that packets are being read from */
     int64_t time_offset; /**< Time offset, in 10^-6 seconds, for all multimedia streams */
 } PlaylistContext;
 
-/** @fn int ff_playlist_init_playelem(PlayElem* pe)
- *  @brief Opens file, codecs, and streams associated with PlayElem.
- *  @param pe PlayElem to open. It should already be allocated.
+/** @fn int ff_playlist_alloc_playelem(PlayElem* pe)
+ *  @brief Allocates and opens file, codecs, and streams associated with filename.
+ *  @param filename Null-terminated string of file to open.
  */
-void ff_playlist_init_playelem(PlayElem* pe);
+AVFormatContext *ff_playlist_alloc_formatcontext(char *filename);
 
 /** @fn void ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index)
  *  @brief Opens the current PlayElem from the PlaylistContext.

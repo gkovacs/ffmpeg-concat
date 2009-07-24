@@ -34,16 +34,17 @@
 #include "playlist.h"
 #include "internal.h"
 
-void ff_playlist_init_playelem(PlayElem *pe)
+AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
 {
     int err;
-    pe->ic = av_mallocz(sizeof(*(pe->ic)));
-    err = av_open_input_file(&(pe->ic), pe->filename, pe->ic->iformat, 0, NULL);
+    AVFormatContext *ic = av_mallocz(sizeof(*ic));
+    err = av_open_input_file(&(ic), filename, ic->iformat, 0, NULL);
     if (err < 0)
-        av_log(pe->ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
-    err = av_find_stream_info(pe->ic);
+        av_log(ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
+    err = av_find_stream_info(ic);
     if (err < 0)
-        av_log(pe->ic, AV_LOG_ERROR, "Could not find stream info\n");
+        av_log(ic, AV_LOG_ERROR, "Could not find stream info\n");
+    return ic;
 }
 
 void ff_playlist_populate_context(AVFormatContext *s)
@@ -51,8 +52,8 @@ void ff_playlist_populate_context(AVFormatContext *s)
     int i;
     AVFormatContext *ic;
     PlaylistContext *ctx = s->priv_data;
-    ff_playlist_init_playelem(ctx->pelist[ctx->pe_curidx]);
-    ic = ctx->pelist[ctx->pe_curidx]->ic;
+    ctx->icl = av_realloc(ctx->icl, sizeof(*(ctx->icl)) * (ctx->pe_curidx+1));
+    ic = ctx->icl[ctx->pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[ctx->pe_curidx]);
     ic->iformat->read_header(ic, 0);
     s->nb_streams = ic->nb_streams;
     for (i = 0; i < ic->nb_streams; ++i)
@@ -78,10 +79,10 @@ void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx)
 
 AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index)
 {
-    if (ctx && pe_idx < ctx->pelist_size && ctx->pelist && ctx->pelist[pe_idx] &&
-        ctx->pelist[pe_idx]->ic && stream_index < ctx->pelist[pe_idx]->ic->nb_streams &&
-        ctx->pelist[pe_idx]->ic->streams && ctx->pelist[pe_idx]->ic->streams[stream_index])
-        return ctx->pelist[pe_idx]->ic->streams[stream_index];
+    if (ctx && pe_idx < ctx->pelist_size && ctx->icl && ctx->icl[pe_idx] &&
+        ctx->icl[pe_idx] && stream_index < ctx->icl[pe_idx]->nb_streams &&
+        ctx->icl[pe_idx]->streams && ctx->icl[pe_idx]->streams[stream_index])
+        return ctx->icl[pe_idx]->streams[stream_index];
     else
         return NULL;
 }
@@ -132,10 +133,8 @@ PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep)
 
 void ff_playlist_add_path(PlaylistContext *ctx, char *itempath)
 {
-    ctx->pelist_size++;
-    ctx->pelist = av_realloc(ctx->pelist, ctx->pelist_size * sizeof(PlayElem*));
-    ctx->pelist[ctx->pelist_size-1] = av_mallocz(sizeof(*(ctx->pelist[ctx->pelist_size-1])));
-    ctx->pelist[ctx->pelist_size-1]->filename = itempath;
+    ctx->flist = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * ++ctx->pelist_size);
+    ctx->flist[ctx->pelist_size-1] = itempath;
 }
 
 // converts list of mixed absolute and relative paths into all absolute paths
