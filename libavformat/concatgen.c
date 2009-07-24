@@ -42,34 +42,37 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     char have_switched_streams = 0;
     ctx = s->priv_data;
     stream_index = 0;
-    retr:
-    ic = ctx->icl[ctx->pe_curidx];
-    ret = ic->iformat->read_packet(ic, pkt);
-    if (pkt) {
-        stream_index = pkt->stream_index;
-        pkt->stream = ic->streams[pkt->stream_index];
-    }
-    if (ret >= 0) {
+    for (;;) {
+        ic = ctx->icl[ctx->pe_curidx];
+        ret = ic->iformat->read_packet(ic, pkt);
         if (pkt) {
-            int64_t time_offset;
-            time_offset = av_rescale_q(ctx->time_offset, AV_TIME_BASE_Q, ic->streams[stream_index]->time_base);
-            av_log(ic, AV_LOG_DEBUG, "%s conv stream time from %ld to %d/%d is %ld\n", ic->iformat->name, ctx->time_offset, ic->streams[stream_index]->time_base.num, ic->streams[stream_index]->time_base.den, time_offset);
-            // TODO changing either dts or pts leads to timing issues on h264
-            pkt->dts += time_offset;
-            if (!ic->streams[pkt->stream_index]->codec->has_b_frames)
-                pkt->pts = pkt->dts + 1;
+            stream_index = pkt->stream_index;
+            pkt->stream = ic->streams[pkt->stream_index];
         }
-    } else if (ret < 0 && !have_switched_streams && ctx->pe_curidx < ctx->pelist_size - 1) {
-    // TODO switch from AVERROR_EOF to AVERROR_EOS
-    // -32 AVERROR_EOF for avi, -51 for ogg
-        av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
-        ctx->time_offset += av_rescale_q(ic->streams[i]->duration, ic->streams[i]->time_base, AV_TIME_BASE_Q);
-        ++ctx->pe_curidx;
-        ff_playlist_populate_context(s);
-        have_switched_streams = 1;
-        goto retr;
-    } else {
-        av_log(ic, AV_LOG_DEBUG, "Packet read error %d\n", ret);
+        if (ret >= 0) {
+            if (pkt) {
+                int64_t time_offset;
+                time_offset = av_rescale_q(ctx->time_offset, AV_TIME_BASE_Q, ic->streams[stream_index]->time_base);
+                av_log(ic, AV_LOG_DEBUG, "%s conv stream time from %ld to %d/%d is %ld\n", ic->iformat->name, ctx->time_offset, ic->streams[stream_index]->time_base.num, ic->streams[stream_index]->time_base.den, time_offset);
+                // TODO changing either dts or pts leads to timing issues on h264
+                pkt->dts += time_offset;
+                if (!ic->streams[pkt->stream_index]->codec->has_b_frames)
+                    pkt->pts = pkt->dts + 1;
+            }
+            break;
+        } else if (ret < 0 && !have_switched_streams && ctx->pe_curidx < ctx->pelist_size - 1) {
+        // TODO switch from AVERROR_EOF to AVERROR_EOS
+        // -32 AVERROR_EOF for avi, -51 for ogg
+            av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
+            ctx->time_offset += av_rescale_q(ic->streams[i]->duration, ic->streams[i]->time_base, AV_TIME_BASE_Q);
+            ++ctx->pe_curidx;
+            ff_playlist_populate_context(s);
+            have_switched_streams = 1;
+            continue;
+        } else {
+            av_log(ic, AV_LOG_DEBUG, "Packet read error %d\n", ret);
+            break;
+        }
     }
     return ret;
 }
