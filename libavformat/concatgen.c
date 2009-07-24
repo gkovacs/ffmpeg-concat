@@ -34,7 +34,6 @@
 int ff_concatgen_read_packet(AVFormatContext *s,
                              AVPacket *pkt)
 {
-    int i;
     int ret;
     int stream_index;
     PlaylistContext *ctx;
@@ -61,11 +60,11 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             }
             break;
         } else {
-            if (!have_switched_streams && ctx->pe_curidx < ctx->pelist_size - 1) {
+            if (!have_switched_streams && ctx->pe_curidx < ctx->pelist_size - 1 && ic->cur_st) {
             // TODO switch from AVERROR_EOF to AVERROR_EOS
             // -32 AVERROR_EOF for avi, -51 for ogg
                 av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
-                ctx->time_offset += av_rescale_q(ic->streams[i]->duration, ic->streams[i]->time_base, AV_TIME_BASE_Q);
+                ctx->time_offset += av_rescale_q(ic->cur_st->duration, ic->cur_st->time_base, AV_TIME_BASE_Q);
                 ++ctx->pe_curidx;
                 ff_playlist_populate_context(s);
                 have_switched_streams = 1;
