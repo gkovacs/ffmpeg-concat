@@ -53,6 +53,7 @@ void ff_playlist_populate_context(AVFormatContext *s)
     AVFormatContext *ic;
     PlaylistContext *ctx = s->priv_data;
     ctx->icl = av_realloc(ctx->icl, sizeof(*(ctx->icl)) * (ctx->pe_curidx+1));
+    ctx->icl[ctx->pe_curidx+1] = NULL;
     ic = ctx->icl[ctx->pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[ctx->pe_curidx]);
     ic->iformat->read_header(ic, 0);
     s->nb_streams = ic->nb_streams;
@@ -134,6 +135,7 @@ PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep)
 void ff_playlist_add_path(PlaylistContext *ctx, char *itempath)
 {
     ctx->flist = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * ++ctx->pelist_size);
+    ctx->flist[ctx->pelist_size] = NULL;
     ctx->flist[ctx->pelist_size-1] = itempath;
 }
 
