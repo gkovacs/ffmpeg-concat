@@ -60,18 +60,20 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                     pkt->pts = pkt->dts + 1;
             }
             break;
-        } else if (ret < 0 && !have_switched_streams && ctx->pe_curidx < ctx->pelist_size - 1) {
-        // TODO switch from AVERROR_EOF to AVERROR_EOS
-        // -32 AVERROR_EOF for avi, -51 for ogg
-            av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
-            ctx->time_offset += av_rescale_q(ic->streams[i]->duration, ic->streams[i]->time_base, AV_TIME_BASE_Q);
-            ++ctx->pe_curidx;
-            ff_playlist_populate_context(s);
-            have_switched_streams = 1;
-            continue;
         } else {
-            av_log(ic, AV_LOG_DEBUG, "Packet read error %d\n", ret);
-            break;
+            if (!have_switched_streams && ctx->pe_curidx < ctx->pelist_size - 1) {
+            // TODO switch from AVERROR_EOF to AVERROR_EOS
+            // -32 AVERROR_EOF for avi, -51 for ogg
+                av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
+                ctx->time_offset += av_rescale_q(ic->streams[i]->duration, ic->streams[i]->time_base, AV_TIME_BASE_Q);
+                ++ctx->pe_curidx;
+                ff_playlist_populate_context(s);
+                have_switched_streams = 1;
+                continue;
+            } else {
+                av_log(ic, AV_LOG_ERROR, "Packet read error %d\n", ret);
+                break;
+            }
         }
     }
     return ret;
