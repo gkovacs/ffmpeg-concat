@@ -65,8 +65,8 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             // -32 AVERROR_EOF for avi, -51 for ogg
                 av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
                 ctx->time_offset += av_rescale_q(ic->cur_st->duration, ic->cur_st->time_base, AV_TIME_BASE_Q);
-                ++ctx->pe_curidx;
-                ff_playlist_populate_context(s);
+                if (!ctx->icl[++ctx->pe_curidx])
+                    ff_playlist_populate_context(s);
                 have_switched_streams = 1;
                 continue;
             } else {
