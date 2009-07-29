@@ -36,6 +36,7 @@
 #include "avformat.h"
 #include "riff.h"
 #include <libgen.h>
+#include <libavutil/avstring.h>
 
 /** @struct PlaylistContext
  *  @brief Represents the playlist and contains PlayElem for each playlist item.
