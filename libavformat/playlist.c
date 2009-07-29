@@ -156,3 +156,17 @@ void ff_playlist_relative_paths(char **flist, int len, const char *workingdir)
             flist[i] = fullfpath;
     }
 }
+
+int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts)
+{
+    int i = 0;
+    while (i < ctx->pelist_size) {
+        if (ctx->icl[i]->cur_st->duration > pts) {
+            pts -= ctx->icl[i]->cur_st->duration;
+            ++i;
+            if (!ctx->icl[i])
+                ff_playlist_populate_context(ctx);
+        }
+    }
+    return i;
+}

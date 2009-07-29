@@ -33,10 +33,10 @@
 #ifndef AVFORMAT_PLAYLIST_H
 #define AVFORMAT_PLAYLIST_H
 
+#include <libgen.h>
 #include "avformat.h"
 #include "riff.h"
-#include <libgen.h>
-#include <libavutil/avstring.h>
+#include "libavutil/avstring.h"
 
 /** @struct PlaylistContext
  *  @brief Represents the playlist and contains PlayElem for each playlist item.
@@ -114,5 +114,7 @@ PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep);
  *  @param Absolute path to item for which to add a playlist element.
  */
 void ff_playlist_add_path(PlaylistContext *ctx, char *itempath);
+
+int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts);
 
 #endif /* AVFORMAT_PLAYLIST_H */
