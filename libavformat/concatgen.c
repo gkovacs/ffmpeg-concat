@@ -29,7 +29,7 @@
  *  process.
  */
 
-#include "playlist.h"
+#include "concatgen.h"
 
 int ff_concatgen_read_packet(AVFormatContext *s,
                              AVPacket *pkt)
@@ -65,8 +65,12 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             // -32 AVERROR_EOF for avi, -51 for ogg
                 av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
                 ctx->time_offset += av_rescale_q(ic->cur_st->duration, ic->cur_st->time_base, AV_TIME_BASE_Q);
-                if (!ctx->icl[++ctx->pe_curidx])
-                    ff_playlist_populate_context(s);
+//                fprintf(stderr, "%d\n", ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx, ctx->time_offset));
+//                fflush(stderr);
+                if (!ctx->icl[++ctx->pe_curidx]) {
+                    ff_playlist_populate_context(ctx, ctx->pe_curidx);
+                    ff_playlist_set_streams(s);
+                }
                 have_switched_streams = 1;
                 continue;
             } else {
@@ -90,10 +94,10 @@ int ff_concatgen_read_seek(AVFormatContext *s,
     return ic->iformat->read_seek(ic, stream_index, pts, flags);
 }
 
-int ff_concatgen_read_timestamp(AVFormatContext *s,
-                                int stream_index,
-                                int64_t *pos,
-                                int64_t pos_limit)
+int64_t ff_concatgen_read_timestamp(AVFormatContext *s,
+                                    int stream_index,
+                                    int64_t *pos,
+                                    int64_t pos_limit)
 {
     PlaylistContext *ctx;
     AVFormatContext *ic;

@@ -47,15 +47,19 @@ AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
     return ic;
 }
 
-void ff_playlist_populate_context(AVFormatContext *s)
+void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx)
+{
+    ctx->icl = av_realloc(ctx->icl, sizeof(*(ctx->icl)) * (pe_curidx+2));
+    ctx->icl[pe_curidx+1] = NULL;
+    ctx->icl[pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[pe_curidx]);
+}
+
+void ff_playlist_set_streams(AVFormatContext *s)
 {
     int i;
     AVFormatContext *ic;
     PlaylistContext *ctx = s->priv_data;
-    ctx->icl = av_realloc(ctx->icl, sizeof(*(ctx->icl)) * (ctx->pe_curidx+2));
-    ctx->icl[ctx->pe_curidx+1] = NULL;
-    ic = ctx->icl[ctx->pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[ctx->pe_curidx]);
-    ic->iformat->read_header(ic, 0);
+    ic = ctx->icl[ctx->pe_curidx];
     s->nb_streams = ic->nb_streams;
     for (i = 0; i < ic->nb_streams; ++i)
         s->streams[i] = ic->streams[i];
@@ -159,13 +163,14 @@ void ff_playlist_relative_paths(char **flist, int len, const char *workingdir)
 
 int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts)
 {
-    int i = 0;
-    while (i < ctx->pelist_size) {
+    int i;
+    for (i = 0; i < ctx->pelist_size; ++i) {
         if (ctx->icl[i]->cur_st->duration > pts) {
             pts -= ctx->icl[i]->cur_st->duration;
-            ++i;
-            if (!ctx->icl[i])
-                ff_playlist_populate_context(ctx);
+//            if (!ctx->icl[i])
+//                ff_playlist_populate_context(ctx);
+        } else {
+            break;
         }
     }
     return i;

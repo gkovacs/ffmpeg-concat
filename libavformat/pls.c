@@ -25,19 +25,7 @@
  *  @brief PLS playlist demuxer
  */
 
-#include "playlist.h"
-
-extern int ff_concatgen_read_packet(AVFormatContext *s, AVPacket *pkt);
-
-extern int ff_concatgen_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int flags);
-
-extern int64_t ff_concatgen_read_timestamp(AVFormatContext *s, int stream_index, int64_t *pos, int64_t pos_limit);
-
-extern int ff_concatgen_read_close(AVFormatContext *s);
-
-extern int ff_concatgen_read_play(AVFormatContext *s);
-
-extern int ff_concatgen_read_pause(AVFormatContext *s);
+#include "concatgen.h"
 
 /* The ffmpeg codecs we support, and the IDs they have in the file */
 static const AVCodecTag codec_pls_tags[] = {
@@ -122,7 +110,8 @@ static int pls_read_header(AVFormatContext *s,
         return AVERROR_EOF;
     }
     s->priv_data = ctx;
-    ff_playlist_populate_context(s);
+    ff_playlist_populate_context(ctx, ctx->pe_curidx);
+    ff_playlist_set_streams(s);
     return 0;
 }
 

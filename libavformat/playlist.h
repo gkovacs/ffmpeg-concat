@@ -59,7 +59,9 @@ AVFormatContext *ff_playlist_alloc_formatcontext(char *filename);
  *  @brief Opens the current PlayElem from the PlaylistContext.
  *  @param s AVFormatContext of the concat-type demuxer, which contains the PlaylistContext.
  */
-void ff_playlist_populate_context(AVFormatContext *s);
+void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx);
+
+void ff_playlist_set_streams(AVFormatContext *s);
 
 /** @fn PlaylistContext* ff_playlist_get_context(AVFormatContext *ic)
  *  @brief Returns PlaylistContext continaed within a concat-type demuxer.

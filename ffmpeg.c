@@ -2893,7 +2893,8 @@ static void opt_input_file(const char *filename)
             ic->nb_streams = 2;
             ic->iformat = ff_concat_alloc_demuxer();
             ff_playlist_set_context(ic, playlist_ctx);
-            ff_playlist_populate_context(ic);
+            ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
+            ff_playlist_set_streams(ic);
             nb_input_files = 1;
             input_files[0] = ic;
             goto configcodecs;
@@ -2915,7 +2916,8 @@ static void opt_input_file(const char *filename)
         ic->nb_streams = 2;
         ic->iformat = ff_concat_alloc_demuxer();
         ff_playlist_set_context(ic, playlist_ctx);
-        ff_playlist_populate_context(ic);
+        ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
+        ff_playlist_set_streams(ic);
         nb_input_files = 1;
         input_files[0] = ic;
         goto configcodecs;
