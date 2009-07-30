@@ -1,5 +1,7 @@
 [playlist]
-File1=/home/geza/ffmpeg/bb-test-suite/bb1.avi
+File1=bb.xspf
+#File2=/home/geza/Desktop/nsm1.flv
+#File1=/home/geza/ffmpeg/bb-test-suite/bb1.avi
 File2=bb4.avi
 File3=bb7.avi
 #File4=bb8-mpeg.mp4
