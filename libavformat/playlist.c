@@ -141,6 +141,8 @@ void ff_playlist_add_path(PlaylistContext *ctx, char *itempath)
     ctx->flist = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size+1));
     ctx->flist[ctx->pelist_size] = NULL;
     ctx->flist[ctx->pelist_size-1] = itempath;
+    ctx->durations = av_realloc(ctx->durations, sizeof(*(ctx->durations)) * (ctx->pelist_size+1));
+    ctx->durations[ctx->pelist_size] = NULL;
 }
 
 // converts list of mixed absolute and relative paths into all absolute paths
@@ -161,17 +163,25 @@ void ff_playlist_relative_paths(char **flist, int len, const char *workingdir)
     }
 }
 
+int64_t ff_playlist_time_offset(int64_t *durations, int pe_curidx)
+{
+    int i;
+    int64_t total = 0;
+    for (i = 0; i < pe_curidx; ++i) {
+        total += durations[i];
+    }
+    return total;
+}
+
 int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts)
 {
     int i;
-    for (i = 0; i < ctx->pelist_size; ++i) {
-        if (ctx->icl[i]->cur_st->duration > pts) {
-            pts -= ctx->icl[i]->cur_st->duration;
-//            if (!ctx->icl[i])
-//                ff_playlist_populate_context(ctx);
-        } else {
+    int64_t total;
+    i = total = 0;
+    while (pts >= total) {
+        if (i >= ctx->pelist_size)
             break;
-        }
+        total += ctx->durations[i++];
     }
     return i;
 }
