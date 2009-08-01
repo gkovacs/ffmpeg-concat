@@ -1,8 +1,33 @@
-/* 
- * File:   concat.h
- * Author: geza
+/*
+ * Minimal playlist/concatenation demuxer
+ * Copyright (c) 2009 Geza Kovacs
  *
- * Created on July 31, 2009, 6:52 PM
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+/** @file libavformat/concat.h
+ *  @author Geza Kovacs ( gkovacs mit edu )
+ *
+ *  @brief Minimal playlist/concatenation demuxer
+ *
+ *  @details This is a minimal concat-type demuxer that can be constructed
+ *  by allocating a PlayElem for each playlist item and setting its filename,
+ *  then allocating a PlaylistContext, creating a list of PlayElem, and setting
+ *  the PlaylistContext in the AVFormatContext.
  */
 
 #ifndef AVFORMAT_CONCAT_H
