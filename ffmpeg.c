@@ -1666,7 +1666,6 @@ static int av_encode(AVFormatContext **output_files,
     uint8_t no_packet[MAX_FILES]={0};
     int no_packet_count=0;
 
-
     file_table= av_mallocz(nb_input_files * sizeof(AVInputFile));
     if (!file_table)
         goto fail;
@@ -2870,7 +2869,6 @@ static enum CodecID find_codec_or_die(const char *name, int type, int encoder)
 
 static void opt_input_file(const char *filename)
 {
-
     AVFormatContext *ic;
     AVFormatParameters params, *ap = &params;
     int err, i, ret, rfps, rfps_base;
