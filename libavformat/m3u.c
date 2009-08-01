@@ -79,7 +79,6 @@ static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx, const char *fi
 static int m3u_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
-    int i;
     PlaylistContext *ctx = av_mallocz(sizeof(*ctx));
     m3u_list_files(s->pb, ctx, s->filename);
     s->priv_data = ctx;

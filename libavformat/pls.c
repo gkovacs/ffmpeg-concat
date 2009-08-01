@@ -103,7 +103,6 @@ static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *fi
 static int pls_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
-    int i;
     PlaylistContext *ctx = av_mallocz(sizeof(*ctx));
     if (pls_list_files(s->pb, ctx, s->filename)) {
         fprintf(stderr, "no playlist items found in %s\n", s->filename);
