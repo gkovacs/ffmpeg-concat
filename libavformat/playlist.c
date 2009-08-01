@@ -87,7 +87,8 @@ void ff_playlist_split_encodedstring(const char *s, const char sep, char ***flis
 {
     char c, *ts, **flist;
     int i, len, buflen, *sepidx;
-    buflen = sepidx = len = 0;
+    sepidx = NULL;
+    buflen = len = 0;
     sepidx = av_fast_realloc(sepidx, &buflen, ++len);
     sepidx[0] = 0;
     ts = s;
@@ -133,7 +134,7 @@ void ff_playlist_add_path(PlaylistContext *ctx, const char *itempath)
     ctx->flist[ctx->pelist_size] = NULL;
     ctx->flist[ctx->pelist_size-1] = itempath;
     ctx->durations = av_realloc(ctx->durations, sizeof(*(ctx->durations)) * (ctx->pelist_size+1));
-    ctx->durations[ctx->pelist_size] = NULL;
+    ctx->durations[ctx->pelist_size] = 0;
 }
 
 void ff_playlist_relative_paths(char **flist, const int len, const char *workingdir)

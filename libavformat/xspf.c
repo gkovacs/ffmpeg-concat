@@ -55,7 +55,8 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *f
     char buf[1024];
     char s[10];
     char t[] = "<location>";
-    state = flist = buflen = i = j = 0;
+    flist = NULL;
+    state = buflen = i = j = 0;
     while ((c = url_fgetc(b))) {
         if (c == EOF)
             break;
