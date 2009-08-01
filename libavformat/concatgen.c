@@ -48,12 +48,12 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         }
         if (ret >= 0) {
             if (pkt) {
-                // TODO changing either dts or pts leads to timing issues on h264
-                pkt->dts += av_rescale_q(ff_playlist_time_offset(ctx->durations, ctx->pe_curidx),
-                                         AV_TIME_BASE_Q,
-                                         ic->streams[stream_index]->time_base);
-                if (!ic->streams[pkt->stream_index]->codec->has_b_frames)
+                if (!ic->streams[pkt->stream_index]->codec->has_b_frames) {
+                    pkt->dts += av_rescale_q(ff_playlist_time_offset(ctx->durations, ctx->pe_curidx),
+                                             AV_TIME_BASE_Q,
+                                             ic->streams[stream_index]->time_base);
                     pkt->pts = pkt->dts + 1;
+                }
             }
             break;
         } else {
