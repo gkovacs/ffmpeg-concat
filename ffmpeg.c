@@ -70,7 +70,7 @@
 
 #undef exit
 
-#include "libavformat/playlist.h"
+#include "libavformat/concat.h"
 
 const char program_name[] = "FFmpeg";
 const int program_birth_year = 2000;

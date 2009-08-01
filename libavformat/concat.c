@@ -30,7 +30,7 @@
  *  the PlaylistContext in the AVFormatContext.
  */
 
-#include "concatgen.h"
+#include "concat.h"
 
 // The FFmpeg codecs we support, and the IDs they have in the file
 static const AVCodecTag codec_concat_tags[] = {
