@@ -46,7 +46,7 @@ typedef struct PlaylistContext {
     AVFormatContext **icl; /**< List of FormatContext for each playlist items */
     int pelist_size; /**< Number of PlayElem stored in pelist */
     int pe_curidx; /**< Index of the PlayElem that packets are being read from */
-    int64_t *durations; /**< Durations, in 10^-6 seconds, for each playlist item */
+    int64_t *durations; /**< Durations, in AV_TIME_BASE units, for each playlist item */
 } PlaylistContext;
 
 /** @fn int ff_playlist_alloc_playelem(PlayElem* pe)
@@ -55,12 +55,17 @@ typedef struct PlaylistContext {
  */
 AVFormatContext *ff_playlist_alloc_formatcontext(char *filename);
 
-/** @fn void ff_playlist_populate_context(PlaylistContext *playlc, AVFormatContext *s, int stream_index)
- *  @brief Opens the current PlayElem from the PlaylistContext.
- *  @param s AVFormatContext of the concat-type demuxer, which contains the PlaylistContext.
+/** @fn void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx)
+ *  @brief Opens the playlist element with the specified index from the PlaylistContext.
+ *  @param ctx PlaylistContext containing the desired playlist element.
+ *  @param pe_curidx Index of the playlist element to be opened.
  */
 void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx);
 
+/** @fn void ff_playlist_set_streams(AVFormatContext *s)
+ *  @brief Sets the master concat-type demuxer's streams to those of its currently opened playlist element.
+ *  @param s AVFormatContext of the concat-type demuxer, which contains the PlaylistContext and substreams.
+ */
 void ff_playlist_set_streams(AVFormatContext *s);
 
 /** @fn PlaylistContext* ff_playlist_get_context(AVFormatContext *ic)
@@ -113,10 +118,16 @@ PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep);
 /** @fn void ff_playlist_add_path(PlaylistContext *ctx, char *itempath)
  *  @brief Adds PlayElem for item located at specified path to a PlaylistContext.
  *  @param ctx Pre-allocated PlaylistContext to add elements to.
- *  @param Absolute path to item for which to add a playlist element.
+ *  @param itempath Absolute path to item for which to add a playlist element.
  */
 void ff_playlist_add_path(PlaylistContext *ctx, char *itempath);
 
+/** @fn int64_t ff_playlist_time_offset(int64_t *durations, int pe_curidx)
+ *  @brief Calculates the total time offset of an element in a PlaylistContext in AV_TIME_BASE units.
+ *  @param durations Durations of playlist items in AV_TIME_BASE units, array must be of size greater than or equal to pe_curidx.
+ *  @param pe_curidx Index of the playlist element for which to calculate the time offset.
+ *  @return Returns the time offset in AV_TIME_BASE units.
+ */
 int64_t ff_playlist_time_offset(int64_t *durations, int pe_curidx);
 
 int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts);
