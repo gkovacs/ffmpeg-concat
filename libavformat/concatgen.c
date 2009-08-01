@@ -45,7 +45,6 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         ret = ic->iformat->read_packet(ic, pkt);
         if (pkt) {
             stream_index = pkt->stream_index;
-            pkt->stream = ic->streams[pkt->stream_index];
         }
         if (ret >= 0) {
             if (pkt) {
@@ -89,25 +88,7 @@ int ff_concatgen_read_seek(AVFormatContext *s,
     AVFormatContext *ic;
     ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
-    int64_t pts_avtimebase = av_rescale_q(pts, ic->cur_st->time_base, AV_TIME_BASE_Q);
-    fprintf(stderr, "\n\n\npts_avtimebase is %ld\n\n\n", pts_avtimebase);
-    fflush(stderr);
-    ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx, pts_avtimebase);
-    fprintf(stderr, "\n\n\npe curidx is %d\n\n\n", ctx->pe_curidx);
-    fflush(stderr);
-    if (!ctx->icl[ctx->pe_curidx]) {
-        fprintf(stderr, "\n\n\nswitching files\n\n\n");
-        fflush(stderr);
-        ff_playlist_populate_context(ctx, ctx->pe_curidx);
-        ff_playlist_set_streams(s);
-    }
-    ic = ctx->icl[ctx->pe_curidx];
-    int64_t pts_remain_avtimebase = ff_playlist_remainder_from_time(ctx, pts_avtimebase);
-    fprintf(stderr, "\n\n\npts_remain_avtimebase is %ld\n\n\n", pts_remain_avtimebase);
-    int64_t pts_remain = av_rescale_q(pts_remain_avtimebase, AV_TIME_BASE_Q, ic->streams[stream_index]->time_base);
-    fprintf(stderr, "\n\n\npts_remain is %ld\n\n\n", pts_remain);
-    return ic->iformat->read_seek(ic, stream_index, 0, flags);
-//    return ic->iformat->read_seek(ic, stream_index, pts_remain, flags);
+    return ic->iformat->read_seek(ic, stream_index, pts, flags);
 }
 
 int64_t ff_concatgen_read_timestamp(AVFormatContext *s,

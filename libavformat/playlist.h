@@ -119,8 +119,6 @@ void ff_playlist_add_path(PlaylistContext *ctx, char *itempath);
 
 int64_t ff_playlist_time_offset(int64_t *durations, int pe_curidx);
 
-int64_t ff_playlist_remainder_from_time(PlaylistContext *ctx, int64_t pts);
-
 int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts);
 
 #endif /* AVFORMAT_PLAYLIST_H */

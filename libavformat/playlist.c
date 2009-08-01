@@ -186,14 +186,3 @@ int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts)
     }
     return i;
 }
-
-int64_t ff_playlist_remainder_from_time(PlaylistContext *ctx, int64_t pts)
-{
-    int i;
-    for (i = 0; i < ctx->pe_curidx - 1; ++i) {
-        if (pts < ctx->durations[i])
-            break;
-        pts -= ctx->durations[i];
-    }
-    return pts;
-}
