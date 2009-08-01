@@ -82,14 +82,6 @@ PlaylistContext* ff_playlist_get_context(AVFormatContext *ic);
  */
 void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx);
 
-/** @fn AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index)
- *  @brief Obtains a specified stream from a specified item in a PlaylistContext.
- *  @param ctx PlaylistContext which contains the desired stream.
- *  @param pe_idx Index that the PlayElem has in the PlaylistContext (playlist item number), PlayElem should already be open.
- *  @param stream_index Index of the multimedia stream (audio or video) within the PlayElem.
- */
-AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index);
-
 /** @fn void ff_playlist_relative_paths(char **flist, int len, const char *workingdir)
  *  @brief Converts a list of mixed relative or absolute paths into all absolute paths.
  *  @param flist List of null-terminated strings of relative or absolute paths.

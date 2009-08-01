@@ -1614,7 +1614,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
                 if (pl_ctx && pkt) {
-                    AVStream *propst = ff_playlist_get_stream(pl_ctx, st_idx+1, pkt->stream_index);
+                    AVStream *propst = 0;//ff_playlist_get_stream(pl_ctx, st_idx+1, pkt->stream_index);
                     if (propst && propst->codec && propst->codec->codec_type == CODEC_TYPE_AUDIO) {
                         if (!propst->codec->codec) {
                             AVCodec *codec = avcodec_find_decoder(propst->codec->codec_id);

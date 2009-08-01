@@ -83,16 +83,6 @@ void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx)
         ic->priv_data = ctx;
 }
 
-AVStream *ff_playlist_get_stream(PlaylistContext *ctx, int pe_idx, int stream_index)
-{
-    if (ctx && pe_idx < ctx->pelist_size && ctx->icl && ctx->icl[pe_idx] &&
-        ctx->icl[pe_idx] && stream_index < ctx->icl[pe_idx]->nb_streams &&
-        ctx->icl[pe_idx]->streams && ctx->icl[pe_idx]->streams[stream_index])
-        return ctx->icl[pe_idx]->streams[stream_index];
-    else
-        return NULL;
-}
-
 void ff_playlist_split_encodedstring(char *s, char sep, char ***flist_ptr, int *len_ptr)
 {
     char c, *ts, **flist;
