@@ -37,7 +37,7 @@
 AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
 {
     int err;
-    AVFormatContext *ic = av_mallocz(sizeof(*ic));
+    AVFormatContext *ic = avformat_alloc_context();
     err = av_open_input_file(&(ic), filename, ic->iformat, 0, NULL);
     if (err < 0)
         av_log(ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
