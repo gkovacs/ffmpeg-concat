@@ -14,14 +14,12 @@ FFmpeg can be hooked up with a number of external libraries to add support
 for more formats. None of them are used by default, their use has to be
 explicitly requested by passing the appropriate flags to @file{./configure}.
 
-@section AMR
+@section OpenCORE AMR
 
-AMR comes in two different flavors, wideband and narrowband. FFmpeg can make
-use of the OpenCORE libraries for AMR-NB decoding/encoding and AMR-WB decoding.
+FFmpeg can make use of the OpenCORE libraries for AMR-NB
+decoding/encoding and AMR-WB decoding.
 
-@subsection OpenCORE
-
-Go to @url{http://gitorious.org/opencore-amr/} and follow the instructions for
+Go to @url{http://sourceforge.net/projects/opencore-amr/} and follow the instructions for
 installing the libraries. Then pass @code{--enable-libopencore-amrnb} and/or
 @code{--enable-libopencore-amrwb} to configure to enable the libraries.
 
@@ -197,6 +195,7 @@ library:
 @item RL2                       @tab   @tab X
     @tab Audio and video format used in some games by Entertainment Software Partners.
 @item RPL/ARMovie               @tab   @tab X
+@item RTMP                      @tab   @tab X
 @item RTP                       @tab   @tab X
 @item RTSP                      @tab   @tab X
 @item SDP                       @tab   @tab X

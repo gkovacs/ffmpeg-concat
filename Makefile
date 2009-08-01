@@ -37,7 +37,7 @@ ifneq ($(PROGS),)
 INSTALL_TARGETS-yes             += install-progs install-data
 INSTALL_TARGETS-$(BUILD_DOC)    += install-man
 endif
-INSTALL_PROGS_TARGETS-$(BUILD_SHARED) = install-libs
+INSTALL_PROGS_TARGETS-$(CONFIG_SHARED) = install-libs
 
 all: $(FF_DEP_LIBS) $(PROGS) $(ALL_TARGETS-yes)
 
@@ -67,8 +67,11 @@ ffserver_g$(EXESUF): FF_LDFLAGS += $(FFSERVERLDFLAGS)
 %_g$(EXESUF): %.o cmdutils.o $(FF_DEP_LIBS)
 	$(LD) $(FF_LDFLAGS) -o $@ $< cmdutils.o $(FF_EXTRALIBS)
 
-tools/%$(EXESUF): tools/%.c
-	$(LD) $(CFLAGS) $(FF_LDFLAGS) -o $@ $< $(FF_EXTRALIBS)
+tools/%$(EXESUF): tools/%.o
+	$(LD) $(FF_LDFLAGS) -o $@ $< $(FF_EXTRALIBS)
+
+tools/%.o: tools.%.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(CC_O) $<
 
 ffplay.o ffplay.d: CFLAGS += $(SDL_CFLAGS)
 
@@ -121,7 +124,7 @@ clean:: testclean
 	rm -f $(ALLPROGS) $(ALLPROGS_G)
 	rm -f $(CLEANSUFFIXES)
 	rm -f doc/*.html doc/*.pod doc/*.1
-	rm -f tests/seek_test$(EXESUF)
+	rm -f tests/seek_test$(EXESUF) tests/seek_test.o
 	rm -f $(addprefix tests/,$(addsuffix $(HOSTEXESUF),audiogen videogen rotozoom tiny_psnr))
 	rm -f $(addprefix tools/,$(addsuffix $(EXESUF),cws2fws pktdumper qt-faststart trasher))
 

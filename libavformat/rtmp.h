@@ -1,6 +1,6 @@
 /*
- * AC-3 and E-AC-3 decoder tables
- * Copyright (c) 2007 Bartlomiej Wolowiec <bartek.wolowiec@gmail.com>
+ * RTMP definitions
+ * Copyright (c) 2009 Kostya Shishkov
  *
  * This file is part of FFmpeg.
  *
@@ -19,15 +19,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_AC3DEC_DATA_H
-#define AVCODEC_AC3DEC_DATA_H
+#ifndef AVFORMAT_RTMP_H
+#define AVFORMAT_RTMP_H
 
-#include <stdint.h>
+#include "avformat.h"
 
-extern const uint8_t ff_ac3_ungroup_3_in_5_bits_tab[32][3];
-extern const uint8_t ff_ac3_rematrix_band_tab[5];
+#define RTMP_DEFAULT_PORT 1935
 
-extern const uint8_t ff_eac3_hebap_tab[64];
-extern const uint8_t ff_eac3_default_cpl_band_struct[18];
+#define RTMP_HANDSHAKE_PACKET_SIZE 1536
 
-#endif /* AVCODEC_AC3DEC_DATA_H */
+/**
+ * emulated Flash client version - 9.0.124.2 on Linux
+ * @{
+ */
+#define RTMP_CLIENT_PLATFORM "LNX"
+#define RTMP_CLIENT_VER1    9
+#define RTMP_CLIENT_VER2    0
+#define RTMP_CLIENT_VER3  124
+#define RTMP_CLIENT_VER4    2
+/** @} */ //version defines
+
+#endif /* AVFORMAT_RTMP_H */

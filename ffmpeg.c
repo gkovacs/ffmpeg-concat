@@ -330,7 +330,7 @@ static void term_exit(void)
 #endif
 }
 
-static volatile sig_atomic_t received_sigterm = 0;
+static volatile int received_sigterm = 0;
 
 static void
 sigterm_handler(int sig)
@@ -3702,7 +3702,7 @@ static void opt_target(const char *arg)
 
         opt_frame_size(norm ? "352x240" : "352x288");
         opt_frame_rate(NULL, frame_rates[norm]);
-        opt_default("gop", norm ? "18" : "15");
+        opt_default("g", norm ? "18" : "15");
 
         opt_default("b", "1150000");
         opt_default("maxrate", "1150000");
@@ -3730,7 +3730,7 @@ static void opt_target(const char *arg)
 
         opt_frame_size(norm ? "480x480" : "480x576");
         opt_frame_rate(NULL, frame_rates[norm]);
-        opt_default("gop", norm ? "18" : "15");
+        opt_default("g", norm ? "18" : "15");
 
         opt_default("b", "2040000");
         opt_default("maxrate", "2516000");
@@ -3752,7 +3752,7 @@ static void opt_target(const char *arg)
 
         opt_frame_size(norm ? "720x480" : "720x576");
         opt_frame_rate(NULL, frame_rates[norm]);
-        opt_default("gop", norm ? "18" : "15");
+        opt_default("g", norm ? "18" : "15");
 
         opt_default("b", "6000000");
         opt_default("maxrate", "9000000");
@@ -4014,8 +4014,10 @@ int main(int argc, char **argv)
     avdevice_register_all();
     av_register_all();
 
+#if HAVE_ISATTY
     if(isatty(STDIN_FILENO))
         url_set_interrupt_cb(decode_interrupt_cb);
+#endif
 
     for(i=0; i<CODEC_TYPE_NB; i++){
         avcodec_opts[i]= avcodec_alloc_context2(i);

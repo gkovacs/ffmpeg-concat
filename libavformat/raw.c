@@ -329,7 +329,9 @@ static int mpegvideo_probe(AVProbeData *p)
         return AVPROBE_SCORE_MAX/2+1; // +1 for .mpg
     return 0;
 }
+#endif
 
+#if CONFIG_CAVSVIDEO_DEMUXER
 #define CAVS_SEQ_START_CODE       0x000001b0
 #define CAVS_PIC_I_START_CODE     0x000001b3
 #define CAVS_UNDEF_START_CODE     0x000001b4
@@ -1101,7 +1103,7 @@ AVOutputFormat null_muxer = {
     NULL,
     NULL,
     0,
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     CODEC_ID_PCM_S16BE,
 #else
     CODEC_ID_PCM_S16LE,
@@ -1230,7 +1232,7 @@ AVOutputFormat pcm_ ## name ## _muxer = {\
 #define PCMDEF(name, long_name, ext, codec)
 #endif
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
 #define BE_DEF(s) s
 #define LE_DEF(s) NULL
 #else

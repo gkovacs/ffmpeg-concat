@@ -364,7 +364,7 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 /* This is true for all paletted codecs implemented in ffmpeg */
                 if (st->codec->extradata_size && (st->codec->bits_per_coded_sample <= 8)) {
                     st->codec->palctrl = av_mallocz(sizeof(AVPaletteControl));
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
                     for (i = 0; i < FFMIN(st->codec->extradata_size, AVPALETTE_SIZE)/4; i++)
                         st->codec->palctrl->palette[i] = bswap_32(((uint32_t*)st->codec->extradata)[i]);
 #else
@@ -609,6 +609,14 @@ static int ff_asf_get_packet(AVFormatContext *s, ByteIOContext *pb)
     }
 
     if (c != 0x82) {
+        /**
+         * This code allows handling of -EAGAIN at packet boundaries (i.e.
+         * if the packet sync code above triggers -EAGAIN). This does not
+         * imply complete -EAGAIN handling support at random positions in
+         * the stream.
+         */
+        if (url_ferror(pb) == AVERROR(EAGAIN))
+            return AVERROR(EAGAIN);
         if (!url_feof(pb))
             av_log(s, AV_LOG_ERROR, "ff asf bad header %x  at:%"PRId64"\n", c, url_ftell(pb));
     }
