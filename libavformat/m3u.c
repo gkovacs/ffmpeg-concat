@@ -50,7 +50,8 @@ static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx, const char *fi
 {
     char **flist;
     int i, k, bufsize;
-    i = bufsize = flist = 0;
+    flist = NULL;
+    i = bufsize = 0;
     while (1) {
         char *q;
         char linebuf[1024] = {0};
