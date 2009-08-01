@@ -65,7 +65,9 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                 ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx, ff_playlist_time_offset(ctx->durations, ctx->pe_curidx));
                 ff_playlist_populate_context(ctx, ctx->pe_curidx);
                 ff_playlist_set_streams(s);
+                // have_switched_streams is set to avoid infinite loop
                 have_switched_streams = 1;
+                // duration is updated in case it's checked by a parent demuxer (chained concat demuxers)
                 s->duration = 0;
                 for (i = 0; i < ctx->pe_curidx; ++i)
                     s->duration += ctx->durations[i];
