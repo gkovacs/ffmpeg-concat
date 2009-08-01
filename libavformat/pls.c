@@ -126,9 +126,9 @@ AVInputFormat pls_demuxer = {
     ff_concatgen_read_close,
     ff_concatgen_read_seek,
     ff_concatgen_read_timestamp,
-    NULL, //flags
+    0, //flags
     NULL, //extensions
-    NULL, //value
+    0, //value
     ff_concatgen_read_play,
     ff_concatgen_read_pause,
     (const AVCodecTag* const []){codec_pls_tags, 0},
