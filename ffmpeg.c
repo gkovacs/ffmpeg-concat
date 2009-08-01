@@ -225,8 +225,6 @@ static unsigned int sws_flags = SWS_BICUBIC;
 
 static int64_t timer_start;
 
-static int concatenate_video_files;
-
 PlaylistContext *playlist_ctx;
 
 static uint8_t *audio_buf;
@@ -2877,6 +2875,7 @@ static void opt_input_file(const char *filename)
     AVFormatParameters params, *ap = &params;
     int err, i, ret, rfps, rfps_base;
     int64_t timestamp;
+    char concatenate_video_files;
 
     if (!strcmp(filename, "-"))
         filename = "pipe:";
@@ -2884,29 +2883,6 @@ static void opt_input_file(const char *filename)
     using_stdin |= !strncmp(filename, "pipe:", 5) ||
                     !strcmp(filename, "/dev/stdin");
 
-    if (concatenate_video_files) { // need to specify -conc before -i
-        if (!playlist_ctx) {
-            ic = avformat_alloc_context();
-            av_log(ic, AV_LOG_DEBUG, "Generating playlist ctx\n");
-            playlist_ctx = av_mallocz(sizeof(*playlist_ctx));
-            ff_playlist_add_path(playlist_ctx, filename);
-            ic->nb_streams = 2;
-            ic->iformat = ff_concat_alloc_demuxer();
-            ff_playlist_set_context(ic, playlist_ctx);
-            ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
-            ff_playlist_set_streams(ic);
-            nb_input_files = 1;
-            input_files[0] = ic;
-            goto configcodecs;
-        }
-        else {
-            av_log(ic, AV_LOG_DEBUG, "Adding file %s to playlist\n", filename);
-            ff_playlist_add_path(playlist_ctx, filename);
-            return;
-        }
-    }
-
-    // alternative interface for concat - specify -i item1,item2,item3
     playlist_ctx = ff_playlist_from_encodedstring(filename, ',');
     if (playlist_ctx) {
         av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
@@ -2922,6 +2898,8 @@ static void opt_input_file(const char *filename)
         input_files[0] = ic;
         goto configcodecs;
     }
+    else
+        concatenate_video_files = 0;
 
     /* get default parameters from command line */
     ic = avformat_alloc_context();
@@ -3942,7 +3920,6 @@ static const OptionDef options[] = {
     { "programid", HAS_ARG | OPT_INT | OPT_EXPERT, {(void*)&opt_programid}, "desired program number", "" },
     { "xerror", OPT_BOOL, {(void*)&exit_on_error}, "exit on error", "error" },
     { "copyinkf", OPT_BOOL | OPT_EXPERT, {(void*)&copy_initial_nonkeyframes}, "copy initial non-keyframes" },
-    { "conc", OPT_BOOL, {(void*)&concatenate_video_files}, "concatenate video files", "concatenate" },
 
     /* video options */
     { "b", OPT_FUNC2 | HAS_ARG | OPT_VIDEO, {(void*)opt_bitrate}, "set bitrate (in bits/s)", "bitrate" },
