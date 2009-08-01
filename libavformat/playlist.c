@@ -136,7 +136,6 @@ void ff_playlist_add_path(PlaylistContext *ctx, char *itempath)
     ctx->durations[ctx->pelist_size] = NULL;
 }
 
-// converts list of mixed absolute and relative paths into all absolute paths
 void ff_playlist_relative_paths(char **flist, int len, const char *workingdir)
 {
     int i;
