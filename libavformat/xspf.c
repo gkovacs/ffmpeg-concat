@@ -53,7 +53,7 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *f
     char state;
     char **flist;
     char buf[1024];
-    char s[10];
+    char s[10] = {0};
     char t[] = "<location>";
     flist = NULL;
     state = buflen = i = j = 0;
