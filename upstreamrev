@@ -1,13 +1,13 @@
 ffmpeg:
-svn: 19424
-git: 806496708b491d2f825309f6e3b4f6c6f7c7d085
-committer: diego
-commitdate: Mon, 13 Jul 2009 17:16:36 +0000
-commitlog: Only #define lseek to _lseeki64 on MinGW, not MinGW CE. This fixes compilation on WinCE, which does not support _lseeki64. patch by Ismail Dönmez, ismail namtrac org
+svn: 19556
+git: 286d8e676cb471e8ee678de1dd30a99cf42498f3
+committer: mru
+commitdate: Fri, 31 Jul 2009 07:40:35 +0000
+commitlog: RTMP needs tcp_protocol
 
 libswscale:
-svn: 19424
-git: f3ae90a5d9f9e01b326c031803b977be3d5369c0
+svn: 19556
+git: 2e681b9f903764844ffc514d9da9b96799a4b59f
 committer: ramiro
-commitdate: Thu, 9 Jul 2009 02:27:39 +0000
-commitlog: Remove dependency from swscale_internal.h to lavu/internal.h, it is no longer needed for DECLARE_ALIGNED. Remove dependency from swscale-example.c to swscale_internal.h by duplicating the necessary code. The duplicated code is a hack and should be removed once a cleaner pixel format information system exists. swscale-example.c is example code on how to use the library and therefore shouldn't rely on internal headers.
+commitdate: Tue, 28 Jul 2009 05:45:47 +0000
+commitlog: MMX2 scaler: Remove {} block leftover from factorization in initMMX2Scaler(). Merge variable declarations to previous {} block and indent.
