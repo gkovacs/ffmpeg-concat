@@ -44,14 +44,15 @@
 typedef struct PlaylistContext {
     char **flist; /**< List of file names for each playlist item */
     AVFormatContext **icl; /**< List of FormatContext for each playlist items */
-    int pelist_size; /**< Number of PlayElem stored in pelist */
-    int pe_curidx; /**< Index of the PlayElem that packets are being read from */
+    int pelist_size; /**< Number of playlist elements stored in icl */
+    int pe_curidx; /**< Index of the AVFormatContext in icl that packets are being read from */
     int64_t *durations; /**< Durations, in AV_TIME_BASE units, for each playlist item */
 } PlaylistContext;
 
-/** @fn int ff_playlist_alloc_playelem(PlayElem* pe)
+/** @fn AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
  *  @brief Allocates and opens file, codecs, and streams associated with filename.
  *  @param filename Null-terminated string of file to open.
+ *  @return Returns an allocated AVFormatContext.
  */
 AVFormatContext *ff_playlist_alloc_formatcontext(char *filename);
 
