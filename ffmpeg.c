@@ -225,8 +225,6 @@ static unsigned int sws_flags = SWS_BICUBIC;
 
 static int64_t timer_start;
 
-PlaylistContext *playlist_ctx;
-
 static uint8_t *audio_buf;
 static uint8_t *audio_out;
 static uint8_t *audio_out2;
@@ -2870,6 +2868,7 @@ static enum CodecID find_codec_or_die(const char *name, int type, int encoder)
 static void opt_input_file(const char *filename)
 {
     AVFormatContext *ic;
+    PlaylistContext *playlist_ctx;
     AVFormatParameters params, *ap = &params;
     int err, i, ret, rfps, rfps_base;
     int64_t timestamp;
