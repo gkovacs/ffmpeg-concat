@@ -2873,7 +2873,6 @@ static void opt_input_file(const char *filename)
     AVFormatParameters params, *ap = &params;
     int err, i, ret, rfps, rfps_base;
     int64_t timestamp;
-    char concatenate_video_files = 0;
 
     if (!strcmp(filename, "-"))
         filename = "pipe:";
@@ -2908,16 +2907,15 @@ static void opt_input_file(const char *filename)
     ic->subtitle_codec_id= find_codec_or_die(subtitle_codec_name, CODEC_TYPE_SUBTITLE, 0);
     ic->flags |= AVFMT_FLAG_NONBLOCK;
 
-    err = 0;
     playlist_ctx = ff_playlist_from_encodedstring(filename, ',');
     if (playlist_ctx) {
         av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
-        concatenate_video_files = 1;
         av_strlcpy(ic->filename, filename, sizeof(ic->filename));
         ic->iformat = ff_concat_alloc_demuxer();
         ff_playlist_set_context(ic, playlist_ctx);
         ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
         ff_playlist_set_streams(ic);
+        err = 0;
     } else {
         /* open the input file with generic libav function */
         err = av_open_input_file(&ic, filename, file_iformat, 0, ap);
@@ -3035,8 +3033,6 @@ static void opt_input_file(const char *filename)
         dump_format(ic, nb_input_files, filename, 0);
 
     nb_input_files++;
-    if (concatenate_video_files)
-        nb_input_files = 1;
     file_iformat = NULL;
     file_oformat = NULL;
 
