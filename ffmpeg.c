@@ -2873,31 +2873,13 @@ static void opt_input_file(const char *filename)
     AVFormatParameters params, *ap = &params;
     int err, i, ret, rfps, rfps_base;
     int64_t timestamp;
-    char concatenate_video_files;
+    char concatenate_video_files = 0;
 
     if (!strcmp(filename, "-"))
         filename = "pipe:";
 
     using_stdin |= !strncmp(filename, "pipe:", 5) ||
                     !strcmp(filename, "/dev/stdin");
-
-    playlist_ctx = ff_playlist_from_encodedstring(filename, ',');
-    if (playlist_ctx) {
-        av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
-        concatenate_video_files = 1;
-        ic = avformat_alloc_context();
-        av_strlcpy(ic->filename, filename, sizeof(ic->filename));
-        ic->nb_streams = 2;
-        ic->iformat = ff_concat_alloc_demuxer();
-        ff_playlist_set_context(ic, playlist_ctx);
-        ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
-        ff_playlist_set_streams(ic);
-        nb_input_files = 1;
-        input_files[0] = ic;
-        goto configcodecs;
-    }
-    else
-        concatenate_video_files = 0;
 
     /* get default parameters from command line */
     ic = avformat_alloc_context();
@@ -2926,12 +2908,28 @@ static void opt_input_file(const char *filename)
     ic->subtitle_codec_id= find_codec_or_die(subtitle_codec_name, CODEC_TYPE_SUBTITLE, 0);
     ic->flags |= AVFMT_FLAG_NONBLOCK;
 
-    /* open the input file with generic libav function */
-    err = av_open_input_file(&ic, filename, file_iformat, 0, ap);
-    if (err < 0) {
-        print_error(filename, err);
-        av_exit(1);
+    err = 0;
+    playlist_ctx = ff_playlist_from_encodedstring(filename, ',');
+    if (playlist_ctx) {
+        av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
+        concatenate_video_files = 1;
+        av_strlcpy(ic->filename, filename, sizeof(ic->filename));
+        ic->nb_streams = 2;
+        ic->iformat = ff_concat_alloc_demuxer();
+        ff_playlist_set_context(ic, playlist_ctx);
+        ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
+        ff_playlist_set_streams(ic);
+        nb_input_files = 1;
+        input_files[0] = ic;
+    } else {
+        /* open the input file with generic libav function */
+        err = av_open_input_file(&ic, filename, file_iformat, 0, ap);
+        if (err < 0) {
+            print_error(filename, err);
+            av_exit(1);
+        }
     }
+
     if(opt_programid) {
         int i;
         for(i=0; i<ic->nb_programs; i++)
@@ -2964,8 +2962,6 @@ static void opt_input_file(const char *filename)
         /* reset seek info */
         start_time = 0;
     }
-
-    configcodecs:
 
     /* update the current parameters so that they match the one of the input stream */
     for(i=0;i<ic->nb_streams;i++) {
