@@ -2909,7 +2909,6 @@ static void opt_input_file(const char *filename)
         print_error(filename, err);
         av_exit(1);
     }
-
     if(opt_programid) {
         int i;
         for(i=0; i<ic->nb_programs; i++)
