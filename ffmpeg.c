@@ -70,8 +70,6 @@
 
 #undef exit
 
-#include "libavformat/concat.h"
-
 const char program_name[] = "FFmpeg";
 const int program_birth_year = 2000;
 
@@ -2868,7 +2866,6 @@ static enum CodecID find_codec_or_die(const char *name, int type, int encoder)
 static void opt_input_file(const char *filename)
 {
     AVFormatContext *ic;
-    PlaylistContext *playlist_ctx;
     AVFormatParameters params, *ap = &params;
     int err, i, ret, rfps, rfps_base;
     int64_t timestamp;
@@ -2906,22 +2903,11 @@ static void opt_input_file(const char *filename)
     ic->subtitle_codec_id= find_codec_or_die(subtitle_codec_name, CODEC_TYPE_SUBTITLE, 0);
     ic->flags |= AVFMT_FLAG_NONBLOCK;
 
-    playlist_ctx = ff_playlist_from_encodedstring(filename, ',');
-    if (playlist_ctx) {
-        av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
-        av_strlcpy(ic->filename, filename, sizeof(ic->filename));
-        ic->iformat = ff_concat_alloc_demuxer();
-        ff_playlist_set_context(ic, playlist_ctx);
-        ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
-        ff_playlist_set_streams(ic);
-        err = 0;
-    } else {
-        /* open the input file with generic libav function */
-        err = av_open_input_file(&ic, filename, file_iformat, 0, ap);
-        if (err < 0) {
-            print_error(filename, err);
-            av_exit(1);
-        }
+    /* open the input file with generic libav function */
+    err = av_open_input_file(&ic, filename, file_iformat, 0, ap);
+    if (err < 0) {
+        print_error(filename, err);
+        av_exit(1);
     }
 
     if(opt_programid) {

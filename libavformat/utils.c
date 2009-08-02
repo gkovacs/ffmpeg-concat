@@ -27,6 +27,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <strings.h>
+#include "concat.h"
 
 #undef NDEBUG
 #include <assert.h>
@@ -433,6 +434,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
                        AVFormatParameters *ap)
 {
     int err, probe_size;
+    PlaylistContext *playlist_ctx;
     AVProbeData probe_data, *pd = &probe_data;
     ByteIOContext *pb = NULL;
 
@@ -441,6 +443,17 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
         pd->filename = filename;
     pd->buf = NULL;
     pd->buf_size = 0;
+
+    playlist_ctx = ff_playlist_from_encodedstring(filename, ',');
+    if (playlist_ctx) {
+        av_log((*ic_ptr), AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
+        av_strlcpy((*ic_ptr)->filename, filename, sizeof((*ic_ptr)->filename));
+        (*ic_ptr)->iformat = ff_concat_alloc_demuxer();
+        ff_playlist_set_context((*ic_ptr), playlist_ctx);
+        ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
+        ff_playlist_set_streams((*ic_ptr));
+        return 0;
+    }
 
     if (!fmt) {
         /* guess format if no file can be opened */
