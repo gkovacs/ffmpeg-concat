@@ -2914,13 +2914,10 @@ static void opt_input_file(const char *filename)
         av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
         concatenate_video_files = 1;
         av_strlcpy(ic->filename, filename, sizeof(ic->filename));
-        ic->nb_streams = 2;
         ic->iformat = ff_concat_alloc_demuxer();
         ff_playlist_set_context(ic, playlist_ctx);
         ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
         ff_playlist_set_streams(ic);
-        nb_input_files = 1;
-        input_files[0] = ic;
     } else {
         /* open the input file with generic libav function */
         err = av_open_input_file(&ic, filename, file_iformat, 0, ap);
