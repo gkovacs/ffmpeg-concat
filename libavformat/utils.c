@@ -444,20 +444,30 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
     pd->buf = NULL;
     pd->buf_size = 0;
 
-    playlist_ctx = ff_playlist_from_encodedstring(filename, ',');
-    if (playlist_ctx) {
-        av_log((*ic_ptr), AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
-        av_strlcpy((*ic_ptr)->filename, filename, sizeof((*ic_ptr)->filename));
-        (*ic_ptr)->iformat = ff_concat_alloc_demuxer();
-        ff_playlist_set_context((*ic_ptr), playlist_ctx);
-        ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
-        ff_playlist_set_streams((*ic_ptr));
-        return 0;
-    }
-
     if (!fmt) {
         /* guess format if no file can be opened */
         fmt = av_probe_input_format(pd, 0);
+    }
+
+    playlist_ctx = ff_playlist_from_encodedstring(filename, ',');
+    if (playlist_ctx) {
+        AVFormatContext *ic;
+        AVFormatParameters default_ap;
+        if(!ap){
+            ap=&default_ap;
+            memset(ap, 0, sizeof(default_ap));
+        }
+        if(!ap->prealloced_context)
+            ic = *ic_ptr = avformat_alloc_context();
+        else
+            ic = *ic_ptr;
+        av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
+        av_strlcpy(ic->filename, filename, sizeof(ic->filename));
+        ic->iformat = ff_concat_alloc_demuxer();
+        ff_playlist_set_context(ic, playlist_ctx);
+        ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
+        ff_playlist_set_streams(ic);
+        return 0;
     }
 
     /* Do not open file if the format does not need it. XXX: specific

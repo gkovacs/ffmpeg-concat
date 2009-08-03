@@ -2,7 +2,7 @@
 
 #trackedfiles="ffmpeg.c libavformat/Makefile libavformat/allformats.c libavformat/concat.c libavformat/concatgen.c libavformat/playlist.c libavformat/playlist.h"
 
-trackedfiles="libavformat/Makefile libavformat/allformats.c libavformat/playlist.c libavformat/playlist.h libavformat/concatgen.c libavformat/concat.c libavformat/m3u.c libavformat/pls.c libavformat/xspf.c ffmpeg.c"
+trackedfiles="libavformat/Makefile libavformat/allformats.c libavformat/playlist.c libavformat/playlist.h libavformat/concatgen.c libavformat/concat.c libavformat/m3u.c libavformat/pls.c libavformat/xspf.c libavformat/utils.c ffmpeg.c"
 
 if [ -e ffmpeg-concat.diff ]
 then
