@@ -44,7 +44,6 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         ic = ctx->icl[ctx->pe_curidx];
         ret = ic->iformat->read_packet(ic, pkt);
         if (pkt) {
-            pkt->stream = ic->streams[pkt->stream_index];
             stream_index = pkt->stream_index;
         }
         if (ret >= 0) {
@@ -91,7 +90,6 @@ int ff_concatgen_read_seek(AVFormatContext *s,
     AVFormatContext *ic;
     ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
-    fprintf(stderr, "\n\n\nseeking to %ld\n\n\n", pts);
     return ic->iformat->read_seek(ic, stream_index, pts, flags);
 }
 
