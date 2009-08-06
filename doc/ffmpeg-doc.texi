@@ -105,6 +105,12 @@ ffmpeg -i /tmp/a.wav -s 640x480 -i /tmp/a.yuv /tmp/a.mpg
 Converts the audio file a.wav and the raw YUV video file a.yuv
 to MPEG file a.mpg.
 
+* You can also concatenate several input files into a single output file:
+
+@example
+ffmpeg -i part1.avi,part2.mpg,part3.mp4 fullvideo.avi
+@end example
+
 * You can also do audio and video conversions at the same time:
 
 @example
