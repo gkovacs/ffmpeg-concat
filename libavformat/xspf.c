@@ -116,7 +116,6 @@ static int xspf_read_header(AVFormatContext *s,
     return 0;
 }
 
-#if CONFIG_XSPF_DEMUXER
 AVInputFormat xspf_demuxer = {
     "xspf",
     NULL_IF_CONFIG_SMALL("CONCAT XSPF format"),
@@ -137,4 +136,3 @@ AVInputFormat xspf_demuxer = {
     NULL, //metadata_conv
     NULL, //next
 };
-#endif

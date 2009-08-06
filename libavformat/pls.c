@@ -115,7 +115,6 @@ static int pls_read_header(AVFormatContext *s,
     return 0;
 }
 
-#if CONFIG_PLS_DEMUXER
 AVInputFormat pls_demuxer = {
     "pls",
     NULL_IF_CONFIG_SMALL("CONCAT PLS format"),
@@ -136,4 +135,3 @@ AVInputFormat pls_demuxer = {
     NULL, //metadata_conv
     NULL, //next
 };
-#endif

@@ -74,7 +74,6 @@ AVInputFormat* ff_concat_alloc_demuxer(void)
     return cdm;
 }
 
-#if CONFIG_CONCAT_DEMUXER
 AVInputFormat concat_demuxer = {
     "concat",
     NULL_IF_CONFIG_SMALL("CONCAT format"),
@@ -95,4 +94,3 @@ AVInputFormat concat_demuxer = {
     NULL, //metadata_conv
     NULL, //next
 };
-#endif
