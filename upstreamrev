@@ -1,13 +1,13 @@
 ffmpeg:
-svn: 19556
-git: 286d8e676cb471e8ee678de1dd30a99cf42498f3
-committer: mru
-commitdate: Fri, 31 Jul 2009 07:40:35 +0000
-commitlog: RTMP needs tcp_protocol
+svn: 19597
+git: 2d6e5ef7bc1cd33d7d3b34e9dff5cfa490ffaaef
+committer: diego
+commitdate: Wed, 5 Aug 2009 15:27:22 +0000
+commitlog: Do not check for both CONFIG_H263_ENCODER and CONFIG_FLV_ENCODER. The latter can never be enabled without the former.
 
 libswscale:
-svn: 19556
-git: 2e681b9f903764844ffc514d9da9b96799a4b59f
-committer: ramiro
-commitdate: Tue, 28 Jul 2009 05:45:47 +0000
-commitlog: MMX2 scaler: Remove {} block leftover from factorization in initMMX2Scaler(). Merge variable declarations to previous {} block and indent.
+svn: 19597
+git: b1af9a271e6f587dbcd2b19dbceb4d2ec8eace7e
+committer: cehoyos
+commitdate: Sat, 1 Aug 2009 21:30:36 +0000
+commitlog: Fix regression when converting to nv12/nv21.

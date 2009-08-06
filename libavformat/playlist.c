@@ -164,7 +164,7 @@ int64_t ff_playlist_time_offset(int64_t *durations, const int pe_curidx)
     return total;
 }
 
-int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts)
+int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts, int64_t *localpts)
 {
     int i;
     int64_t total;
@@ -174,5 +174,7 @@ int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts)
             break;
         total += ctx->durations[i++];
     }
+    if (localpts)
+        *localpts = pts-(total-ctx->durations[i-1]);
     return i;
 }

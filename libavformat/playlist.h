@@ -123,12 +123,13 @@ void ff_playlist_add_path(PlaylistContext *ctx, const char *itempath);
  */
 int64_t ff_playlist_time_offset(int64_t *durations, const int pe_curidx);
 
-/** @fn int64_t ff_playlist_time_offset(int64_t *durations, int pe_curidx)
+/** @fn int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts, int64_t *localpts)
  *  @brief Calculates the index of the playlist item which would contain the timestamp specified in AV_TIME_BASE units.
  *  @param ctx PlaylistContext within which the list of playlist elements and durations are stored.
  *  @param pts Timestamp in AV_TIME_BASE.
+ *  @param localpts Time in the local demuxer's timeframe in AV_TIME_BASE units; if null, not calculated.
  *  @return Returns the index of the stream which covers the specified time range.
  */
-int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts);
+int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts, int64_t *localpts);
 
 #endif /* AVFORMAT_PLAYLIST_H */

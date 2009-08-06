@@ -62,7 +62,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             // -32 AVERROR_EOF for avi, -51 for ogg
                 av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
                 ctx->durations[ctx->pe_curidx] = ic->duration;
-                ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx, ff_playlist_time_offset(ctx->durations, ctx->pe_curidx));
+                ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx, ff_playlist_time_offset(ctx->durations, ctx->pe_curidx), NULL);
                 ff_playlist_populate_context(ctx, ctx->pe_curidx);
                 ff_playlist_set_streams(s);
                 // have_switched_streams is set to avoid infinite loop
@@ -86,11 +86,23 @@ int ff_concatgen_read_seek(AVFormatContext *s,
                            int64_t pts,
                            int flags)
 {
+    int i;
+    int64_t localpts_avtimebase, localpts, pts_avtimebase;
     PlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
-    return ic->iformat->read_seek(ic, stream_index, pts, flags);
+    ctx->durations[ctx->pe_curidx] = ic->duration;
+    pts_avtimebase = av_rescale_q(pts, ic->streams[stream_index]->time_base, AV_TIME_BASE_Q);
+    ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx, pts_avtimebase, &localpts_avtimebase);
+    ff_playlist_populate_context(ctx, ctx->pe_curidx);
+    ff_playlist_set_streams(s);
+    ic = ctx->icl[ctx->pe_curidx];
+    localpts = av_rescale_q(localpts_avtimebase, AV_TIME_BASE_Q, ic->streams[stream_index]->time_base);
+    s->duration = 0;
+    for (i = 0; i < ctx->pe_curidx; ++i)
+        s->duration += ctx->durations[i];
+    return ic->iformat->read_seek(ic, stream_index, localpts, flags);
 }
 
 int64_t ff_concatgen_read_timestamp(AVFormatContext *s,
