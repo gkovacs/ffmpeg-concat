@@ -68,7 +68,7 @@ AVInputFormat* ff_concat_alloc_demuxer(void)
     cdm->read_play      = ff_concatgen_read_play;
     cdm->read_pause     = ff_concatgen_read_pause;
     cdm->codec_tag      = codec_concat_tags;
-    cdm->read_seek2     = NULL;
+    cdm->read_seek2     = ff_concatgen_read_seek2;
     cdm->metadata_conv  = NULL;
     cdm->next           = NULL;
     return cdm;
@@ -91,7 +91,7 @@ AVInputFormat concat_demuxer = {
     ff_concatgen_read_play,
     ff_concatgen_read_pause,
     (const AVCodecTag* const []){codec_concat_tags, 0},
-    NULL, //concat_read_seek2
+    ff_concatgen_read_seek2, //concat_read_seek2
     NULL, //metadata_conv
     NULL, //next
 };
