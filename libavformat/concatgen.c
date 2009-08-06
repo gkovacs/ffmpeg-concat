@@ -90,8 +90,6 @@ int ff_concatgen_read_seek(AVFormatContext *s,
     int64_t localpts_avtimebase, localpts, pts_avtimebase;
     PlaylistContext *ctx;
     AVFormatContext *ic;
-    if (pts < 0)
-        pts = -pts;
     ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
     ctx->durations[ctx->pe_curidx] = ic->duration;
@@ -104,38 +102,7 @@ int ff_concatgen_read_seek(AVFormatContext *s,
     s->duration = 0;
     for (i = 0; i < ctx->pe_curidx; ++i)
         s->duration += ctx->durations[i];
-    if (ic->iformat->read_seek)
-        return ic->iformat->read_seek(ic, stream_index, localpts, flags);
-    return 0;
-}
-
-int ff_concatgen_read_seek2(AVFormatContext *s,
-                            int stream_index,
-                            int64_t min_ts,
-                            int64_t ts,
-                            int64_t max_ts,
-                            int flags)
-
-{
-    int i;
-    int64_t localpts_avtimebase, localpts, pts_avtimebase;
-    PlaylistContext *ctx;
-    AVFormatContext *ic;
-    if (ts < 0)
-        ts = -ts;
-    ctx = s->priv_data;
-    ic = ctx->icl[ctx->pe_curidx];
-    ctx->durations[ctx->pe_curidx] = ic->duration;
-    pts_avtimebase = av_rescale_q(ts, ic->streams[stream_index]->time_base, AV_TIME_BASE_Q);
-    ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx, pts_avtimebase, &localpts_avtimebase);
-    ff_playlist_populate_context(ctx, ctx->pe_curidx);
-    ff_playlist_set_streams(s);
-    ic = ctx->icl[ctx->pe_curidx];
-    localpts = av_rescale_q(localpts_avtimebase, AV_TIME_BASE_Q, ic->streams[stream_index]->time_base);
-    s->duration = 0;
-    for (i = 0; i < ctx->pe_curidx; ++i)
-        s->duration += ctx->durations[i];
-    return avformat_seek_file(ic, stream_index, min_ts, localpts, max_ts, flags);
+    return ic->iformat->read_seek(ic, stream_index, localpts, flags);
 }
 
 int64_t ff_concatgen_read_timestamp(AVFormatContext *s,
