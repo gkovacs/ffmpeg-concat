@@ -31,7 +31,7 @@ version <next>:
 - RTP depacketization of ASF and RTSP from WMS servers
 - RTMP support in libavformat
 - noX handling for OPT_BOOL X options
-- Playlist API and concatenation support for ffmpeg
+- Playlist API and concatenation support for FFmpeg
 - Demuxers for M3U, PLS, and XSPF playlist formats
 
 
