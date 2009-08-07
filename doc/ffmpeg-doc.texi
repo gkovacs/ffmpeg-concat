@@ -263,7 +263,8 @@ Codec can handle input truncated at random locations instead of only at frame bo
 Force format.
 
 @item -i @var{filename}
-Input file name, with either relative or absolute paths. Several files can be specified by separating them with commas; these will be concatenated.
+Input file name, with either relative or absolute paths.
+Several files can be specified by separating them with commas; these will be concatenated.
 
 @item -y
 Overwrite output files.
