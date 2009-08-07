@@ -83,7 +83,10 @@ void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx)
         ic->priv_data = ctx;
 }
 
-void ff_playlist_split_encodedstring(const char *s, const char sep, char ***flist_ptr, int *len_ptr)
+void ff_playlist_split_encodedstring(const char *s,
+                                     const char sep,
+                                     char ***flist_ptr,
+                                     int *len_ptr)
 {
     char c, *ts, **flist;
     int i, len, buflen, *sepidx;
@@ -133,11 +136,14 @@ void ff_playlist_add_path(PlaylistContext *ctx, const char *itempath)
     ctx->flist = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size+1));
     ctx->flist[ctx->pelist_size] = NULL;
     ctx->flist[ctx->pelist_size-1] = itempath;
-    ctx->durations = av_realloc(ctx->durations, sizeof(*(ctx->durations)) * (ctx->pelist_size+1));
+    ctx->durations = av_realloc(ctx->durations,
+                                sizeof(*(ctx->durations)) * (ctx->pelist_size+1));
     ctx->durations[ctx->pelist_size] = 0;
 }
 
-void ff_playlist_relative_paths(char **flist, const int len, const char *workingdir)
+void ff_playlist_relative_paths(char **flist,
+                                const int len,
+                                const char *workingdir)
 {
     int i;
     for (i = 0; i < len; ++i) { // determine if relative paths
@@ -164,7 +170,9 @@ int64_t ff_playlist_time_offset(int64_t *durations, const int pe_curidx)
     return total;
 }
 
-int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts, int64_t *localpts)
+int ff_playlist_stream_index_from_time(PlaylistContext *ctx,
+                                       int64_t pts,
+                                       int64_t *localpts)
 {
     int i;
     int64_t total;

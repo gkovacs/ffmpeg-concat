@@ -26,7 +26,10 @@
 
 int ff_concatgen_read_packet(AVFormatContext *s, AVPacket *pkt);
 
-int ff_concatgen_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int flags);
+int ff_concatgen_read_seek(AVFormatContext *s,
+                           int stream_index,
+                           int64_t pts,
+                           int flags);
 
 int64_t ff_concatgen_read_timestamp(AVFormatContext *s,
                                     int stream_index,

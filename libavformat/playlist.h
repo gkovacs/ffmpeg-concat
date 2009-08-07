@@ -89,7 +89,9 @@ void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx);
  *  @param len Number of paths in flist.
  *  @param workingdir Path that strings in flist are relative to.
  */
-void ff_playlist_relative_paths(char **flist, const int len, const char *workingdir);
+void ff_playlist_relative_paths(char **flist,
+                                const int len,
+                                const char *workingdir);
 
 /** @fn void ff_playlist_split_encodedstring(char *s, char sep, char ***flist_ptr, int *len_ptr)
  *  @brief Splits a character-delimited string into a list of strings.
@@ -98,7 +100,10 @@ void ff_playlist_relative_paths(char **flist, const int len, const char *working
  *  @param flist_ptr Pointer to string list which will be allocated by function.
  *  @param len_ptr Number of segments the string was split into.
  */
-void ff_playlist_split_encodedstring(const char *s, const char sep, char ***flist_ptr, int *len_ptr);
+void ff_playlist_split_encodedstring(const char *s,
+                                     const char sep,
+                                     char ***flist_ptr,
+                                     int *len_ptr);
 
 /** @fn PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep)
  *  @brief Allocates and returns a PlaylistContext with playlist elements specified by a character-delimited string.
@@ -130,6 +135,8 @@ int64_t ff_playlist_time_offset(int64_t *durations, const int pe_curidx);
  *  @param localpts Time in the local demuxer's timeframe in AV_TIME_BASE units; if null, not calculated.
  *  @return Returns the index of the stream which covers the specified time range.
  */
-int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts, int64_t *localpts);
+int ff_playlist_stream_index_from_time(PlaylistContext *ctx,
+                                       int64_t pts,
+                                       int64_t *localpts);
 
 #endif /* AVFORMAT_PLAYLIST_H */
