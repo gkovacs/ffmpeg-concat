@@ -45,10 +45,12 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         ret = ic->iformat->read_packet(ic, pkt);
         if (pkt) {
             stream_index = pkt->stream_index;
+            pkt->stream_index += ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+            fprintf(stderr, "\n\n\n\nstream idx is %d and pkt idx is %d\n\n\n\n", stream_index, pkt->stream_index);
         }
         if (ret >= 0) {
             if (pkt) {
-                if (!ic->streams[pkt->stream_index]->codec->has_b_frames) {
+                if (!ic->streams[stream_index]->codec->has_b_frames) {
                     pkt->dts += av_rescale_q(ff_playlist_time_offset(ctx->durations, ctx->pe_curidx),
                                              AV_TIME_BASE_Q,
                                              ic->streams[stream_index]->time_base);

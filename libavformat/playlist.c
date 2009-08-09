@@ -52,6 +52,7 @@ void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx)
     ctx->icl = av_realloc(ctx->icl, sizeof(*(ctx->icl)) * (pe_curidx+2));
     ctx->icl[pe_curidx+1] = NULL;
     ctx->icl[pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[pe_curidx]);
+    ctx->nb_streams_list[pe_curidx] = ctx->icl[pe_curidx]->nb_streams;
 }
 
 void ff_playlist_set_streams(AVFormatContext *s)
@@ -60,9 +61,9 @@ void ff_playlist_set_streams(AVFormatContext *s)
     AVFormatContext *ic;
     PlaylistContext *ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
-    s->nb_streams = ic->nb_streams;
     for (i = 0; i < ic->nb_streams; ++i)
-        s->streams[i] = ic->streams[i];
+        s->streams[s->nb_streams + i] = ic->streams[i];
+    s->nb_streams += ic->nb_streams;
     s->cur_st = ic->cur_st;
     s->packet_buffer = ic->packet_buffer;
     s->packet_buffer_end = ic->packet_buffer_end;
@@ -139,6 +140,9 @@ void ff_playlist_add_path(PlaylistContext *ctx, const char *itempath)
     ctx->durations = av_realloc(ctx->durations,
                                 sizeof(*(ctx->durations)) * (ctx->pelist_size+1));
     ctx->durations[ctx->pelist_size] = 0;
+    ctx->nb_streams_list = av_realloc(ctx->nb_streams_list,
+                                      sizeof(*(ctx->nb_streams_list)) * (ctx->pelist_size+1));
+    ctx->nb_streams_list[ctx->pelist_size] = 0;
 }
 
 void ff_playlist_relative_paths(char **flist,
@@ -185,4 +189,32 @@ int ff_playlist_stream_index_from_time(PlaylistContext *ctx,
     if (localpts)
         *localpts = pts-(total-ctx->durations[i-1]);
     return i;
+}
+
+int ff_playlist_playidx_from_streamidx(PlaylistContext *ctx, int stream_index)
+{
+    int i, total;
+    i = total = 0;
+    while (stream_index >= total)
+        total += ctx->nb_streams_list[i++];
+    return i-1;
+}
+
+int ff_playlist_localstidx_from_streamidx(PlaylistContext *ctx, int stream_index)
+{
+    int i, total;
+    i = total = 0;
+    while (stream_index >= total) {
+        total += ctx->nb_streams_list[i++];
+    }
+    return stream_index - (total - ctx->nb_streams_list[i-1]);
+}
+
+int ff_playlist_streams_offset_from_playidx(PlaylistContext *ctx, int playidx)
+{
+    int i, total;
+    i = total = 0;
+    while (playidx > i)
+        total += ctx->nb_streams_list[i++];
+    return total;
 }

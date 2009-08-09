@@ -47,6 +47,7 @@ typedef struct PlaylistContext {
     int pelist_size; /**< Number of playlist elements stored in icl */
     int pe_curidx; /**< Index of the AVFormatContext in icl that packets are being read from */
     int64_t *durations; /**< Durations, in AV_TIME_BASE units, for each playlist item */
+    int *nb_streams_list; /**< List of the number of streams in each playlist item*/
 } PlaylistContext;
 
 /** @fn AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
@@ -138,5 +139,11 @@ int64_t ff_playlist_time_offset(int64_t *durations, const int pe_curidx);
 int ff_playlist_stream_index_from_time(PlaylistContext *ctx,
                                        int64_t pts,
                                        int64_t *localpts);
+
+int ff_playlist_playidx_from_streamidx(PlaylistContext *ctx, int stream_index);
+
+int ff_playlist_localstidx_from_streamidx(PlaylistContext *ctx, int stream_index);
+
+int ff_playlist_streams_offset_from_playidx(PlaylistContext *ctx, int playidx);
 
 #endif /* AVFORMAT_PLAYLIST_H */
