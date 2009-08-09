@@ -1251,8 +1251,10 @@ static int output_packet(AVInputStream *ist, int ist_index,
     AVSubtitle subtitle, *subtitle_to_free;
     int got_subtitle;
     AVPacket avpkt;
-    ist->st = is->streams[pkt->stream_index];
-//    fprintf(stderr, "\n\n\n\n\npkt stream index is %d\n\n\n\n\n\n", pkt->stream_index);
+    if (pkt) {
+        ist->st = is->streams[pkt->stream_index];
+//        fprintf(stderr, "\n\n\n\n\npkt stream index is %d\n\n\n\n\n\n", pkt->stream_index);
+    }
     if (ist && is && pkt && is->iformat && is->iformat->long_name &&
         !strncmp(is->iformat->long_name, "CONCAT", 6) && is->nb_streams > pkt->stream_index &&
         is->streams && is->streams[pkt->stream_index] && is->streams[pkt->stream_index]->codec) {

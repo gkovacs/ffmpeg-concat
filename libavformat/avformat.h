@@ -646,6 +646,7 @@ typedef struct AVFormatContext {
      */
 #define RAW_PACKET_BUFFER_SIZE 32000
     int raw_packet_buffer_remaining_size;
+    int index_offset;
 } AVFormatContext;
 
 typedef struct AVPacketList {

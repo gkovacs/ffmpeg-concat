@@ -932,11 +932,12 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
 static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 {
     AVStream *st;
-    int len, ret, i;
+    int len, ret, i, offset;
     int stream_index;
     AVStream *stream;
     stream_index = 0;
     stream = 0;
+    offset = 0;
 
     av_init_packet(pkt);
 
@@ -944,6 +945,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
         /* select current input stream component */
         st = s->cur_st;
         if (st) {
+            offset = st->index_offset;
             if (!st->need_parsing || !st->parser) {
                 /* no parsing needed: we just output the packet as is */
                 /* raw data support */
@@ -975,7 +977,9 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 //                        pkt->stream_index = stream_index;
 //                    } else {
 //                        pkt->stream = st;
-                        pkt->stream_index = st->index + st->index_offset;
+                pkt->stream_index = st->index + s->index_offset;
+//                        pkt->stream_index = st->index;// + offset;
+                        fprintf(stderr, "\n\n\n\nstream_index is %d and index_offset is %d\n\n\n\n", st->index, s->index_offset);
 //                    }
                     pkt->duration = 0;
                     pkt->pts = st->parser->pts;
