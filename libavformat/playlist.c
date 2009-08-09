@@ -61,8 +61,11 @@ void ff_playlist_set_streams(AVFormatContext *s)
     AVFormatContext *ic;
     PlaylistContext *ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
-    for (i = 0; i < ic->nb_streams; ++i)
+    for (i = 0; i < ic->nb_streams; ++i) {
+        ic->streams[i]->index_offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+        fprintf(stderr, "\n\n\n\nstreams index offset is %d\n\n\n\n", ic->streams[i]->index_offset);
         s->streams[s->nb_streams + i] = ic->streams[i];
+    }
     s->nb_streams += ic->nb_streams;
     s->cur_st = ic->cur_st;
     s->packet_buffer = ic->packet_buffer;

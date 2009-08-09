@@ -341,6 +341,7 @@ typedef struct AVIndexEntry {
  */
 typedef struct AVStream {
     int index;    /**< stream index in AVFormatContext */
+    int index_offset;
     int id;       /**< format-specific stream ID */
     AVCodecContext *codec; /**< codec context */
     /**

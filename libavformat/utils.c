@@ -970,13 +970,13 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 /* return packet if any */
                 if (pkt->size) {
                 got_packet:
-                    if (stream && stream->codec && stream->codec->codec) {
+//                    if (stream && stream->codec && stream->codec->codec) {
                         pkt->stream = stream;
-                        pkt->stream_index = stream_index;
-                    } else {
-                        pkt->stream = st;
-                        pkt->stream_index = st->index;
-                    }
+//                        pkt->stream_index = stream_index;
+//                    } else {
+//                        pkt->stream = st;
+                        pkt->stream_index = st->index + st->index_offset;
+//                    }
                     pkt->duration = 0;
                     pkt->pts = st->parser->pts;
                     pkt->dts = st->parser->dts;

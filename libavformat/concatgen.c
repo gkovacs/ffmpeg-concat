@@ -46,7 +46,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         if (pkt) {
             stream_index = pkt->stream_index;
             pkt->stream_index += ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
-            fprintf(stderr, "\n\n\n\nstream idx is %d and pkt idx is %d\n\n\n\n", stream_index, pkt->stream_index);
+//            fprintf(stderr, "\n\n\n\nstream idx is %d and pkt idx is %d\n\n\n\n", stream_index, pkt->stream_index);
         }
         if (ret >= 0) {
             if (pkt) {
