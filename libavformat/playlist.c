@@ -67,6 +67,7 @@ void ff_playlist_set_streams(AVFormatContext *s)
 //        s->streams[i] = ic->streams[i];
 
         s->streams[offset + i] = ic->streams[i];
+        ic->streams[i]->index += offset;
 
 //        if (!ic->streams[i]->codec->codec) {
         AVCodec *codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
@@ -76,6 +77,7 @@ void ff_playlist_set_streams(AVFormatContext *s)
 //                return AVERROR(EINVAL);
 //             }
              avcodec_open(ic->streams[i]->codec, codec);
+
     }
 //    }
     s->nb_streams = ic->nb_streams + offset;
