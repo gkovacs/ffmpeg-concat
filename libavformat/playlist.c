@@ -62,7 +62,10 @@ void ff_playlist_set_streams(AVFormatContext *s)
     PlaylistContext *ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
     for (i = 0; i < ic->nb_streams; ++i) {
-        s->streams[s->nb_streams + i] = ic->streams[i];
+        s->streams[i] = ic->streams[i];
+
+//        s->streams[s->nb_streams + i] = ic->streams[i];
+
 //        if (!ic->streams[i]->codec->codec) {
         AVCodec *codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
 //            if (!codec) {
@@ -73,7 +76,8 @@ void ff_playlist_set_streams(AVFormatContext *s)
              avcodec_open(ic->streams[i]->codec, codec);
     }
 //    }
-    s->nb_streams += ic->nb_streams;
+    s->nb_streams = ic->nb_streams;
+//    s->nb_streams += ic->nb_streams;
     s->cur_st = ic->cur_st;
     s->packet_buffer = ic->packet_buffer;
     s->packet_buffer_end = ic->packet_buffer_end;
