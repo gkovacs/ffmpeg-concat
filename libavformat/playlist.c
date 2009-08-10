@@ -77,7 +77,8 @@ void ff_playlist_set_streams(AVFormatContext *s)
     }
 //    }
 //    s->nb_streams = ic->nb_streams;
-    s->nb_streams += ic->nb_streams;
+    s->nb_streams = ic->nb_streams + ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+//    s->nb_streams += ic->nb_streams;
     s->cur_st = ic->cur_st;
     s->packet_buffer = ic->packet_buffer;
     s->packet_buffer_end = ic->packet_buffer_end;
