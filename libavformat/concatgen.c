@@ -45,7 +45,12 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         ret = ic->iformat->read_packet(ic, pkt);
         if (pkt) {
             stream_index = pkt->stream_index;
-            ic->streams[stream_index]->index_offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+            pkt->index_offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+//            ic->streams[1]->index_offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+//            ic->streams[0]->index_offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+//            ic->streams[0]->index = ic->streams[0]->index_offset;
+//            ic->streams[1]->index = ic->streams[1]->index_offset+1;
+//            fprintf(stderr, "\n\n\n\n\nstreamindex is %d\n\n\n\n\n", ic->streams[0]->index);
 //            pkt->stream_index += ic->streams[stream_index]->index_offset;
 //            fprintf(stderr, "\n\n\n\nstream idx is %d and pkt idx is %d\n\n\n\n", stream_index, pkt->stream_index);
         }

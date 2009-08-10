@@ -1252,13 +1252,13 @@ static int output_packet(AVInputStream *ist, int ist_index,
     int got_subtitle;
     AVPacket avpkt;
     if (pkt) {
-        ist->st = is->streams[pkt->stream_index];
-//        fprintf(stderr, "\n\n\n\n\npkt stream index is %d\n\n\n\n\n\n", pkt->stream_index);
+        ist->st = is->streams[pkt->stream_index + pkt->index_offset];
+        fprintf(stderr, "\n\n\n\n\npkt stream index is %d\n\n\n\n\n\n", pkt->stream_index);
     }
-    if (ist && is && pkt && is->iformat && is->iformat->long_name &&
-        !strncmp(is->iformat->long_name, "CONCAT", 6) && is->nb_streams > pkt->stream_index &&
-        is->streams && is->streams[pkt->stream_index] && is->streams[pkt->stream_index]->codec) {
-        ist->st = is->streams[pkt->stream_index];
+//    if (ist && is && pkt && is->iformat && is->iformat->long_name &&
+//        !strncmp(is->iformat->long_name, "CONCAT", 6) && is->nb_streams > pkt->stream_index &&
+//        is->streams && is->streams[pkt->stream_index] && is->streams[pkt->stream_index]->codec) {
+//        ist->st = is->streams[pkt->stream_index];
         if (!ist->st->codec->codec) {
             fprintf(stderr, "\n\n\n\n\nseeking new codec\n\n\n\n");
             AVCodec *codec = avcodec_find_decoder(ist->st->codec->codec_id);
@@ -1272,7 +1272,7 @@ static int output_packet(AVInputStream *ist, int ist_index,
                        ist->file_index, ist->index);
                 return AVERROR(EINVAL);
              }
-         }
+//         }
     }
     if(ist->next_pts == AV_NOPTS_VALUE)
         ist->next_pts= ist->pts;
