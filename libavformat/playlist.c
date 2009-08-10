@@ -64,15 +64,15 @@ void ff_playlist_set_streams(AVFormatContext *s)
     for (i = 0; i < ic->nb_streams; ++i) {
         s->streams[s->nb_streams + i] = ic->streams[i];
 //        if (!ic->streams[i]->codec->codec) {
-//        AVCodec *codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
+        AVCodec *codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
 //            if (!codec) {
 //                av_log(ist->st->codec, AV_LOG_ERROR, "Decoder (codec id %d) not found for input stream #%d.%d\n",
 //                       ist->st->codec->codec_id, ist->file_index, ist->index);
 //                return AVERROR(EINVAL);
 //             }
-//             avcodec_open(ic->streams[i]->codec, codec);
-//    }
+             avcodec_open(ic->streams[i]->codec, codec);
     }
+//    }
     s->nb_streams += ic->nb_streams;
     s->cur_st = ic->cur_st;
     s->packet_buffer = ic->packet_buffer;

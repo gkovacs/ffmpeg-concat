@@ -973,13 +973,17 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 /* return packet if any */
                 if (pkt->size) {
                 got_packet:
-//                    if (stream && stream->codec && stream->codec->codec) {
-//                        pkt->stream = stream;
-//                        pkt->stream_index = stream_index;
-//                    } else {
+                    if (stream && stream->codec /*&& stream->codec->codec*/) {
+                        pkt->stream = stream;
+                        pkt->stream_index = stream_index;
+                        pkt->index_offset = offset;
+                    } else {
                         pkt->stream = st;
-                pkt->index_offset = offset;
-                pkt->stream_index = st->index;//+offset;
+                        pkt->stream_index = st->index;//+offset;
+                        pkt->index_offset = offset;
+                    }
+//                pkt->index_offset = offset;
+//                pkt->stream_index = st->index+offset;
 //                pkt->stream_index = st->index + st->index_offset;
 //                pkt->stream_index = st->index + /*offset;//*/s->index_offset;
 //                        pkt->stream_index = st->index;// + offset;
@@ -1023,9 +1027,9 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                                         AV_NOPTS_VALUE, AV_NOPTS_VALUE,
                                         AV_NOPTS_VALUE);
                         if (pkt->size) {
-                            stream_index = cur_pkt.stream_index;
                             stream = cur_pkt.stream;
                             offset = cur_pkt.index_offset;
+                            stream_index = cur_pkt.stream_index;//+offset;
                             goto got_packet;
                         }
                     }
