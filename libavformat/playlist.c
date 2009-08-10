@@ -62,7 +62,7 @@ void ff_playlist_set_streams(AVFormatContext *s)
     AVFormatContext *ic;
     PlaylistContext *ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
-    offset = 0;//ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+    offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
     for (i = 0; i < ic->nb_streams; ++i) {
 //        s->streams[i] = ic->streams[i];
 
