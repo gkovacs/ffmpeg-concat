@@ -1252,7 +1252,7 @@ static int output_packet(AVInputStream *ist, int ist_index,
     int got_subtitle;
     AVPacket avpkt;
     if (pkt) {
-        pkt->stream_index += pkt->index_offset;
+//        pkt->stream_index += pkt->index_offset;
         ist->st = is->streams[pkt->stream_index];
         fprintf(stderr, "\n\n\n\n\npkt stream index is %d\n\n\n\n\n\n", pkt->stream_index);
     }
