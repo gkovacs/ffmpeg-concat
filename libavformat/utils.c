@@ -1032,7 +1032,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                         if (pkt->size) {
                             stream = cur_pkt.stream;
                             offset = cur_pkt.index_offset;
-                            stream_index = cur_pkt.stream_index+offset;
+                            stream_index = cur_pkt.stream_index;//+offset;
                             goto got_packet;
                         }
                     }

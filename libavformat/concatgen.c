@@ -47,6 +47,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             pkt->stream = ic->streams[pkt->stream_index];
             stream_index = pkt->stream_index;
             pkt->index_offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+            pkt->stream_index += pkt->index_offset;
 //            ic->streams[1]->index_offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
 //            ic->streams[0]->index_offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
 //            ic->streams[0]->index = ic->streams[0]->index_offset;
