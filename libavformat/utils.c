@@ -946,6 +946,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
         st = s->cur_st;
         if (st) {
             offset = st->cur_pkt.index_offset;
+            stream_index = st->cur_pkt.stream_index;
 //            offset = st->index_offset;
             if (!st->need_parsing || !st->parser) {
                 /* no parsing needed: we just output the packet as is */
@@ -973,18 +974,16 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 /* return packet if any */
                 if (pkt->size) {
                 got_packet:
-            if (offset > 0) {
-                printf("offsetting");
-            }
-                    if (stream && stream->codec /*&& stream->codec->codec*/) {
-                        pkt->stream = stream;
-                        pkt->stream_index = stream_index;
-                        pkt->index_offset = offset;
-                    } else {
+//                    if (stream && stream->codec /*&& stream->codec->codec*/) {
+//                        pkt->stream = stream;
+//                        pkt->stream_index = stream_index;
+//                        pkt->index_offset = offset;
+//                    } else {
                         pkt->stream = st;
-                        pkt->stream_index = st->index+offset;
+                pkt->stream_index = stream_index;
+//                        pkt->stream_index = st->index+offset;
                         pkt->index_offset = offset;
-                    }
+//                    }
 //                pkt->index_offset = offset;
 //                pkt->stream_index = st->index+offset;
 //                pkt->stream_index = st->index + st->index_offset;
