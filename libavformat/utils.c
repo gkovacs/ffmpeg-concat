@@ -947,6 +947,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
         if (st) {
             offset = st->cur_pkt.index_offset;
             stream_index = st->cur_pkt.stream_index;
+            stream = st->cur_pkt.stream;
 //            offset = st->index_offset;
             if (!st->need_parsing || !st->parser) {
                 /* no parsing needed: we just output the packet as is */
@@ -1029,9 +1030,9 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                                         AV_NOPTS_VALUE, AV_NOPTS_VALUE,
                                         AV_NOPTS_VALUE);
                         if (pkt->size) {
-                            stream = cur_pkt.stream;
-                            offset = cur_pkt.index_offset;
-                            stream_index = cur_pkt.stream_index;//+offset;
+//                            stream = cur_pkt.stream;
+//                            offset = cur_pkt.index_offset;
+//                            stream_index = cur_pkt.stream_index;//+offset;
                             goto got_packet;
                         }
                     }
