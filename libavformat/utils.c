@@ -973,6 +973,9 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 /* return packet if any */
                 if (pkt->size) {
                 got_packet:
+            if (offset > 0) {
+                printf("offsetting");
+            }
                     if (stream && stream->codec /*&& stream->codec->codec*/) {
                         pkt->stream = stream;
                         pkt->stream_index = stream_index;
