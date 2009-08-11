@@ -69,30 +69,21 @@ void ff_playlist_set_streams(AVFormatContext *s)
 //        s->streams[i] = ic->streams[i];
         s->streams[offset + i] = ic->streams[i];
         ic->streams[i]->index += offset;
-/*
-//        if (!ic->streams[i]->codec->codec) {
-        AVCodec *codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
-//            if (!codec) {
-//                av_log(ist->st->codec, AV_LOG_ERROR, "Decoder (codec id %d) not found for input stream #%d.%d\n",
-//                       ist->st->codec->codec_id, ist->file_index, ist->index);
-//                return AVERROR(EINVAL);
-//             }
-             avcodec_open(ic->streams[i]->codec, codec);
-if (ic->streams[i]->need_parsing && !ic->streams[i]->parser) {
-                ic->streams[i]->parser = av_parser_init(ic->streams[i]->codec->codec_id);
-                if (!ic->streams[i]->parser) {
-                    // no parser available: just output the raw packets
-                    ic->streams[i]->need_parsing = AVSTREAM_PARSE_NONE;
-                }else if(ic->streams[i]->need_parsing == AVSTREAM_PARSE_HEADERS){
-                    ic->streams[i]->parser->flags |= PARSER_FLAG_COMPLETE_FRAMES;
-                }
-                if(ic->streams[i]->parser && (ic->iformat->flags & AVFMT_GENERIC_INDEX)){
-                    ic->streams[i]->parser->next_frame_offset=
-                    ic->streams[i]->parser->cur_offset= ic->streams[i]->cur_pkt.pos;
-                }
-            }*/
+
+        if (!ic->streams[i]->codec->codec) {
+            AVCodec *codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
+            if (!codec) {
+                av_log(ic->streams[i]->codec, AV_LOG_ERROR, "Decoder (codec id %d) not found for input stream #%d\n",
+                       ic->streams[i]->codec->codec_id, ic->streams[i]->index);
+                return AVERROR(EINVAL);
+             }
+             if (avcodec_open(ic->streams[i]->codec, codec) < 0) {
+                av_log(ic->streams[i]->codec, AV_LOG_ERROR, "Error while opening decoder for input stream #%d\n",
+                       ic->streams[i]->index);
+                return AVERROR(EINVAL);
+             }
+        }
     }
-//    }
     s->nb_streams = ic->nb_streams + offset;
     s->cur_st = ic->cur_st;
     s->packet_buffer = ic->packet_buffer;
