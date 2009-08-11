@@ -64,12 +64,8 @@ void ff_playlist_set_streams(AVFormatContext *s)
     ic = ctx->icl[ctx->pe_curidx];
     offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
     for (i = 0; i < ic->nb_streams; ++i) {
-//        s->streams[i] = ic->streams[i];
-
-//        s->streams[i] = ic->streams[i];
         s->streams[offset + i] = ic->streams[i];
         ic->streams[i]->index += offset;
-
         if (!ic->streams[i]->codec->codec) {
             AVCodec *codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
             if (!codec) {
@@ -233,7 +229,6 @@ int ff_playlist_localstidx_from_streamidx(PlaylistContext *ctx, int stream_index
 
 int ff_playlist_streams_offset_from_playidx(PlaylistContext *ctx, int playidx)
 {
-//    return 0;
     int i, total;
     i = total = 0;
     while (playidx > i)
