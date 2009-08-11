@@ -94,6 +94,7 @@ if (ic->streams[i]->need_parsing && !ic->streams[i]->parser) {
     }
 //    }
     s->nb_streams = ic->nb_streams + offset;
+    s->cur_st = ic->cur_st;
     s->packet_buffer = ic->packet_buffer;
     s->packet_buffer_end = ic->packet_buffer_end;
 }

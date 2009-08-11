@@ -43,6 +43,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     for (;;) {
         ic = ctx->icl[ctx->pe_curidx];
         ret = ic->iformat->read_packet(ic, pkt);
+        s->cur_st = ic->cur_st;
         if (pkt) {
             pkt->stream = ic->streams[pkt->stream_index];
             stream_index = pkt->stream_index;
