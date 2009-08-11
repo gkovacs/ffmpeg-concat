@@ -45,16 +45,14 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         ic = ctx->icl[ctx->pe_curidx];
 //        ff_playlist_set_streams(s);
         ret = ic->iformat->read_packet(ic, pkt);
-        ff_playlist_set_streams(s);
+//        ff_playlist_set_streams(s);
         s->cur_st = ic->cur_st;
-        if (pkt) {
-            pkt->stream = ic->streams[pkt->stream_index];
+        if (ret >= 0) {
+            if (pkt) {
+                pkt->stream = ic->streams[pkt->stream_index];
             stream_index = pkt->stream_index;
             pkt->index_offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
             pkt->stream_index += pkt->index_offset;
-        }
-        if (ret >= 0) {
-            if (pkt) {
 //                ff_playlist_set_streams(s);
                 if (!ic->streams[stream_index]->codec->has_b_frames) {
                     pkt->dts += av_rescale_q(ff_playlist_time_offset(ctx->durations, ctx->pe_curidx),
@@ -76,7 +74,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                                                                     ff_playlist_time_offset(ctx->durations, ctx->pe_curidx),
                                                                     NULL);
                 ff_playlist_populate_context(ctx, ctx->pe_curidx);
-//                ff_playlist_set_streams(s);
+                ff_playlist_set_streams(s);
                 // have_switched_streams is set to avoid infinite loop
                 have_switched_streams = 1;
                 // duration is updated in case it's checked by a parent demuxer (chained concat demuxers)
