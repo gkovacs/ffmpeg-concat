@@ -945,10 +945,6 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
         /* select current input stream component */
         st = s->cur_st;
         if (st) {
-            offset = st->cur_pkt.index_offset;
-            stream_index = st->cur_pkt.stream_index;
-            stream = st->cur_pkt.stream;
-//            offset = st->index_offset;
             if (!st->need_parsing || !st->parser) {
                 /* no parsing needed: we just output the packet as is */
                 /* raw data support */
@@ -975,24 +971,9 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 /* return packet if any */
                 if (pkt->size) {
                 got_packet:
-//                    if (stream && stream->codec /*&& stream->codec->codec*/) {
-//                        pkt->stream = stream;
-//                        pkt->stream_index = stream_index;
-//                        pkt->index_offset = offset;
-//                    } else {
-                        pkt->stream = st;
-                pkt->stream_index = stream_index;
-//                        pkt->stream_index = st->index+offset;
-                        pkt->index_offset = offset;
-//                    }
-//                pkt->index_offset = offset;
-//                pkt->stream_index = st->index+offset;
-//                pkt->stream_index = st->index + st->index_offset;
-//                pkt->stream_index = st->index + /*offset;//*/s->index_offset;
-//                        pkt->stream_index = st->index;// + offset;
-                        
-//                    }
-//                    fprintf(stderr, "\n\n\n\npktstidx is %d and stream_index is %d and stidx is %d and index_offset is %d\n\n\n\n", pkt->stream_index, stream_index, st->index, s->index_offset);
+                    pkt->stream = st;
+                    pkt->stream_index = stream_index;
+                    pkt->index_offset = offset;
                     pkt->duration = 0;
                     pkt->pts = st->parser->pts;
                     pkt->dts = st->parser->dts;
