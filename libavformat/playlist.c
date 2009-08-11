@@ -231,7 +231,6 @@ int ff_playlist_localstidx_from_streamidx(PlaylistContext *ctx, int stream_index
 
 int ff_playlist_streams_offset_from_playidx(PlaylistContext *ctx, int playidx)
 {
-//    return 0;
     int i, total;
     i = total = 0;
     while (playidx > i)
