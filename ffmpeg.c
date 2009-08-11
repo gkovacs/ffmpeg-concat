@@ -1251,25 +1251,11 @@ static int output_packet(AVInputStream *ist, int ist_index,
     AVSubtitle subtitle, *subtitle_to_free;
     int got_subtitle;
     AVPacket avpkt;
-//    if (pkt) {
-//        pkt->stream_index += pkt->index_offset;
-//        ist->st = is->streams[pkt->stream_index];
-//        fprintf(stderr, "\n\n\n\n\npkt stream index is %d\n\n\n\n\n\n", pkt->stream_index);
-//    }
-    /*
-    if (pkt && ist && ist->st) {
-        //    pkt->stream_index += pkt->index_offset;
-    ist->st = is->streams[pkt->stream_index];
-    } else {
-        return AVERROR(EINVAL);
-    }*/
-    
     if (ist && is && pkt && is->iformat && is->iformat->long_name &&
         !strncmp(is->iformat->long_name, "CONCAT", 6) && is->nb_streams > pkt->stream_index &&
         is->streams && is->streams[pkt->stream_index] && is->streams[pkt->stream_index]->codec) {
         ist->st = is->streams[pkt->stream_index];
         if (!ist->st->codec->codec) {
-            fprintf(stderr, "\n\n\n\n\nseeking new codec\n\n\n\n");
             AVCodec *codec = avcodec_find_decoder(ist->st->codec->codec_id);
             if (!codec) {
                 av_log(ist->st->codec, AV_LOG_ERROR, "Decoder (codec id %d) not found for input stream #%d.%d\n",
