@@ -2274,14 +2274,53 @@ static int av_encode(AVFormatContext **output_files,
         if (do_pkt_dump) {
             av_pkt_dump_log(NULL, AV_LOG_DEBUG, &pkt, do_hex_dump);
         }
+
+
+/*
+            for(i=0;i<nb_istreams;i++) {
+        ist = av_mallocz(sizeof(AVInputStream));
+        if (!ist)
+            goto fail;
+        ist_table[i] = ist;
+    }
+    j = 0;*/
+    /*
+    for(i=0;i<nb_input_files;i++) {
+        is = input_files[i];
+        for(k=0;k<is->nb_streams;k++) {
+            ist = ist_table[j++];
+            ist->st = is->streams[k];
+            ist->file_index = i;
+            ist->index = k;
+            ist->discard = 1; 
+
+            if (rate_emu) {
+                ist->start = av_gettime();
+            }
+        }
+    }
+*/
+        if (pkt.stream_index >= nb_istreams) {
+            ist_table = av_realloc(ist_table, sizeof(*ist_table) * (pkt.stream_index + 1));
+            for (i = nb_istreams; i < pkt.stream_index + 1; ++i) {
+                ist = ist_table[i] = av_mallocz(sizeof(AVInputStream));
+                ist->st = is->cur_st;//is->streams[pkt.stream_index];
+                ist->file_index = 0;//file_index;
+                ist->decoding_needed = 1;
+                ist->discard = 0;
+                ist->index = pkt.stream_index;
+            }
+//            nb_istreams = pkt.stream_index + 1;
+
+        }
         /* the following test is needed in case new streams appear
            dynamically in stream : we ignore them */
-        if (pkt.stream_index - pkt.index_offset >= file_table[file_index].nb_streams)
-            goto discard_packet;
-        ist_index = file_table[file_index].ist_index + pkt.stream_index - pkt.index_offset;
+//        if (pkt.stream_index - pkt.index_offset >= file_table[file_index].nb_streams)
+//            goto discard_packet;
+        ist_index = /*file_table[file_index].ist_index +*/ pkt.stream_index - pkt.index_offset;
         ist = ist_table[ist_index];
-        if (ist->discard)
-            goto discard_packet;
+//        if (ist->discard)
+//            goto discard_packet;
 
         if (pkt.dts != AV_NOPTS_VALUE)
             pkt.dts += av_rescale_q(input_files_ts_offset[ist->file_index], AV_TIME_BASE_Q, ist->st->time_base);
