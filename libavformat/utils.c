@@ -1017,6 +1017,9 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             AVPacket cur_pkt;
             /* read next packet */
             ret = av_read_packet(s, &cur_pkt);
+            offset = cur_pkt.index_offset;
+            stream_index = cur_pkt.stream_index;
+            stream = cur_pkt.stream;
             if (ret < 0) {
                 if (ret == AVERROR(EAGAIN))
                     return ret;

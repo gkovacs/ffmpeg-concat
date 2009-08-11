@@ -66,9 +66,10 @@ void ff_playlist_set_streams(AVFormatContext *s)
     for (i = 0; i < ic->nb_streams; ++i) {
 //        s->streams[i] = ic->streams[i];
 
+//        s->streams[i] = ic->streams[i];
         s->streams[offset + i] = ic->streams[i];
         ic->streams[i]->index += offset;
-
+/*
 //        if (!ic->streams[i]->codec->codec) {
         AVCodec *codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
 //            if (!codec) {
@@ -77,7 +78,19 @@ void ff_playlist_set_streams(AVFormatContext *s)
 //                return AVERROR(EINVAL);
 //             }
              avcodec_open(ic->streams[i]->codec, codec);
-
+if (ic->streams[i]->need_parsing && !ic->streams[i]->parser) {
+                ic->streams[i]->parser = av_parser_init(ic->streams[i]->codec->codec_id);
+                if (!ic->streams[i]->parser) {
+                    // no parser available: just output the raw packets
+                    ic->streams[i]->need_parsing = AVSTREAM_PARSE_NONE;
+                }else if(ic->streams[i]->need_parsing == AVSTREAM_PARSE_HEADERS){
+                    ic->streams[i]->parser->flags |= PARSER_FLAG_COMPLETE_FRAMES;
+                }
+                if(ic->streams[i]->parser && (ic->iformat->flags & AVFMT_GENERIC_INDEX)){
+                    ic->streams[i]->parser->next_frame_offset=
+                    ic->streams[i]->parser->cur_offset= ic->streams[i]->cur_pkt.pos;
+                }
+            }*/
     }
 //    }
     s->nb_streams = ic->nb_streams + offset;
@@ -273,6 +286,7 @@ int ff_playlist_localstidx_from_streamidx(PlaylistContext *ctx, int stream_index
 
 int ff_playlist_streams_offset_from_playidx(PlaylistContext *ctx, int playidx)
 {
+//    return 0;
     int i, total;
     i = total = 0;
     while (playidx > i)
