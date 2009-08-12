@@ -1370,12 +1370,14 @@ static int video_thread(void *arg)
         if (pl_ctx && pkt && !tryswitchalready) {
             tryswitchalready = 1;
             checkagain:
-//            if (pkt->stream_index >= 0 && pkt->stream_index < is->ic->nb_streams)
-                is->video_stream = is->ic->streams[pkt->stream_index];
-//            else {
-//                is->video_stream = is->ic->streams[0];
-//                continue;
-//            }
+            if (pkt->stream_index >= 0 && pkt->stream_index < is->ic->nb_streams) {
+                is->video_st = is->ic->streams[pkt->stream_index];
+                is->video_stream = pkt->stream_index;
+            } else {
+                is->video_st = is->ic->streams[0];
+                is->video_stream = 0;
+                //continue;
+            }
 //            AVStream *propst = ff_playlist_get_stream(pl_ctx, st_idx+1, pkt->stream_index);
 //            if (propst && propst->codec && propst->codec->codec_type == CODEC_TYPE_VIDEO) {
 //                is->video_st = propst;
