@@ -1369,11 +1369,19 @@ static int video_thread(void *arg)
 
         if (pl_ctx && pkt && !tryswitchalready) {
             tryswitchalready = 1;
+            checkagain:
+//            if (pkt->stream_index >= 0 && pkt->stream_index < is->ic->nb_streams)
+                is->video_stream = is->ic->streams[pkt->stream_index];
+//            else {
+//                is->video_stream = is->ic->streams[0];
+//                continue;
+//            }
 //            AVStream *propst = ff_playlist_get_stream(pl_ctx, st_idx+1, pkt->stream_index);
 //            if (propst && propst->codec && propst->codec->codec_type == CODEC_TYPE_VIDEO) {
 //                is->video_st = propst;
 //                ++st_idx;
 //            }
+            /*
             if (pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_VIDEO) {
                 if (!pkt->stream->codec->codec) {
                     AVCodec *codec = avcodec_find_decoder(pkt->stream->codec->codec_id);
@@ -1393,6 +1401,7 @@ static int video_thread(void *arg)
                     goto tryagain;
                 }
             }
+             */
         }
         tryswitchalready = 0;
 
@@ -1609,10 +1618,14 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             len1 = avcodec_decode_audio3(is->audio_st->codec,
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
+            is->audio_st = is->ic->streams[pkt->stream_index];
             if (len1 < 0) {
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
-                if (pl_ctx && pkt) {
+//                if (pl_ctx && pkt) {
+//                    is->audio_st = is->ic->streams[pkt->stream_index];
+//                }
+                    /*
                     AVStream *propst = 0;//ff_playlist_get_stream(pl_ctx, st_idx+1, pkt->stream_index);
                     if (propst && propst->codec && propst->codec->codec_type == CODEC_TYPE_AUDIO) {
                         if (!propst->codec->codec) {
@@ -1638,6 +1651,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                 }
                 tryswitchalready = 0;
                 break;
+                     */
             }
             tryswitchalready = 0;
 
