@@ -1387,8 +1387,13 @@ static int video_thread(void *arg)
                 //is->video_stream = 0;
                 //continue;
             //}
+
             if (prevst != is->video_st)
                 goto decodeagain;
+
+            if (len1 < 0)
+                goto getagain;
+            
 //            AVStream *propst = ff_playlist_get_stream(pl_ctx, st_idx+1, pkt->stream_index);
 //            if (propst && propst->codec && propst->codec->codec_type == CODEC_TYPE_VIDEO) {
 //                is->video_st = propst;
