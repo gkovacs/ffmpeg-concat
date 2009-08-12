@@ -42,7 +42,9 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     stream_index = 0;
     for (;;) {
         ic = ctx->icl[ctx->pe_curidx];
-        ret = ic->iformat->read_packet(ic, pkt);
+        ret = av_read_packet(ic, pkt);
+//        ret = ic->iformat->read_packet(ic, pkt);
+        ff_playlist_set_streams(s);
         s->cur_st = ic->cur_st;
         if (ret >= 0) {
             if (pkt) {
