@@ -2301,7 +2301,7 @@ static int av_encode(AVFormatContext **output_files,
         i = pkt.stream_index; //- pkt.index_offset;
 
         ist_index = file_table[file_index].ist_index + i;// - pkt.index_offset;
-        ist = ist_table[ist_index- pkt.index_offset];
+        ist = ist_table[ist_index - pkt.index_offset];
 //        if (ist->discard)
 //            goto discard_packet;
 
@@ -2311,6 +2311,7 @@ static int av_encode(AVFormatContext **output_files,
                 ist->decoding_needed = 1;
                 ist->is_start = 1;
                 ist->discard = 0;
+                ist->sample_index = 0;
                 ist->index = file_table[file_index].ist_index + i;
                 ist->pts = 0;
                 ist->next_pts = AV_NOPTS_VALUE;
