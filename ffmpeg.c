@@ -2265,17 +2265,18 @@ static int av_encode(AVFormatContext **output_files,
             ist_table = av_realloc(ist_table, sizeof(*ist_table) * (pkt.stream_index + 1));
             for (i = nb_istreams; i < pkt.stream_index + 1; ++i) {
                 ist = ist_table[i] = av_mallocz(sizeof(AVInputStream));
-                ist->st = is->streams[pkt.stream_index];
+                ist->st = is->streams[i];
                 ist->file_index = file_index;
                 ist->decoding_needed = 1;
+                ist->is_start = 0;
                 ist->is_start = 1;
                 ist->discard = 0;
-                ist->index = file_table[file_index].ist_index + pkt.stream_index;
+                ist->index = file_table[file_index].ist_index + i;
                 ist->pts = 0;
                 ist->next_pts = AV_NOPTS_VALUE;
             }
-            file_table[file_index].nb_streams = pkt.stream_index + 1;
-//            nb_istreams = pkt.stream_index + 1;
+            file_table[file_index].nb_streams = file_table[file_index].ist_index + pkt.stream_index + 1;
+//            nb_istreams = file_table[file_index].ist_index + pkt.stream_index + 1;
         }
         /* the following test is needed in case new streams appear
            dynamically in stream : we ignore them */
