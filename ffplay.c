@@ -1620,7 +1620,14 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             len1 = avcodec_decode_audio3(is->audio_st->codec,
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
-            is->audio_st = is->ic->streams[pkt->stream_index];
+            if (pkt->stream_index >= 0 && pkt->stream_index < is->ic->nb_streams) {
+                is->audio_st = is->ic->streams[pkt->stream_index];
+                is->audio_stream = pkt->stream_index;
+            } else {
+                is->audio_st = is->ic->streams[0];
+                is->audio_stream = 0;
+                //continue;
+            }
             if (len1 < 0) {
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
