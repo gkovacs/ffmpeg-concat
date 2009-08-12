@@ -1652,11 +1652,15 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 //            if (prevst != is->audio_st)
 //                goto decodeagain;
 
+                            if (prevst != is->audio_st)
+                    goto decodeagain;
+
+            if (len1 < 0)
+                goto tryagain;
+
             if (len1 < 0) {
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
-                if (prevst != is->audio_st)
-                    goto decodeagain;
 //                if (pl_ctx && pkt) {
 //                    is->audio_st = is->ic->streams[pkt->stream_index];
 //                }
