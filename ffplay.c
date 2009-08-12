@@ -1389,7 +1389,10 @@ static int video_thread(void *arg)
             //}
 
             if (prevst != is->video_st)
-                goto decodeagain;
+                len1 = is->video_st->codec->codec->decode(is->video_st->codec,
+                                    frame, &got_picture,
+                                    pkt);
+//                goto decodeagain;
 
             if (len1 < 0)
                 goto getagain;
