@@ -1644,6 +1644,10 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             if (pkt->stream_index >= 0 && pkt->stream_index < is->ic->nb_streams) {
                 is->audio_st = is->ic->streams[pkt->stream_index];
                 is->audio_stream = pkt->stream_index;
+//                is->audioq.first_pkt = is->ic->packet_buffer;
+//                is->audioq.last_pkt = is->ic->packet_buffer_end;
+//                is->audioq.size = is->ic->packet_size;
+//                is->audioq.nb_packets =
             } //else {
                 //is->audio_st = is->ic->streams[0];
                 //is->audio_stream = 0;
@@ -1653,7 +1657,10 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
 //                goto decodeagain;
 
                             if (prevst != is->audio_st)
-                    goto decodeagain;
+                                len1 = is->audio_st->codec->codec->decode(is->audio_st->codec,
+                                        (int16_t *)is->audio_buf1, &data_size,
+                                        pkt_temp);
+//                    goto decodeagain;
 
             if (len1 < 0)
                 goto tryagain;
