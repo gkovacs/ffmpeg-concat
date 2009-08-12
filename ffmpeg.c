@@ -2309,7 +2309,6 @@ static int av_encode(AVFormatContext **output_files,
                 ist->st = is->streams[i];
                 ist->file_index = file_index;
                 ist->decoding_needed = 1;
-                ist->is_start = 0;
                 ist->is_start = 1;
                 ist->discard = 0;
                 ist->index = file_table[file_index].ist_index + i;
