@@ -1294,7 +1294,7 @@ LIB_INSTALL_EXTRA_CMD='$(RANLIB) "$(LIBDIR)/$(LIBNAME)"'
 
 CC_O='-o $@'
 
-host_cflags='-O3 -g -Wall'
+host_cflags='-O0 -g -Wall'
 host_libs='-lm'
 
 target_path='.'
@@ -1551,7 +1551,7 @@ elif $cc -version 2>/dev/null | grep -q TMS470; then
                 -mfpu=neon)     echo --float_support=vfpv3 --neon ;;
                 -mfpu=vfp)      echo --float_support=vfpv2        ;;
                 -mfpu=softvfp)  echo --float_support=vfplib       ;;
-                -Os)            echo -O3 -mf=2                    ;;
+                -Os)            echo -O0 -mf=2                    ;;
                 -O[0-3])        echo $flag -mf=5                  ;;
                 -g)             echo -g -mn                       ;;
             esac
@@ -2352,7 +2352,7 @@ elif enabled optimizations; then
     elif enabled ccc; then
         add_cflags -fast
     else
-        add_cflags -O3
+        add_cflags -O0
     fi
 fi
 check_cflags -fno-math-errno

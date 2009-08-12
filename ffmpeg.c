@@ -2264,7 +2264,8 @@ static int av_encode(AVFormatContext **output_files,
         if (pkt.stream_index >= nb_istreams && pkt.stream_index < is->nb_streams && pkt.stream_index > 0 && is->streams[pkt.stream_index]) {
             ist_table = av_realloc(ist_table, sizeof(*ist_table) * (pkt.stream_index + 1));
             for (i = nb_istreams; i < pkt.stream_index + 1; ++i) {
-                ist = ist_table[i] = av_mallocz(sizeof(AVInputStream));
+                ist_table[i] = av_mallocz(sizeof(AVInputStream));
+                ist = ist_table[i];
                 ist->st = is->streams[i];
                 ist->file_index = file_index;
                 ist->decoding_needed = 1;
