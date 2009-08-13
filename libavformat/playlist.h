@@ -140,10 +140,28 @@ int ff_playlist_stream_index_from_time(PlaylistContext *ctx,
                                        int64_t pts,
                                        int64_t *localpts);
 
+/** @fn int ff_playlist_playidx_from_streamidx(PlaylistContext *ctx, int stream_index)
+ *  @brief Calculates the index of the playlist item which contains the specified stream index.
+ *  @param ctx PlaylistContext within which the list of playlist elements and durations are stored.
+ *  @param stream_index Global stream index, the index of the stream within the playlist demuxer.
+ *  @return Returns the index of the playlist item which contains the specified stream index.
+ */
 int ff_playlist_playidx_from_streamidx(PlaylistContext *ctx, int stream_index);
 
+/** @fn int ff_playlist_localstidx_from_streamidx(PlaylistContext *ctx, int stream_index)
+ *  @brief Calculates the local stream index which corresponds to a global stream index.
+ *  @param ctx PlaylistContext within which the list of playlist elements and durations are stored.
+ *  @param stream_index Global stream index, the index of the stream within the playlist demuxer.
+ *  @return Returns the local stream index, the index of the stream within the child demuxer.
+ */
 int ff_playlist_localstidx_from_streamidx(PlaylistContext *ctx, int stream_index);
 
+/** @fn int ff_playlist_streams_offset_from_playidx(PlaylistContext *ctx, int playidx)
+ *  @brief Calculates the stream offset which corresponds to the given playlist item index.
+ *  @param ctx PlaylistContext within which the list of playlist elements and durations are stored.
+ *  @param playidx Playlist item index, the index of the child demuxer within ctx->icl.
+ *  @return Returns the stream offset, which is global stream index - local stream index.
+ */
 int ff_playlist_streams_offset_from_playidx(PlaylistContext *ctx, int playidx);
 
 #endif /* AVFORMAT_PLAYLIST_H */
