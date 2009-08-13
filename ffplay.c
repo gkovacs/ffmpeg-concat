@@ -1355,74 +1355,36 @@ static int video_thread(void *arg)
         if (packet_queue_get(&is->videoq, pkt, 1) < 0)
             break;
 
-        tryagain:
-
         if(pkt->data == flush_pkt.data){
             avcodec_flush_buffers(is->video_st->codec);
             continue;
         }
         /* NOTE: ipts is the PTS of the _first_ picture beginning in
            this packet, if any */
-
-        decodeagain:
-
-        is->video_st->codec->reordered_opaque= pkt->pts;
-
         
-
+        is->video_st->codec->reordered_opaque= pkt->pts;
+        
         len1 = avcodec_decode_video2(is->video_st->codec,
-                                    frame, &got_picture,
-                                    pkt);
+                                     frame, &got_picture,
+                                     pkt);
 
         prevst = is->video_st;
 
-        if (pl_ctx && pkt /*&& !tryswitchalready*/) {
-//            tryswitchalready = 1;
+        if (pl_ctx && pkt && !tryswitchalready) {
+            tryswitchalready = 1;
             checkagain:
             if (pkt->stream_index >= 0 && pkt->stream_index < is->ic->nb_streams) {
                 is->video_st = is->ic->streams[pkt->stream_index];
                 is->video_stream = pkt->stream_index;
-            } //else {
-                //is->video_st = is->ic->streams[0];
-                //is->video_stream = 0;
-                //continue;
-            //}
+            }
 
             if (prevst != is->video_st)
                 len1 = is->video_st->codec->codec->decode(is->video_st->codec,
-                                    frame, &got_picture,
-                                    pkt);
-//                goto decodeagain;
+                                                          frame, &got_picture,
+                                                          pkt);
 
             if (len1 < 0)
                 goto getagain;
-            
-//            AVStream *propst = ff_playlist_get_stream(pl_ctx, st_idx+1, pkt->stream_index);
-//            if (propst && propst->codec && propst->codec->codec_type == CODEC_TYPE_VIDEO) {
-//                is->video_st = propst;
-//                ++st_idx;
-//            }
-            /*
-            if (pkt->stream && pkt->stream->codec && pkt->stream->codec->codec_type == CODEC_TYPE_VIDEO) {
-                if (!pkt->stream->codec->codec) {
-                    AVCodec *codec = avcodec_find_decoder(pkt->stream->codec->codec_id);
-                    if (!codec) {
-                        fprintf(stderr, "output_packet: Decoder (codec id %d) not found for input stream #%d\n",
-                                pkt->stream->codec->codec_id, pkt->stream->index);
-                        return AVERROR(EINVAL);
-                    }
-                    if (avcodec_open(pkt->stream->codec, codec) < 0) {
-                        fprintf(stderr, "output_packet: Error while opening decoder for input stream #%d\n",
-                                pkt->stream->index);
-                        return AVERROR(EINVAL);
-                     }
-                }
-                if (is->video_st != pkt->stream) {
-                    is->video_st = pkt->stream;
-                    goto tryagain;
-                }
-            }
-             */
         }
         tryswitchalready = 0;
 
@@ -1638,7 +1600,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             
             tryagain:
             data_size = sizeof(is->audio_buf1);
-            decodeagain:
+
             len1 = avcodec_decode_audio3(is->audio_st->codec,
                                         (int16_t *)is->audio_buf1, &data_size,
                                         pkt_temp);
@@ -1647,60 +1609,19 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             if (pkt->stream_index >= 0 && pkt->stream_index < is->ic->nb_streams) {
                 is->audio_st = is->ic->streams[pkt->stream_index];
                 is->audio_stream = pkt->stream_index;
-//                is->audioq.first_pkt = is->ic->packet_buffer;
-//                is->audioq.last_pkt = is->ic->packet_buffer_end;
-//                is->audioq.size = is->ic->packet_size;
-//                is->audioq.nb_packets =
-            } //else {
-                //is->audio_st = is->ic->streams[0];
-                //is->audio_stream = 0;
-                //continue;
-            //}
-//            if (prevst != is->audio_st)
-//                goto decodeagain;
+            }
 
-                            if (prevst != is->audio_st)
-                                len1 = is->audio_st->codec->codec->decode(is->audio_st->codec,
-                                        (int16_t *)is->audio_buf1, &data_size,
-                                        pkt_temp);
-//                    goto decodeagain;
+            if (prevst != is->audio_st)
+                len1 = is->audio_st->codec->codec->decode(is->audio_st->codec,
+                                                         (int16_t *)is->audio_buf1,
+                                                          &data_size,
+                                                          pkt_temp);
 
-            if (len1 < 0)
-                goto tryagain;
-
-            if (len1 < 0) {
+            if (len1 < 0 && !tryswitchalready) {
                 /* if error, we skip the frame */
                 pkt_temp->size = 0;
-//                if (pl_ctx && pkt) {
-//                    is->audio_st = is->ic->streams[pkt->stream_index];
-//                }
-                    /*
-                    AVStream *propst = 0;//ff_playlist_get_stream(pl_ctx, st_idx+1, pkt->stream_index);
-                    if (propst && propst->codec && propst->codec->codec_type == CODEC_TYPE_AUDIO) {
-                        if (!propst->codec->codec) {
-                            AVCodec *codec = avcodec_find_decoder(propst->codec->codec_id);
-                            if (!codec) {
-                                av_log(propst->codec, AV_LOG_ERROR, "Decoder (codec id %d) not found for input stream #%d\n",
-                                       propst->codec->codec_id, propst->index);
-                                return AVERROR(EINVAL);
-                            }
-                            if (avcodec_open(propst->codec, codec) < 0) {
-                                av_log(propst->codec, AV_LOG_ERROR, "Error while opening decoder for input stream #%d\n",
-                                       propst->index);
-                                return AVERROR(EINVAL);
-                            }
-                        }
-                        is->audio_st = propst;
-                        ++st_idx;
-                    }
-                }
-                if (pl_ctx && !tryswitchalready) {
-                    tryswitchalready = 1;
-                    goto tryagain;
-                }
-                tryswitchalready = 0;
-                break;
-                     */
+                tryswitchalready = 1;
+                goto tryagain;
             }
             tryswitchalready = 0;
 
