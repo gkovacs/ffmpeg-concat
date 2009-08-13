@@ -1252,6 +1252,12 @@ static int output_packet(AVInputStream *ist, int ist_index,
     int got_subtitle;
     int offset = 0;
     AVPacket avpkt;
+
+    if (pkt) {
+    ist->st = is->streams[pkt->stream_index];
+    offset = pkt->index_offset;
+    }
+    /*
     if (ist && is && pkt && is->iformat && is->iformat->long_name &&
         !strncmp(is->iformat->long_name, "CONCAT", 6) && is->nb_streams > pkt->stream_index &&
         is->streams && is->streams[pkt->stream_index] && is->streams[pkt->stream_index]->codec) {
@@ -1271,6 +1277,7 @@ static int output_packet(AVInputStream *ist, int ist_index,
              }
          }
     }
+     */
 //    ist_index -= offset;
      
     if(ist->next_pts == AV_NOPTS_VALUE)
@@ -1314,6 +1321,15 @@ static int output_packet(AVInputStream *ist, int ist_index,
                        endianness as CPU */
                 ret = avcodec_decode_audio3(ist->st->codec, samples, &data_size,
                                             &avpkt);
+
+
+                ist->st = is->streams[avpkt.stream_index];
+
+                    while (ret < 0)
+                        ret = ist->st->codec->codec->decode(ist->st->codec, samples, &data_size,
+                                            &avpkt);
+
+
                 if (ret < 0)
                     goto fail_decode;
                 avpkt.data += ret;
@@ -1336,6 +1352,12 @@ static int output_packet(AVInputStream *ist, int ist_index,
                     ret = avcodec_decode_video2(ist->st->codec,
                                                 &picture, &got_picture, &avpkt);
                     ist->st->quality= picture.quality;
+
+                    ist->st = is->streams[avpkt.stream_index];
+
+                    while (ret < 0)
+                        ret = ist->st->codec->codec->decode(ist->st->codec,
+                                                &picture, &got_picture, &avpkt);
                     if (ret < 0)
                         goto fail_decode;
                     if (!got_picture) {

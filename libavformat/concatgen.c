@@ -62,8 +62,8 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             break;
         } else {
             if (!have_switched_streams &&
-                ctx->pe_curidx < ctx->pelist_size - 1 &&
-                ic->cur_st) {
+                ctx->pe_curidx < ctx->pelist_size - 1// &&
+                /*ic->cur_st*/) {
             // TODO switch from AVERROR_EOF to AVERROR_EOS
             // -32 AVERROR_EOF for avi, -51 for ogg
                 av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
@@ -74,7 +74,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                 ff_playlist_populate_context(ctx, ctx->pe_curidx);
                 ff_playlist_set_streams(s);
                 // have_switched_streams is set to avoid infinite loop
-                have_switched_streams = 1;
+//                have_switched_streams = 1;
                 // duration is updated in case it's checked by a parent demuxer (chained concat demuxers)
                 s->duration = 0;
                 for (i = 0; i < ctx->pe_curidx; ++i)
@@ -82,6 +82,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                 continue;
             } else {
                 av_log(ic, AV_LOG_ERROR, "Packet read error %d\n", ret);
+//                continue;
                 break;
             }
         }
