@@ -1302,14 +1302,6 @@ static int output_packet(AVInputStream *ist, int ist_index,
                 ret = avcodec_decode_audio3(ist->st->codec, samples, &data_size,
                                             &avpkt);
 
-
-                ist->st = is->streams[avpkt.stream_index];
-
-                    while (ret < 0)
-                        ret = ist->st->codec->codec->decode(ist->st->codec, samples, &data_size,
-                                            &avpkt);
-
-
                 if (ret < 0)
                     goto fail_decode;
                 avpkt.data += ret;
@@ -1332,12 +1324,6 @@ static int output_packet(AVInputStream *ist, int ist_index,
                     ret = avcodec_decode_video2(ist->st->codec,
                                                 &picture, &got_picture, &avpkt);
                     ist->st->quality= picture.quality;
-
-                    ist->st = is->streams[avpkt.stream_index];
-
-                    while (ret < 0)
-                        ret = ist->st->codec->codec->decode(ist->st->codec,
-                                                &picture, &got_picture, &avpkt);
                     if (ret < 0)
                         goto fail_decode;
                     if (!got_picture) {
