@@ -1,13 +1,13 @@
 ffmpeg:
-svn: 19597
-git: 2d6e5ef7bc1cd33d7d3b34e9dff5cfa490ffaaef
-committer: diego
-commitdate: Wed, 5 Aug 2009 15:27:22 +0000
-commitlog: Do not check for both CONFIG_H263_ENCODER and CONFIG_FLV_ENCODER. The latter can never be enabled without the former.
+svn: 19635
+git: 184d37aca1e2eb2cd2438a77b7fb33a5cefee62b
+committer: ramiro
+commitdate: Thu, 13 Aug 2009 18:47:13 +0000
+commitlog: Introduce av_clip_uint16().
 
 libswscale:
-svn: 19597
-git: b1af9a271e6f587dbcd2b19dbceb4d2ec8eace7e
-committer: cehoyos
-commitdate: Sat, 1 Aug 2009 21:30:36 +0000
-commitlog: Fix regression when converting to nv12/nv21.
+svn: 19635
+git: 7462c6875cb7429cdc33496b4f8b5a9653899374
+committer: ramiro
+commitdate: Thu, 13 Aug 2009 19:03:14 +0000
+commitlog: Indent.
