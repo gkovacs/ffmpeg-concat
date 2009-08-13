@@ -43,7 +43,7 @@ static int concat_probe(AVProbeData *p)
     return 0;
 }
 
-// PlaylistD should be constructed externally
+// PlaylistContext should be constructed externally
 static int concat_read_header(AVFormatContext *s,
                               AVFormatParameters *ap)
 {
