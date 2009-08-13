@@ -933,7 +933,6 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 {
     AVStream *st;
     int len, ret, i;
-    int stream_index = 0;
 
     av_init_packet(pkt);
 
@@ -967,8 +966,8 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 /* return packet if any */
                 if (pkt->size) {
                 got_packet:
-                    pkt->stream_index = stream_index;
                     pkt->duration = 0;
+                    pkt->stream_index = st->index;
                     pkt->pts = st->parser->pts;
                     pkt->dts = st->parser->dts;
                     pkt->pos = st->parser->pos;
@@ -992,7 +991,6 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             AVPacket cur_pkt;
             /* read next packet */
             ret = av_read_packet(s, &cur_pkt);
-            stream_index = cur_pkt.stream_index;
             if (ret < 0) {
                 if (ret == AVERROR(EAGAIN))
                     return ret;
@@ -1005,9 +1003,8 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                                         NULL, 0,
                                         AV_NOPTS_VALUE, AV_NOPTS_VALUE,
                                         AV_NOPTS_VALUE);
-                        if (pkt->size) {
+                        if (pkt->size)
                             goto got_packet;
-                        }
                     }
                 }
                 /* no more packets: really terminate parsing */
