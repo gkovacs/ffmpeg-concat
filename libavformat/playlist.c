@@ -221,9 +221,8 @@ int ff_playlist_localstidx_from_streamidx(PlaylistContext *ctx, int stream_index
 {
     int i, total;
     i = total = 0;
-    while (stream_index >= total) {
+    while (stream_index >= total)
         total += ctx->nb_streams_list[i++];
-    }
     return stream_index - (total - ctx->nb_streams_list[i-1]);
 }
 
