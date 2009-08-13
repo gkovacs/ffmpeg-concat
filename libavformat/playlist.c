@@ -55,27 +55,6 @@ void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx)
     ctx->nb_streams_list[pe_curidx] = ctx->icl[pe_curidx]->nb_streams;
 }
 
-static void flush_packet_queue(AVFormatContext *s)
-{
-    AVPacketList *pktl;
-
-    for(;;) {
-        pktl = s->packet_buffer;
-        if (!pktl)
-            break;
-        s->packet_buffer = pktl->next;
-        av_free_packet(&pktl->pkt);
-        av_free(pktl);
-    }
-    while(s->raw_packet_buffer){
-        pktl = s->raw_packet_buffer;
-        s->raw_packet_buffer = pktl->next;
-        av_free_packet(&pktl->pkt);
-        av_free(pktl);
-    }
-    s->raw_packet_buffer_remaining_size = RAW_PACKET_BUFFER_SIZE;
-}
-
 void ff_playlist_set_streams(AVFormatContext *s)
 {
     int i;
