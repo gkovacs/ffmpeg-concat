@@ -40,6 +40,7 @@
 #include "libavutil/fifo.h"
 #include "libavutil/avstring.h"
 #include "libavformat/os_support.h"
+#include "libavformat/concat.h"
 
 #if HAVE_SYS_RESOURCE_H
 #include <sys/types.h>
@@ -1250,12 +1251,13 @@ static int output_packet(AVInputStream *ist, int ist_index,
     static unsigned int samples_size= 0;
     AVSubtitle subtitle, *subtitle_to_free;
     int got_subtitle;
-    int offset = 0;
+    int stream_offset = 0;
     AVPacket avpkt;
+    PlaylistContext *pl_ctx = ff_playlist_get_context(is);
 
-    if (pkt) {
+    if (pl_ctx && pkt) {
         ist->st = is->streams[pkt->stream_index];
-        offset = pkt->index_offset;
+        stream_offset = pkt->stream_index - ff_playlist_localstidx_from_streamidx(pl_ctx, pkt->stream_index);
     }
      
     if(ist->next_pts == AV_NOPTS_VALUE)
@@ -1420,7 +1422,7 @@ static int output_packet(AVInputStream *ist, int ist_index,
                 int frame_size;
 
                 ost = ost_table[i];
-                if (ost->source_index == ist_index - offset) {
+                if (ost->source_index == ist_index - stream_offset) {
                     os = output_files[ost->file_index];
 
 #if 0
@@ -2178,6 +2180,8 @@ static int av_encode(AVFormatContext **output_files,
         AVPacket pkt;
         double ipts_min;
         double opts_min;
+        PlaylistContext *pl_ctx;
+        int stream_offset;
 
     redo:
         ipts_min= 1e100;
@@ -2264,29 +2268,34 @@ static int av_encode(AVFormatContext **output_files,
             av_pkt_dump_log(NULL, AV_LOG_DEBUG, &pkt, do_hex_dump);
         }
 
-        if (pkt.stream_index >= nb_istreams &&
-            pkt.stream_index < is->nb_streams &&
-            pkt.stream_index > 0 &&
-            is->streams[pkt.stream_index]) {
-            ist_table = av_realloc(ist_table, sizeof(*ist_table) * (pkt.stream_index + 1));
-            for (i = nb_istreams; i < pkt.stream_index + 1; ++i)
-                ist_table[i] = NULL;
-            file_table[file_index].nb_streams = file_table[file_index].ist_index + pkt.stream_index + 1;
-            nb_istreams = file_table[file_index].ist_index + pkt.stream_index + 1;
-        }
-
-        if (!ist_table[pkt.stream_index]) {
-            ist = ist_table[pkt.stream_index] = av_mallocz(sizeof(AVInputStream));
-            ist->st              = is->streams[pkt.stream_index];
-            ist->file_index      = file_index;
-            ist->decoding_needed = 1;
-            ist->is_start        = 1;
-            ist->discard         = 0;
-            ist->sample_index    = 0;
-            ist->index           = file_table[file_index].ist_index + pkt.stream_index;
-            ist->pts             = 0;
-            ist->next_pts        = AV_NOPTS_VALUE;
-            input_files_ts_scale[file_index][pkt.stream_index] = 0.0L;
+        pl_ctx = ff_playlist_get_context(is);
+        if (pl_ctx) {
+            if (pkt.stream_index >= nb_istreams &&
+                pkt.stream_index < is->nb_streams &&
+                pkt.stream_index > 0 &&
+                is->streams[pkt.stream_index]) {
+                ist_table = av_realloc(ist_table, sizeof(*ist_table) * (pkt.stream_index + 1));
+                for (i = nb_istreams; i < pkt.stream_index + 1; ++i)
+                    ist_table[i] = NULL;
+                file_table[file_index].nb_streams = file_table[file_index].ist_index + pkt.stream_index + 1;
+                nb_istreams = file_table[file_index].ist_index + pkt.stream_index + 1;
+            }
+            if (!ist_table[pkt.stream_index]) {
+                ist = ist_table[pkt.stream_index] = av_mallocz(sizeof(AVInputStream));
+                ist->st              = is->streams[pkt.stream_index];
+                ist->file_index      = file_index;
+                ist->decoding_needed = 1;
+                ist->is_start        = 1;
+                ist->discard         = 0;
+                ist->sample_index    = 0;
+                ist->index           = file_table[file_index].ist_index + pkt.stream_index;
+                ist->pts             = 0;
+                ist->next_pts        = AV_NOPTS_VALUE;
+                input_files_ts_scale[file_index][pkt.stream_index] = 0.0L;
+            }
+            stream_offset = pkt.stream_index - ff_playlist_localstidx_from_streamidx(pl_ctx, pkt.stream_index);
+        } else {
+            stream_offset = 0;
         }
 
         /* the following test is needed in case new streams appear
@@ -2295,7 +2304,7 @@ static int av_encode(AVFormatContext **output_files,
             goto discard_packet;
 
         ist_index = file_table[file_index].ist_index + pkt.stream_index;
-        ist = ist_table[ist_index - pkt.index_offset];
+        ist = ist_table[ist_index - stream_offset];
         if (ist->discard)
             goto discard_packet;
 

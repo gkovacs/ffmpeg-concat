@@ -43,7 +43,6 @@ void av_init_packet(AVPacket *pkt)
     pkt->flags = 0;
     pkt->stream_index = 0;
     pkt->destruct= NULL;
-    pkt->index_offset = 0;
 }
 
 int av_new_packet(AVPacket *pkt, int size)

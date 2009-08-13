@@ -951,7 +951,6 @@ typedef struct AVPacket {
      * subtitles are correctly displayed after seeking.
      */
     int64_t convergence_duration;
-    int index_offset;
 } AVPacket;
 #define AV_PKT_FLAG_KEY   0x0001
 #if LIBAVCODEC_VERSION_MAJOR < 53
