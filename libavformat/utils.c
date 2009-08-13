@@ -933,8 +933,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 {
     AVStream *st;
     int len, ret, i;
-    int stream_index;
-    stream_index = 0;
+    int stream_index = 0;
 
     av_init_packet(pkt);
 
