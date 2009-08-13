@@ -2288,58 +2288,34 @@ static int av_encode(AVFormatContext **output_files,
 
         if (pkt.stream_index >= nb_istreams && pkt.stream_index < is->nb_streams && pkt.stream_index > 0 && is->streams[pkt.stream_index]) {
             ist_table = av_realloc(ist_table, sizeof(*ist_table) * (pkt.stream_index + 1));
-            for (i = nb_istreams; i < pkt.stream_index + 1; ++i) {
+            for (i = nb_istreams; i < pkt.stream_index + 1; ++i)
                 ist_table[i] = NULL;
-                /*
-                ist_table[i] = av_mallocz(sizeof(AVInputStream));
-                ist = ist_table[i];
-                ist->st = is->streams[i];
-                ist->file_index = file_index;
-                ist->decoding_needed = 1;
-                ist->is_start = 0;
-                ist->is_start = 1;
-                ist->discard = 0;
-                ist->index = file_table[file_index].ist_index + i;
-                ist->pts = 0;
-                ist->next_pts = AV_NOPTS_VALUE;
-                */
-            }
             file_table[file_index].nb_streams = file_table[file_index].ist_index + pkt.stream_index + 1;
             nb_istreams = file_table[file_index].ist_index + pkt.stream_index + 1;
         }
 
         if (!ist_table[pkt.stream_index]) {
-            ist_table[pkt.stream_index] = av_mallocz(sizeof(AVInputStream));
+            ist = ist_table[pkt.stream_index] = av_mallocz(sizeof(AVInputStream));
+            ist->st = is->streams[pkt.stream_index];
+            ist->file_index = file_index;
+            ist->decoding_needed = 1;
+            ist->is_start = 1;
+            ist->discard = 0;
+            ist->sample_index = 0;
+            ist->index = file_table[file_index].ist_index + pkt.stream_index;
+            ist->pts = 0;
+            ist->next_pts = AV_NOPTS_VALUE;
         }
-        
-//                ist = ist_table[pkt.stream_index];
-
 
         /* the following test is needed in case new streams appear
            dynamically in stream : we ignore them */
         if (pkt.stream_index >= file_table[file_index].nb_streams)
             goto discard_packet;
 
-        i = pkt.stream_index; //- pkt.index_offset;
-
-        ist_index = file_table[file_index].ist_index + i;// - pkt.index_offset;
+        ist_index = file_table[file_index].ist_index + pkt.stream_index;
         ist = ist_table[ist_index - pkt.index_offset];
         if (ist->discard)
             goto discard_packet;
-
-        
-                ist->st = is->streams[i];
-                ist->file_index = file_index;
-                ist->decoding_needed = 1;
-                ist->is_start = 1;
-                ist->discard = 0;
-                ist->sample_index = 0;
-                ist->index = file_table[file_index].ist_index + i;
-                ist->pts = 0;
-                ist->next_pts = AV_NOPTS_VALUE;
-
-
-//                ist_index -= pkt.index_offset;
 
         if (pkt.dts != AV_NOPTS_VALUE)
             pkt.dts += av_rescale_q(input_files_ts_offset[ist->file_index], AV_TIME_BASE_Q, ist->st->time_base);
