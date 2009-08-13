@@ -951,7 +951,6 @@ typedef struct AVPacket {
      * subtitles are correctly displayed after seeking.
      */
     int64_t convergence_duration;
-    struct AVStream *stream;  /**<  stream that packet was read from */
     int index_offset;
 } AVPacket;
 #define AV_PKT_FLAG_KEY   0x0001

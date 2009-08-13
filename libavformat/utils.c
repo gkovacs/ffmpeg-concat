@@ -971,7 +971,6 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 /* return packet if any */
                 if (pkt->size) {
                 got_packet:
-                    pkt->stream = st;
                     pkt->stream_index = stream_index;
                     pkt->index_offset = offset;
                     pkt->duration = 0;
@@ -1000,7 +999,6 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             ret = av_read_packet(s, &cur_pkt);
             offset = cur_pkt.index_offset;
             stream_index = cur_pkt.stream_index;
-            stream = cur_pkt.stream;
             if (ret < 0) {
                 if (ret == AVERROR(EAGAIN))
                     return ret;
