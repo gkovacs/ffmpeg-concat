@@ -1239,7 +1239,7 @@ static void print_report(AVFormatContext **output_files,
 static int output_packet(AVInputStream *ist, int ist_index,
                          AVOutputStream **ost_table, int nb_ostreams,
                          AVPacket *pkt,
-                         AVFormatContext *is)
+                         AVFormatContext *ic)
 {
     AVFormatContext *os;
     AVOutputStream *ost;
@@ -1253,10 +1253,10 @@ static int output_packet(AVInputStream *ist, int ist_index,
     int got_subtitle;
     int stream_offset = 0;
     AVPacket avpkt;
-    PlaylistContext *pl_ctx = ff_playlist_get_context(is);
+    PlaylistContext *pl_ctx = ff_playlist_get_context(ic);
 
     if (pl_ctx && pkt) {
-        ist->st = is->streams[pkt->stream_index];
+        ist->st = ic->streams[pkt->stream_index];
         stream_offset = pkt->stream_index - ff_playlist_localstidx_from_streamidx(pl_ctx, pkt->stream_index);
     }
      
