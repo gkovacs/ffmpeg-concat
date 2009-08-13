@@ -2317,15 +2317,15 @@ static int av_encode(AVFormatContext **output_files,
 
         /* the following test is needed in case new streams appear
            dynamically in stream : we ignore them */
-//        if (pkt.stream_index >= file_table[file_index].nb_streams)
-//            goto discard_packet;
+        if (pkt.stream_index >= file_table[file_index].nb_streams)
+            goto discard_packet;
 
         i = pkt.stream_index; //- pkt.index_offset;
 
         ist_index = file_table[file_index].ist_index + i;// - pkt.index_offset;
         ist = ist_table[ist_index - pkt.index_offset];
-//        if (ist->discard)
-//            goto discard_packet;
+        if (ist->discard)
+            goto discard_packet;
 
         
                 ist->st = is->streams[i];
