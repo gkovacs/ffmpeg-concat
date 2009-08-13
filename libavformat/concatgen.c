@@ -74,7 +74,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                 ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx,
                                                                     ff_playlist_time_offset(ctx->durations, ctx->pe_curidx),
                                                                     NULL);
-                ff_playlist_populate_context(ctx, ctx->pe_curidx, s);
+                ff_playlist_populate_context(ctx, ctx->pe_curidx);
                 ff_playlist_set_streams(s);
                 // have_switched_streams is set to avoid infinite loop
                 have_switched_streams = 1;
@@ -110,7 +110,7 @@ int ff_concatgen_read_seek(AVFormatContext *s,
     ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx,
                                                         pts_avtimebase,
                                                         &localpts_avtimebase);
-    ff_playlist_populate_context(ctx, ctx->pe_curidx, s);
+    ff_playlist_populate_context(ctx, ctx->pe_curidx);
     ff_playlist_set_streams(s);
     ic = ctx->icl[ctx->pe_curidx];
     localpts = av_rescale_q(localpts_avtimebase,

@@ -111,7 +111,7 @@ static int xspf_read_header(AVFormatContext *s,
         return AVERROR_EOF;
     }
     s->priv_data = ctx;
-    ff_playlist_populate_context(ctx, ctx->pe_curidx, s);
+    ff_playlist_populate_context(ctx, ctx->pe_curidx);
     ff_playlist_set_streams(s);
     return 0;
 }

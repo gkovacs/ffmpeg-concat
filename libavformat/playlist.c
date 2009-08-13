@@ -34,30 +34,24 @@
 #include "playlist.h"
 #include "internal.h"
 
-AVFormatContext *ff_playlist_alloc_formatcontext(char *filename, AVFormatContext *s)
+AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
 {
     int err;
     AVFormatContext *ic = avformat_alloc_context();
-    //ic->packet_buffer = s->packet_buffer;
     err = av_open_input_file(&(ic), filename, ic->iformat, 0, NULL);
     if (err < 0)
         av_log(ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
-    //ic->packet_buffer = s->packet_buffer;
-    //err = ic->iformat->read_header(ic, NULL);
-    //if (err < 0)
-        //av_log(ic, AV_LOG_ERROR, "Error during read_header\n");
     err = av_find_stream_info(ic);
     if (err < 0)
         av_log(ic, AV_LOG_ERROR, "Could not find stream info\n");
-    //ic->packet_buffer = s->packet_buffer;
     return ic;
 }
 
-void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx, AVFormatContext *s)
+void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx)
 {
     ctx->icl = av_realloc(ctx->icl, sizeof(*(ctx->icl)) * (pe_curidx+2));
     ctx->icl[pe_curidx+1] = NULL;
-    ctx->icl[pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[pe_curidx], s);
+    ctx->icl[pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[pe_curidx]);
     ctx->nb_streams_list[pe_curidx] = ctx->icl[pe_curidx]->nb_streams;
 }
 
