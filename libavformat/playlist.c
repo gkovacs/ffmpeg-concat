@@ -93,7 +93,7 @@ void ff_playlist_set_streams(AVFormatContext *s)
     ic->iformat->read_header(ic, NULL);
     for (i = 0; i < ic->nb_streams; ++i) {
         s->streams[offset + i] = ic->streams[i];
-//        ic->streams[i]->index += offset;
+        ic->streams[i]->index += offset;
         if (!ic->streams[i]->codec->codec) {
             AVCodec *codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
             //ic->streams[i]->codec->codec = avcodec_alloc_context2(codec->type);
@@ -111,21 +111,14 @@ void ff_playlist_set_streams(AVFormatContext *s)
              }
         }
     }
-    s->nb_streams = ic->nb_streams + offset;
-    s->cur_st = ic->cur_st;
-    s->raw_packet_buffer = ic->raw_packet_buffer;
-    s->raw_packet_buffer_end = ic->raw_packet_buffer_end;
+    s->nb_streams                       = ic->nb_streams + offset;
+    s->cur_st                           = ic->cur_st;
+    s->raw_packet_buffer                = ic->raw_packet_buffer;
+    s->raw_packet_buffer_end            = ic->raw_packet_buffer_end;
     s->raw_packet_buffer_remaining_size = ic->raw_packet_buffer_remaining_size;
-    s->packet_size = ic->packet_size;
-    //if (ic->packet_buffer && ic->packet_buffer->pkt.data && ic->packet_buffer->pkt.stream_index >= offset && ic->packet_buffer->pkt.stream_index < ic->nb_streams + offset)
-
-    //flush_packet_queue(ic);
-    //flush_packet_queue(s);
-    //ic->packet_buffer = 0;
-    //s->packet_buffer = 0;
-        s->packet_buffer = ic->packet_buffer;
-    //if (ic->packet_buffer_end && ic->packet_buffer_end->pkt.data && ic->packet_buffer_end->pkt.stream_index >= offset && ic->packet_buffer_end->pkt.stream_index < ic->nb_streams + offset);
-        s->packet_buffer_end = ic->packet_buffer_end;
+    s->packet_size                      = ic->packet_size;
+    s->packet_buffer                    = ic->packet_buffer;
+    s->packet_buffer_end                = ic->packet_buffer_end;
 }
 
 PlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
