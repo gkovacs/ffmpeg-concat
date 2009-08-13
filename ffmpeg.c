@@ -2264,7 +2264,10 @@ static int av_encode(AVFormatContext **output_files,
             av_pkt_dump_log(NULL, AV_LOG_DEBUG, &pkt, do_hex_dump);
         }
 
-        if (pkt.stream_index >= nb_istreams && pkt.stream_index < is->nb_streams && pkt.stream_index > 0 && is->streams[pkt.stream_index]) {
+        if (pkt.stream_index >= nb_istreams &&
+            pkt.stream_index < is->nb_streams &&
+            pkt.stream_index > 0 &&
+            is->streams[pkt.stream_index]) {
             ist_table = av_realloc(ist_table, sizeof(*ist_table) * (pkt.stream_index + 1));
             for (i = nb_istreams; i < pkt.stream_index + 1; ++i)
                 ist_table[i] = NULL;
