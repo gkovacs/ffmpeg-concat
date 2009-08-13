@@ -68,7 +68,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                 ctx->pe_curidx < ctx->pelist_size - 1) {
             // TODO switch from AVERROR_EOF to AVERROR_EOS
             // -32 AVERROR_EOF for avi, -51 for ogg
-                
+
                 av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
                 ctx->durations[ctx->pe_curidx] = ic->duration;
                 ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx,
