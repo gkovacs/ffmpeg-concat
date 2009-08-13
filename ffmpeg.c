@@ -2274,15 +2274,15 @@ static int av_encode(AVFormatContext **output_files,
 
         if (!ist_table[pkt.stream_index]) {
             ist = ist_table[pkt.stream_index] = av_mallocz(sizeof(AVInputStream));
-            ist->st = is->streams[pkt.stream_index];
-            ist->file_index = file_index;
+            ist->st              = is->streams[pkt.stream_index];
+            ist->file_index      = file_index;
             ist->decoding_needed = 1;
-            ist->is_start = 1;
-            ist->discard = 0;
-            ist->sample_index = 0;
-            ist->index = file_table[file_index].ist_index + pkt.stream_index;
-            ist->pts = 0;
-            ist->next_pts = AV_NOPTS_VALUE;
+            ist->is_start        = 1;
+            ist->discard         = 0;
+            ist->sample_index    = 0;
+            ist->index           = file_table[file_index].ist_index + pkt.stream_index;
+            ist->pts             = 0;
+            ist->next_pts        = AV_NOPTS_VALUE;
         }
 
         /* the following test is needed in case new streams appear
