@@ -112,11 +112,6 @@ void ff_playlist_set_streams(AVFormatContext *s)
         }
     }
     s->nb_streams                       = ic->nb_streams + offset;
-    s->cur_st                           = ic->cur_st;
-    s->raw_packet_buffer                = ic->raw_packet_buffer;
-    s->raw_packet_buffer_end            = ic->raw_packet_buffer_end;
-    s->raw_packet_buffer_remaining_size = ic->raw_packet_buffer_remaining_size;
-    s->packet_size                      = ic->packet_size;
     s->packet_buffer                    = ic->packet_buffer;
     s->packet_buffer_end                = ic->packet_buffer_end;
 }

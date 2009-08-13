@@ -40,14 +40,9 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     char have_switched_streams = 0;
     ctx = s->priv_data;
     stream_index = 0;
-//    for (;;) {
-    success:
+    for (;;) {
         ic = ctx->icl[ctx->pe_curidx];
         av_init_packet(pkt);
-//        ret = av_read_frame(ic, pkt);
-//        ret = av_read_packet(ic, pkt);
-        //ff_playlist_set_streams(s);
-        
         if (s->packet_buffer) {
             *pkt = s->packet_buffer->pkt;
             s->packet_buffer = s->packet_buffer->next;
@@ -55,7 +50,6 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         } else {
             ret = ic->iformat->read_packet(ic, pkt);
         }
-        s->cur_st = ic->cur_st;
         if (ret >= 0) {
             if (pkt) {
                 stream_index = pkt->stream_index;
@@ -68,11 +62,10 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                     pkt->pts = pkt->dts + 1;
                 }
             }
-            //break;
+            break;
         } else {
             if (!have_switched_streams &&
-                ctx->pe_curidx < ctx->pelist_size - 1// &&
-                /*ic->cur_st*/) {
+                ctx->pe_curidx < ctx->pelist_size - 1) {
             // TODO switch from AVERROR_EOF to AVERROR_EOS
             // -32 AVERROR_EOF for avi, -51 for ogg
                 
@@ -81,28 +74,21 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                 ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx,
                                                                     ff_playlist_time_offset(ctx->durations, ctx->pe_curidx),
                                                                     NULL);
-
-                //*pkt = s->packet_buffer->pkt;
-                //avcodec_flush_buffers(s->streams[0]->codec);
-                
                 ff_playlist_populate_context(ctx, ctx->pe_curidx, s);
                 ff_playlist_set_streams(s);
-
                 // have_switched_streams is set to avoid infinite loop
                 have_switched_streams = 1;
                 // duration is updated in case it's checked by a parent demuxer (chained concat demuxers)
                 s->duration = 0;
                 for (i = 0; i < ctx->pe_curidx; ++i)
                     s->duration += ctx->durations[i];
-                goto success;
-//                continue;
+                continue;
             } else {
                 av_log(ic, AV_LOG_ERROR, "Packet read error %d\n", ret);
-//                continue;
-                //break;
+                break;
             }
         }
-//    }
+    }
     return ret;
 }
 
