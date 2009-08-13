@@ -41,22 +41,22 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     ctx = s->priv_data;
     stream_index = 0;
 //    for (;;) {
-    success:
+    //success:
         ic = ctx->icl[ctx->pe_curidx];
         av_init_packet(pkt);
 //        ret = av_read_frame(ic, pkt);
 //        ret = av_read_packet(ic, pkt);
         //ff_playlist_set_streams(s);
         
-        if (s->packet_buffer) {
-            *pkt = s->packet_buffer->pkt;
-            s->packet_buffer = s->packet_buffer->next;
-            ret = 0;
-        } else {
+        //if (s->packet_buffer) {
+            //*pkt = s->packet_buffer->pkt;
+            //s->packet_buffer = s->packet_buffer->next;
+            //ret = 0;
+        //} else {
             ret = ic->iformat->read_packet(ic, pkt);
-        }
+        //}
 //        ff_playlist_set_streams(s);
-        
+        success:
         
         //s->packet_buffer = ic->packet_buffer;
         //s->packet_buffer_end = ic->packet_buffer_end;
@@ -90,20 +90,26 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                                                                     NULL);
 
                 //*pkt = s->packet_buffer->pkt;
-//                avcodec_flush_buffers(s->streams[0]->codec);
+                //avcodec_flush_buffers(s->streams[0]->codec);
+                
                 ff_playlist_populate_context(ctx, ctx->pe_curidx, s);
                 ff_playlist_set_streams(s);
 
                 // have_switched_streams is set to avoid infinite loop
-//                have_switched_streams = 1;
+                have_switched_streams = 1;
                 // duration is updated in case it's checked by a parent demuxer (chained concat demuxers)
                 s->duration = 0;
                 for (i = 0; i < ctx->pe_curidx; ++i)
                     s->duration += ctx->durations[i];
                 
                 //s->packet_buffer
-                ret = 0;
+                //ret = 0;
                 ic = ctx->icl[ctx->pe_curidx];
+                if (s->packet_buffer) {
+                    *pkt = s->packet_buffer->pkt;
+                    s->packet_buffer = s->packet_buffer->next;
+                    ret = 0;
+                }
                 goto success;
 //                continue;
             } else {
