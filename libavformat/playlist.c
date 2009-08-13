@@ -72,12 +72,12 @@ void ff_playlist_set_streams(AVFormatContext *s)
             if (!codec) {
                 av_log(ic->streams[i]->codec, AV_LOG_ERROR, "Decoder (codec id %d) not found for input stream #%d\n",
                        ic->streams[i]->codec->codec_id, ic->streams[i]->index);
-                return AVERROR(EINVAL);
+                return;
              }
              if (avcodec_open(ic->streams[i]->codec, codec) < 0) {
                 av_log(ic->streams[i]->codec, AV_LOG_ERROR, "Error while opening decoder for input stream #%d\n",
                        ic->streams[i]->index);
-                return AVERROR(EINVAL);
+                return;
              }
         }
     }
