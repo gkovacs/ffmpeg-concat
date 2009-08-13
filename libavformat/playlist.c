@@ -41,6 +41,9 @@ AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
     err = av_open_input_file(&(ic), filename, ic->iformat, 0, NULL);
     if (err < 0)
         av_log(ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
+    //err = ic->iformat->read_header(ic, NULL);
+    //if (err < 0)
+        //av_log(ic, AV_LOG_ERROR, "Error during read_header\n");
     err = av_find_stream_info(ic);
     if (err < 0)
         av_log(ic, AV_LOG_ERROR, "Could not find stream info\n");
@@ -53,6 +56,27 @@ void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx)
     ctx->icl[pe_curidx+1] = NULL;
     ctx->icl[pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[pe_curidx]);
     ctx->nb_streams_list[pe_curidx] = ctx->icl[pe_curidx]->nb_streams;
+}
+
+static void flush_packet_queue(AVFormatContext *s)
+{
+    AVPacketList *pktl;
+
+    for(;;) {
+        pktl = s->packet_buffer;
+        if (!pktl)
+            break;
+        s->packet_buffer = pktl->next;
+        av_free_packet(&pktl->pkt);
+        av_free(pktl);
+    }
+    while(s->raw_packet_buffer){
+        pktl = s->raw_packet_buffer;
+        s->raw_packet_buffer = pktl->next;
+        av_free_packet(&pktl->pkt);
+        av_free(pktl);
+    }
+    s->raw_packet_buffer_remaining_size = RAW_PACKET_BUFFER_SIZE;
 }
 
 void ff_playlist_set_streams(AVFormatContext *s)
@@ -91,6 +115,11 @@ void ff_playlist_set_streams(AVFormatContext *s)
     //s->raw_packet_buffer_remaining_size = ic->raw_packet_buffer_remaining_size;
     //s->packet_size = ic->packet_size;
     //if (ic->packet_buffer && ic->packet_buffer->pkt.data && ic->packet_buffer->pkt.stream_index >= offset && ic->packet_buffer->pkt.stream_index < ic->nb_streams + offset)
+
+    //flush_packet_queue(ic);
+    //flush_packet_queue(s);
+    //ic->packet_buffer = 0;
+    //s->packet_buffer = 0;
         s->packet_buffer = ic->packet_buffer;
     //if (ic->packet_buffer_end && ic->packet_buffer_end->pkt.data && ic->packet_buffer_end->pkt.stream_index >= offset && ic->packet_buffer_end->pkt.stream_index < ic->nb_streams + offset);
         //s->packet_buffer_end = ic->packet_buffer_end;
