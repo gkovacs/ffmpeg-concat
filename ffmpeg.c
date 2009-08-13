@@ -2283,6 +2283,7 @@ static int av_encode(AVFormatContext **output_files,
             ist->index           = file_table[file_index].ist_index + pkt.stream_index;
             ist->pts             = 0;
             ist->next_pts        = AV_NOPTS_VALUE;
+            input_files_ts_scale[file_index][pkt.stream_index] = 0.0L;
         }
 
         /* the following test is needed in case new streams appear
