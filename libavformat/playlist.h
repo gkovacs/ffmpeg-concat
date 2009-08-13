@@ -55,14 +55,14 @@ typedef struct PlaylistContext {
  *  @param filename Null-terminated string of file to open.
  *  @return Returns an allocated AVFormatContext.
  */
-AVFormatContext *ff_playlist_alloc_formatcontext(char *filename);
+AVFormatContext *ff_playlist_alloc_formatcontext(char *filename, AVFormatContext *s);
 
 /** @fn void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx)
  *  @brief Opens the playlist element with the specified index from the PlaylistContext.
  *  @param ctx PlaylistContext containing the desired playlist element.
  *  @param pe_curidx Index of the playlist element to be opened.
  */
-void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx);
+void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx, AVFormatContext *s);
 
 /** @fn void ff_playlist_set_streams(AVFormatContext *s)
  *  @brief Sets the master concat-type demuxer's streams to those of its currently opened playlist element.
