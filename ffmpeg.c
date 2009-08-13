@@ -1254,31 +1254,9 @@ static int output_packet(AVInputStream *ist, int ist_index,
     AVPacket avpkt;
 
     if (pkt) {
-    ist->st = is->streams[pkt->stream_index];
-    offset = pkt->index_offset;
-    }
-    /*
-    if (ist && is && pkt && is->iformat && is->iformat->long_name &&
-        !strncmp(is->iformat->long_name, "CONCAT", 6) && is->nb_streams > pkt->stream_index &&
-        is->streams && is->streams[pkt->stream_index] && is->streams[pkt->stream_index]->codec) {
         ist->st = is->streams[pkt->stream_index];
         offset = pkt->index_offset;
-        if (!ist->st->codec->codec) {
-            AVCodec *codec = avcodec_find_decoder(ist->st->codec->codec_id);
-            if (!codec) {
-                av_log(ist->st->codec, AV_LOG_ERROR, "Decoder (codec id %d) not found for input stream #%d.%d\n",
-                       ist->st->codec->codec_id, ist->file_index, ist->index);
-                return AVERROR(EINVAL);
-             }
-             if (avcodec_open(ist->st->codec, codec) < 0) {
-                av_log(ist->st->codec, AV_LOG_ERROR, "Error while opening decoder for input stream #%d.%d\n",
-                       ist->file_index, ist->index);
-                return AVERROR(EINVAL);
-             }
-         }
     }
-     */
-//    ist_index -= offset;
      
     if(ist->next_pts == AV_NOPTS_VALUE)
         ist->next_pts= ist->pts;
