@@ -193,7 +193,7 @@ static int decode_main_header(NUTContext *nut){
     end += url_ftell(bc);
 
     GET_V(tmp              , tmp >=2 && tmp <= 3)
-    GET_V(stream_count     , tmp > 0 && tmp <=MAX_STREAMS)
+    GET_V(stream_count     , tmp > 0 && tmp <= 1024)
 
     nut->max_distance = ff_get_v(bc);
     if(nut->max_distance > 65536){

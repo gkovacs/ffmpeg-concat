@@ -242,7 +242,7 @@ typedef struct RTSPState {
 
     /** stream setup during the last frame read. This is used to detect if
      * we need to subscribe or unsubscribe to any new streams. */
-    enum AVDiscard real_setup_cache[MAX_STREAMS];
+    enum AVDiscard *real_setup_cache;
 
     /** the last value of the "SET_PARAMETER Subscribe:" RTSP command.
      * this is used to send the same "Unsubscribe:" if stream setup changed,

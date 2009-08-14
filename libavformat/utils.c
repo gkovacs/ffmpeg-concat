@@ -2036,16 +2036,21 @@ int av_find_stream_info(AVFormatContext *ic)
     int i, count, ret, read_size, j;
     AVStream *st;
     AVPacket pkt1, *pkt;
-    int64_t last_dts[MAX_STREAMS];
-    int64_t duration_gcd[MAX_STREAMS]={0};
-    int duration_count[MAX_STREAMS]={0};
+    int64_t last_dts[ic->nb_streams];
+    int64_t duration_gcd[ic->nb_streams];
+    int duration_count[ic->nb_streams];
     double (*duration_error)[MAX_STD_TIMEBASES];
     int64_t old_offset = url_ftell(ic->pb);
-    int64_t codec_info_duration[MAX_STREAMS]={0};
-    int codec_info_nb_frames[MAX_STREAMS]={0};
+    int64_t codec_info_duration[ic->nb_streams];
+    int codec_info_nb_frames[ic->nb_streams];
 
-    duration_error = av_mallocz(MAX_STREAMS * sizeof(*duration_error));
+    duration_error = av_mallocz(ic->nb_streams * sizeof(*duration_error));
     if (!duration_error) return AVERROR(ENOMEM);
+
+    memset(duration_gcd        , 0, sizeof(duration_gcd));
+    memset(duration_count      , 0, sizeof(duration_count));
+    memset(codec_info_duration , 0, sizeof(codec_info_duration));
+    memset(codec_info_nb_frames, 0, sizeof(codec_info_nb_frames));
 
     for(i=0;i<ic->nb_streams;i++) {
         st = ic->streams[i];
@@ -2064,7 +2069,7 @@ int av_find_stream_info(AVFormatContext *ic)
         }
     }
 
-    for(i=0;i<MAX_STREAMS;i++){
+    for(i=0;i<ic->nb_streams;i++){
         last_dts[i]= AV_NOPTS_VALUE;
     }
 
@@ -2703,7 +2708,7 @@ int ff_interleave_compare_dts(AVFormatContext *s, AVPacket *next, AVPacket *pkt)
 int av_interleave_packet_per_dts(AVFormatContext *s, AVPacket *out, AVPacket *pkt, int flush){
     AVPacketList *pktl;
     int stream_count=0;
-    int streams[MAX_STREAMS];
+    int streams[s->nb_streams];
 
     if(pkt){
         ff_interleave_add_packet(s, pkt, ff_interleave_compare_dts);
