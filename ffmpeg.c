@@ -94,7 +94,7 @@ static const OptionDef options[];
 
 static AVFormatContext *input_files[MAX_FILES];
 static int64_t input_files_ts_offset[MAX_FILES];
-static double *input_files_ts_scale[MAX_FILES];
+static double input_files_ts_scale[MAX_FILES][MAX_STREAMS];
 static AVCodec **input_codecs;
 static int nb_input_files = 0;
 static int nb_icodecs;
@@ -1656,7 +1656,7 @@ static int av_encode(AVFormatContext **output_files,
         file_table[i].ist_index = j;
         file_table[i].nb_streams = is->nb_streams;
         j += is->nb_streams;
-        input_files_ts_scale[i] = av_mallocz(is->nb_streams * sizeof(*input_files_ts_scale[0]));
+        //input_files_ts_scale[i] = av_mallocz(is->nb_streams * sizeof(*input_files_ts_scale[0]));
         if (!input_files_ts_scale[i])
             goto fail;
     }
@@ -2379,9 +2379,9 @@ static int av_encode(AVFormatContext **output_files,
     av_freep(&bit_buffer);
     av_free(file_table);
 
-    for(i=0;i<nb_input_files;i++) {
-        av_free(input_files_ts_scale[i]);
-    }
+    //for(i=0;i<nb_input_files;i++) {
+        //av_free(input_files_ts_scale[i]);
+    //}
     if (ist_table) {
         for(i=0;i<nb_istreams;i++) {
             ist = ist_table[i];
