@@ -95,7 +95,7 @@ static const OptionDef options[];
 static AVFormatContext *input_files[MAX_FILES];
 static int64_t input_files_ts_offset[MAX_FILES];
 static double input_files_ts_scale[MAX_FILES][MAX_STREAMS];
-static AVCodec **input_codecs;
+static AVCodec *input_codecs[MAX_STREAMS];
 static int nb_input_files = 0;
 static int nb_icodecs;
 
@@ -1665,9 +1665,9 @@ static int av_encode(AVFormatContext **output_files,
     ist_table = av_mallocz(nb_istreams * sizeof(AVInputStream *));
     if (!ist_table)
         goto fail;
-    input_codecs = av_mallocz(nb_istreams * sizeof(*input_codecs));
-    if (!input_codecs)
-        goto fail;
+    //input_codecs = av_mallocz(nb_istreams * sizeof(*input_codecs));
+    //if (!input_codecs)
+        //goto fail;
 
     for(i=0;i<nb_istreams;i++) {
         ist = av_mallocz(sizeof(AVInputStream));
@@ -2388,7 +2388,7 @@ static int av_encode(AVFormatContext **output_files,
             av_free(ist);
         }
         av_free(ist_table);
-        av_free(input_codecs);
+        //av_free(input_codecs);
     }
     if (ost_table) {
         for(i=0;i<nb_ostreams;i++) {
@@ -2961,7 +2961,7 @@ static void opt_input_file(const char *filename)
             audio_channels = enc->channels;
             audio_sample_rate = enc->sample_rate;
             audio_sample_fmt = enc->sample_fmt;
-            input_codecs = av_realloc(input_codecs, sizeof(*input_codecs) * (nb_icodecs + 1));
+            //input_codecs = av_realloc(input_codecs, sizeof(*input_codecs) * (nb_icodecs + 1));
             input_codecs[nb_icodecs++] = avcodec_find_decoder_by_name(audio_codec_name);
             if(audio_disable)
                 ic->streams[i]->discard= AVDISCARD_ALL;
@@ -2994,7 +2994,7 @@ static void opt_input_file(const char *filename)
             frame_rate.num = rfps;
             frame_rate.den = rfps_base;
 
-            input_codecs = av_realloc(input_codecs, sizeof(*input_codecs) * (nb_icodecs + 1));
+            //input_codecs = av_realloc(input_codecs, sizeof(*input_codecs) * (nb_icodecs + 1));
             input_codecs[nb_icodecs++] = avcodec_find_decoder_by_name(video_codec_name);
             if(video_disable)
                 ic->streams[i]->discard= AVDISCARD_ALL;
@@ -3004,7 +3004,7 @@ static void opt_input_file(const char *filename)
         case CODEC_TYPE_DATA:
             break;
         case CODEC_TYPE_SUBTITLE:
-            input_codecs = av_realloc(input_codecs, sizeof(*input_codecs) * (nb_icodecs + 1));
+            //input_codecs = av_realloc(input_codecs, sizeof(*input_codecs) * (nb_icodecs + 1));
             input_codecs[nb_icodecs++] = avcodec_find_decoder_by_name(subtitle_codec_name);
             if(subtitle_disable)
                 ic->streams[i]->discard = AVDISCARD_ALL;
