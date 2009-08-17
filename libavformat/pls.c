@@ -34,14 +34,8 @@ static const AVCodecTag codec_pls_tags[] = {
 
 static int pls_probe(AVProbeData *p)
 {
-    if (p->buf != 0) {
-        if (!strncmp(p->buf, "[playli", 7))
-            return AVPROBE_SCORE_MAX;
-        else
-            return 0;
-    }
-    if (match_ext(p->filename, "pls"))
-        return AVPROBE_SCORE_MAX/2;
+    if (!strncmp(p->buf, "[playli", 7))
+        return AVPROBE_SCORE_MAX;
     else
         return 0;
 }

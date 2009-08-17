@@ -34,14 +34,8 @@ static const AVCodecTag codec_m3u_tags[] = {
 
 static int m3u_probe(AVProbeData *p)
 {
-    if (p->buf != 0) {
-        if (!strncmp(p->buf, "#EXTM3U", 7))
-            return AVPROBE_SCORE_MAX;
-        else
-            return 0;
-    }
-    if (match_ext(p->filename, "m3u"))
-        return AVPROBE_SCORE_MAX/2;
+    if (!strncmp(p->buf, "#EXTM3U", 7))
+        return AVPROBE_SCORE_MAX;
     else
         return 0;
 }

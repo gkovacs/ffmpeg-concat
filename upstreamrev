@@ -1,12 +1,12 @@
 ffmpeg:
-svn: 20025
-git: b69764e3ab22ccb977f3478d402668d5a332f24a
-committer: Geza Kovacs
-commitdate: Mon, 17 Aug 2009 07:27:26 -0700
-commitlog: Merge branch 'master' of git://git.ffmpeg.org/ffmpeg
+svn: 19666
+git: 753d52cbd2428454b531965be08d924c761c4cc0
+committer: mru
+commitdate: Mon, 17 Aug 2009 02:23:53 +0000
+commitlog: AVR32: optimised mathops.h
 
 libswscale:
-svn: 20025
+svn: 19666
 git: bb5f66040578ce22cca08e3605333a39ed048e0c
 committer: ramiro
 commitdate: Mon, 17 Aug 2009 02:06:00 +0000

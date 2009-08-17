@@ -34,14 +34,8 @@ static const AVCodecTag codec_xspf_tags[] = {
 
 static int xspf_probe(AVProbeData *p)
 {
-    if (p->buf != 0) {
-        if (!strncmp(p->buf, "<?xml", 5))
-            return AVPROBE_SCORE_MAX;
-        else
-            return 0;
-    }
-    if (match_ext(p->filename, "xspf"))
-        return AVPROBE_SCORE_MAX/2;
+    if (!strncmp(p->buf, "<?xml", 5))
+        return AVPROBE_SCORE_MAX;
     else
         return 0;
 }
