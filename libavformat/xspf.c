@@ -132,7 +132,4 @@ AVInputFormat xspf_demuxer = {
     ff_concatgen_read_play,
     ff_concatgen_read_pause,
     (const AVCodecTag* const []){codec_xspf_tags, 0},
-    NULL, //xspf_read_seek2
-    NULL, //metadata_conv
-    NULL, //next
 };
