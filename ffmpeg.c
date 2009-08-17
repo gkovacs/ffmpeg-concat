@@ -1237,7 +1237,7 @@ static void print_report(AVFormatContext **output_files,
 /* pkt = NULL means EOF (needed to flush decoder buffers) */
 static int output_packet(AVInputStream *ist, int ist_index,
                          AVOutputStream **ost_table, int nb_ostreams,
-                         AVPacket *pkt,
+                         const AVPacket *pkt,
                          AVFormatContext *ic)
 {
     AVFormatContext *os;
