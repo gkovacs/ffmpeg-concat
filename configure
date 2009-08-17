@@ -865,6 +865,9 @@ THREADS_LIST='
 ARCH_LIST='
     alpha
     arm
+    avr32
+    avr32_ap
+    avr32_uc
     bfin
     ia64
     m68k
@@ -1687,6 +1690,22 @@ case $cpu in
     mips*|[45]k*|[237]4k*|m4k|r*000|loongson2[ef])
         cpuflags="-march=$cpu"
     ;;
+    ap7[02]0[0-2])
+        subarch="avr32_ap"
+        cpuflags="-mpart=$cpu"
+    ;;
+    ap)
+        subarch="avr32_ap"
+        cpuflags="-march=$cpu"
+    ;;
+    uc3[ab]*)
+        subarch="avr32_uc"
+        cpuflags="-mcpu=$cpu"
+    ;;
+    uc)
+        subarch="avr32_uc"
+        cpuflags="-march=$cpu"
+    ;;
     generic)
     ;;
     *)
@@ -2240,8 +2259,8 @@ check_func truncf
 # these are off by default, so fail if requested and not available
 enabled avisynth   && require2 vfw32 "windows.h vfw.h" AVIFileInit -lvfw32
 enabled libdirac   && add_cflags $(pkg-config --cflags dirac) &&
-                      require  libdirac libdirac_decoder/dirac_parser.h dirac_decoder_init -ldirac_decoder &&
-                      require  libdirac libdirac_encoder/dirac_encoder.h dirac_encoder_init -ldirac_encoder
+                      require  libdirac libdirac_decoder/dirac_parser.h dirac_decoder_init $(pkg-config --libs dirac) &&
+                      require  libdirac libdirac_encoder/dirac_encoder.h dirac_encoder_init $(pkg-config --libs dirac)
 enabled libfaac    && require2 libfaac "stdint.h faac.h" faacEncGetVersion -lfaac
 enabled libfaad    && require2 libfaad faad.h faacDecOpen -lfaad
 enabled libgsm     && require  libgsm gsm.h gsm_create -lgsm

@@ -173,11 +173,7 @@ static int decode_dvd_subtitles(AVSubtitle *sub_header,
 
     if (buf_size < 10)
         return -1;
-    sub_header->rects = NULL;
-    sub_header->num_rects = 0;
-    sub_header->format = 0;
-    sub_header->start_display_time = 0;
-    sub_header->end_display_time = 0;
+    memset(sub_header, 0, sizeof(*sub_header));
 
     if (AV_RB16(buf) == 0) {   /* HD subpicture with 4-byte offsets */
         big_offsets = 1;
@@ -191,7 +187,7 @@ static int decode_dvd_subtitles(AVSubtitle *sub_header,
 
     cmd_pos = READ_OFFSET(buf + cmd_pos);
 
-    while ((cmd_pos + 2 + offset_size) < buf_size) {
+    while (cmd_pos > 0 && cmd_pos < buf_size - 2 - offset_size) {
         date = AV_RB16(buf + cmd_pos);
         next_cmd_pos = READ_OFFSET(buf + cmd_pos + 2);
         dprintf(NULL, "cmd_pos=0x%04x next=0x%04x date=%d\n",
