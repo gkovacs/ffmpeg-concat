@@ -91,7 +91,7 @@ void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx);
  *  @param workingdir Path that strings in flist are relative to.
  */
 void ff_playlist_relative_paths(char **flist,
-                                const int len,
+                                int len,
                                 const char *workingdir);
 
 /** @fn void ff_playlist_split_encodedstring(char *s, char sep, char ***flist_ptr, int *len_ptr)
@@ -127,7 +127,7 @@ void ff_playlist_add_path(PlaylistContext *ctx, const char *itempath);
  *  @param pe_curidx Index of the playlist element for which to calculate the time offset.
  *  @return Returns the time offset in AV_TIME_BASE units.
  */
-int64_t ff_playlist_time_offset(int64_t *durations, const int pe_curidx);
+int64_t ff_playlist_time_offset(int64_t *durations, int pe_curidx);
 
 /** @fn int ff_playlist_stream_index_from_time(PlaylistContext *ctx, int64_t pts, int64_t *localpts)
  *  @brief Calculates the index of the playlist item which would contain the timestamp specified in AV_TIME_BASE units.
