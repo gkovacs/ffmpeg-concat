@@ -1,13 +1,13 @@
 ffmpeg:
-svn: 19635
-git: 184d37aca1e2eb2cd2438a77b7fb33a5cefee62b
-committer: ramiro
-commitdate: Thu, 13 Aug 2009 18:47:13 +0000
-commitlog: Introduce av_clip_uint16().
+svn: 20025
+git: b69764e3ab22ccb977f3478d402668d5a332f24a
+committer: Geza Kovacs
+commitdate: Mon, 17 Aug 2009 07:27:26 -0700
+commitlog: Merge branch 'master' of git://git.ffmpeg.org/ffmpeg
 
 libswscale:
-svn: 19635
-git: 7462c6875cb7429cdc33496b4f8b5a9653899374
+svn: 20025
+git: bb5f66040578ce22cca08e3605333a39ed048e0c
 committer: ramiro
-commitdate: Thu, 13 Aug 2009 19:03:14 +0000
-commitlog: Indent.
+commitdate: Mon, 17 Aug 2009 02:06:00 +0000
+commitlog: swscale-example: Make selection of dstW, dstH, and flags more clear.
