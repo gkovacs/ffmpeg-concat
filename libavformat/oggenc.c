@@ -234,14 +234,13 @@ static int ogg_interleave_per_granule(AVFormatContext *s, AVPacket *out, AVPacke
 {
     AVPacketList *pktl;
     int stream_count = 0;
-    int streams[s->nb_streams];
+    int streams[MAX_STREAMS] = {0};
     int interleaved = 0;
 
     if (pkt) {
         ff_interleave_add_packet(s, pkt, ogg_compare_granule);
     }
 
-    memset(streams, 0, sizeof(streams));
     pktl = s->packet_buffer;
     while (pktl) {
         if (streams[pktl->pkt.stream_index] == 0)

@@ -86,8 +86,7 @@ ff_rdt_parse_close(RDTDemuxContext *s)
 
 struct PayloadContext {
     AVFormatContext *rmctx;
-    RMStream **rmst;
-    unsigned int nb_rmst;
+    RMStream *rmst[MAX_STREAMS];
     uint8_t *mlti_data;
     unsigned int mlti_data_size;
     char buffer[RTP_MAX_PACKET_LENGTH + FF_INPUT_BUFFER_PADDING_SIZE];
@@ -421,9 +420,7 @@ rdt_parse_sdp_line (AVFormatContext *s, int st_index,
     else if (av_strstart(p, "ASMRuleBook:string;", &p)) {
         int n = st_index, first = -1;
 
-        rdt->nb_rmst = s->nb_streams;
-        rdt->rmst = av_malloc(rdt->nb_rmst * sizeof(rdt->rmst));
-        for (n = 0; n < rdt->nb_rmst; n++)
+        for (n = 0; n < s->nb_streams; n++)
             if (s->streams[n]->priv_data == stream->priv_data) {
                 if (first == -1) first = n;
                 rdt->rmst[s->streams[n]->index] = ff_rm_alloc_rmstream();
@@ -469,7 +466,7 @@ real_parse_asm_rulebook(AVFormatContext *s, AVStream *orig_st,
                         const char *p)
 {
     const char *end;
-    int n_rules = 0, odd = 0;
+    int n_rules, odd = 0;
     AVStream *st;
 
     /**
@@ -487,7 +484,9 @@ real_parse_asm_rulebook(AVFormatContext *s, AVStream *orig_st,
      * for multi-bitrate streams.
      */
     if (*p == '\"') p++;
-    while ((end = strchr(p, ';'))) {
+    for (n_rules = 0; s->nb_streams < MAX_STREAMS;) {
+        if (!(end = strchr(p, ';')))
+            break;
         if (!odd && end != p) {
             if (n_rules > 0)
                 st = add_dstream(s, orig_st);
@@ -526,12 +525,11 @@ rdt_free_context (PayloadContext *rdt)
 {
     int i;
 
-    for (i = 0; i < rdt->nb_rmst; i++)
+    for (i = 0; i < MAX_STREAMS; i++)
         if (rdt->rmst[i]) {
             ff_rm_free_rmstream(rdt->rmst[i]);
             av_freep(&rdt->rmst[i]);
         }
-    av_free(rdt->rmst);
     if (rdt->rmctx)
         av_close_input_stream(rdt->rmctx);
     av_freep(&rdt->mlti_data);

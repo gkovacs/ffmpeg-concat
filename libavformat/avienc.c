@@ -42,12 +42,12 @@ typedef struct AVIIndex {
 
 typedef struct {
     int64_t riff_start, movi_list, odml_list;
-    int64_t frames_hdr_all, *frames_hdr_strm;
-    int *audio_strm_length;
+    int64_t frames_hdr_all, frames_hdr_strm[MAX_STREAMS];
+    int audio_strm_length[MAX_STREAMS];
     int riff_id;
-    int *packet_count;
+    int packet_count[MAX_STREAMS];
 
-    AVIIndex *indexes;
+    AVIIndex indexes[MAX_STREAMS];
 } AVIContext;
 
 static inline AVIIentry* avi_get_ientry(AVIIndex* idx, int ent_id)
@@ -57,15 +57,14 @@ static inline AVIIentry* avi_get_ientry(AVIIndex* idx, int ent_id)
     return &idx->cluster[cl][id];
 }
 
-static int64_t avi_start_new_riff(AVFormatContext *s, ByteIOContext *pb,
+static int64_t avi_start_new_riff(AVIContext *avi, ByteIOContext *pb,
                                   const char* riff_tag, const char* list_tag)
 {
-    AVIContext *avi = s->priv_data;
     int64_t loff;
     int i;
 
     avi->riff_id++;
-    for (i=0; i<s->nb_streams; i++)
+    for (i=0; i<MAX_STREAMS; i++)
          avi->indexes[i].entry = 0;
 
     avi->riff_start = ff_start_tag(pb, "RIFF");
@@ -156,14 +155,9 @@ static int avi_write_header(AVFormatContext *s)
     AVCodecContext *stream, *video_enc;
     int64_t list1, list2, strh, strf;
 
-    avi->frames_hdr_strm  = av_mallocz(s->nb_streams*sizeof(*avi->frames_hdr_strm));
-    avi->audio_strm_length= av_mallocz(s->nb_streams*sizeof(*avi->audio_strm_length));
-    avi->packet_count     = av_mallocz(s->nb_streams*sizeof(*avi->packet_count));
-    avi->indexes          = av_malloc (s->nb_streams*sizeof(*avi->indexes));
-
     /* header list */
     avi->riff_id = 0;
-    list1 = avi_start_new_riff(s, pb, "AVI ", "hdrl");
+    list1 = avi_start_new_riff(avi, pb, "AVI ", "hdrl");
 
     /* avi header */
     put_tag(pb, "avih");
@@ -451,7 +445,7 @@ static int avi_write_idx1(AVFormatContext *s)
 
     if (!url_is_streamed(pb)) {
         AVIIentry* ie = 0, *tie;
-        int entry[s->nb_streams];
+        int entry[MAX_STREAMS];
         int empty, stream_id = -1;
 
         idx_chunk = ff_start_tag(pb, "idx1");
@@ -520,7 +514,7 @@ static int avi_write_packet(AVFormatContext *s, AVPacket *pkt)
             avi_write_idx1(s);
 
         ff_end_tag(pb, avi->riff_start);
-        avi->movi_list = avi_start_new_riff(s, pb, "AVIX", "movi");
+        avi->movi_list = avi_start_new_riff(avi, pb, "AVIX", "movi");
     }
 
     avi_stream2fourcc(&tag[0], stream_index, enc->codec_type);
@@ -602,16 +596,12 @@ static int avi_write_trailer(AVFormatContext *s)
     }
     put_flush_packet(pb);
 
-    for (i=0; i<s->nb_streams; i++) {
+    for (i=0; i<MAX_STREAMS; i++) {
          for (j=0; j<avi->indexes[i].ents_allocated/AVI_INDEX_CLUSTER_SIZE; j++)
               av_free(avi->indexes[i].cluster[j]);
          av_freep(&avi->indexes[i].cluster);
          avi->indexes[i].ents_allocated = avi->indexes[i].entry = 0;
     }
-    av_free(avi->frames_hdr_strm);
-    av_free(avi->audio_strm_length);
-    av_free(avi->packet_count);
-    av_free(avi->indexes);
 
     return res;
 }

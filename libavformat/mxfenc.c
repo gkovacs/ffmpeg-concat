@@ -1809,7 +1809,7 @@ static int mxf_interleave_get_packet(AVFormatContext *s, AVPacket *out, AVPacket
 {
     AVPacketList *pktl;
     int stream_count = 0;
-    int streams[s->nb_streams];
+    int streams[MAX_STREAMS];
 
     memset(streams, 0, sizeof(streams));
     pktl = s->packet_buffer;

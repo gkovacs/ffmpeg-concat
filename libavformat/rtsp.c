@@ -1289,7 +1289,6 @@ static int rtsp_read_header(AVFormatContext *s,
         }
     } while (err);
 
-    rt->real_setup_cache = av_mallocz(s->nb_streams * sizeof(*rt->real_setup_cache));
     rt->state = RTSP_STATE_IDLE;
     rt->seek_timestamp = 0; /* default is to start stream at position
                                zero */
@@ -1435,13 +1434,14 @@ static int rtsp_read_packet(AVFormatContext *s,
 
     if (rt->server_type == RTSP_SERVER_REAL) {
         int i;
-        enum AVDiscard cache[s->nb_streams];
+        enum AVDiscard cache[MAX_STREAMS];
 
         for (i = 0; i < s->nb_streams; i++)
             cache[i] = s->streams[i]->discard;
 
         if (!rt->need_subscription) {
-            if (memcmp (cache, rt->real_setup_cache, sizeof(cache))) {
+            if (memcmp (cache, rt->real_setup_cache,
+                        sizeof(enum AVDiscard) * s->nb_streams)) {
                 av_strlcatf(cmd, sizeof(cmd),
                             "SET_PARAMETER %s RTSP/1.0\r\n"
                             "Unsubscribe: %s\r\n",
@@ -1456,7 +1456,8 @@ static int rtsp_read_packet(AVFormatContext *s,
         if (rt->need_subscription) {
             int r, rule_nr, first = 1;
 
-            memcpy(rt->real_setup_cache, cache, sizeof(cache));
+            memcpy(rt->real_setup_cache, cache,
+                   sizeof(enum AVDiscard) * s->nb_streams);
             rt->last_subscription[0] = 0;
 
             snprintf(cmd, sizeof(cmd),
