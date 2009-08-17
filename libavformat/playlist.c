@@ -181,7 +181,7 @@ void ff_playlist_relative_paths(char **flist,
     }
 }
 
-int64_t ff_playlist_time_offset(int64_t *durations, int pe_curidx)
+int64_t ff_playlist_time_offset(const int64_t *durations, int pe_curidx)
 {
     int i;
     int64_t total = 0;
