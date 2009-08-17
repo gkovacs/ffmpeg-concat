@@ -1300,7 +1300,6 @@ static int output_packet(AVInputStream *ist, int ist_index,
                        endianness as CPU */
                 ret = avcodec_decode_audio3(ist->st->codec, samples, &data_size,
                                             &avpkt);
-
                 if (ret < 0)
                     goto fail_decode;
                 avpkt.data += ret;
