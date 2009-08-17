@@ -171,7 +171,7 @@ void ff_playlist_relative_paths(char **flist,
         char *fullfpath;
         int wdslen = strlen(workingdir);
         int flslen = strlen(flist[i]);
-        fullfpath = av_malloc(sizeof(char) * (wdslen+flslen+2));
+        fullfpath = av_malloc(wdslen+flslen+2);
         av_strlcpy(fullfpath, workingdir, wdslen+1);
         fullfpath[wdslen] = '/';
         fullfpath[wdslen+1] = 0;
