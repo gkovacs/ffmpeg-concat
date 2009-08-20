@@ -43,10 +43,10 @@ static int m3u_probe(AVProbeData *p)
         return 0;
 }
 
-static int m3u_list_files(ByteIOContext *s, AVPlaylistContext *ctx, const char *filename)
+static int m3u_list_files(ByteIOContext *s, char ***flist_ptr, int *len_ptr)
 {
     char **flist;
-    int i, k, bufsize;
+    int i, bufsize;
     flist = NULL;
     i = bufsize = 0;
     while (1) {
@@ -66,19 +66,28 @@ static int m3u_list_files(ByteIOContext *s, AVPlaylistContext *ctx, const char *
         av_strlcpy(flist[i], linebuf, q-linebuf+1);
         flist[i++][q-linebuf] = 0;
     }
+    *flist_ptr = flist;
+    *len_ptr = i;
+    if (!flist) // no files have been found
+        return AVERROR_EOF;
     flist[i] = 0;
-    av_playlist_relative_paths(flist, i, dirname(filename));
-    for (k = 0; k < i; ++k)
-        av_playlist_add_path(ctx, flist[k]);
-    av_free(flist);
     return 0;
 }
 
 static int m3u_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
-    AVPlaylistContext *ctx = av_mallocz(sizeof(*ctx));
-    m3u_list_files(s->pb, ctx, s->filename);
+    AVPlaylistContext *ctx;
+    char **flist;
+    int flist_len;
+    m3u_list_files(s->pb, &flist, &flist_len);
+    if (!flist || flist_len <= 0) {
+        fprintf(stderr, "no playlist items found in %s\n", s->filename);
+        return AVERROR_EOF;
+    }
+    av_playlist_relative_paths(flist, flist_len, dirname(s->filename));
+    ctx = av_playlist_from_filelist(flist, flist_len);
+    av_free(flist);
     s->priv_data = ctx;
     av_playlist_populate_context(ctx, ctx->pe_curidx);
     av_playlist_set_streams(s);

@@ -45,7 +45,7 @@ static int pls_probe(AVProbeData *p)
 
 static int pls_list_files(ByteIOContext *b, char ***flist_ptr, int *len_ptr)
 {
-    int i, j, k, c;
+    int i, j, c;
     unsigned int buflen;
     char state;
     char **flist;
