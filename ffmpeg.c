@@ -2256,7 +2256,6 @@ static int av_encode(AVFormatContext **output_files,
                 for (i = nb_istreams; i < pkt.stream_index + 1; ++i)
                     ist_table[i] = NULL;
                 file_table[file_index].nb_streams = file_table[file_index].ist_index + pkt.stream_index + 1;
-                nb_istreams = file_table[file_index].ist_index + pkt.stream_index + 1;
             }
             if (!ist_table[pkt.stream_index]) {
                 ist = ist_table[pkt.stream_index] = av_mallocz(sizeof(AVInputStream));
