@@ -43,9 +43,8 @@ fi
 
 cd $gitdir
 git commit -a -m "$1"
-git push origin master
+#git push origin master
 
 cd $svndir
 git commit -a -m "$1"
-git svn dcommit
-
+#git svn dcommit

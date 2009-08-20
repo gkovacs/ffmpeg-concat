@@ -34,8 +34,48 @@ static const AVCodecTag codec_xspf_tags[] = {
 
 static int xspf_probe(AVProbeData *p)
 {
-    if (!strncmp(p->buf, "<?xml", 5))
+    int i, len;
+    char fxml;
+    char ftag;
+    unsigned char c;
+    char t[] = "<?xml";
+    char s[5] = {0};
+    char v[] = "<playlist";
+    char u[9] = {0};
+    fxml = ftag = 0;
+    len = p->buf_size;
+    for (i = 0; i < len; i++) {
+        if (ftag)
+            break;
+        c = p->buf[i];
+        if (!fxml) {
+            s[0] = s[1];
+            s[1] = s[2];
+            s[2] = s[3];
+            s[3] = s[4];
+            s[4] = c;
+            if (s[0] == t[0] && s[1] == t[1] && s[2] == t[2] && s[3] == t[3] && s[4] == t[4])
+                fxml = 1;
+        }
+        if (!ftag) {
+            u[0] = u[1];
+            u[1] = u[2];
+            u[2] = u[3];
+            u[3] = u[4];
+            u[4] = u[5];
+            u[5] = u[6];
+            u[6] = u[7];
+            u[7] = u[8];
+            u[8] = c;
+            if (u[0] == v[0] && u[1] == v[1] && u[2] == v[2] && u[3] == v[3] && u[4] == v[4] &&
+                u[5] == v[5] && u[6] == v[6] && u[7] == v[7] && u[8] == v[8])
+                ftag = 1;
+        }
+    }
+    if (fxml && ftag)
         return AVPROBE_SCORE_MAX;
+    else if (fxml || ftag)
+        return AVPROBE_SCORE_MAX / 2;
     else
         return 0;
 }
