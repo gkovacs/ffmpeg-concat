@@ -54,7 +54,7 @@ static int xspf_probe(AVProbeData *p)
             s[2] = s[3];
             s[3] = s[4];
             s[4] = c;
-            if (!strncmp(s, t, 5))
+            if (!memcmp(s, t, 5))
                 fxml = 1;
         }
         if (!ftag) {
@@ -67,7 +67,7 @@ static int xspf_probe(AVProbeData *p)
             u[6] = u[7];
             u[7] = u[8];
             u[8] = c;
-            if (!strncmp(u, v, 9))
+            if (!memcmp(u, v, 9))
                 ftag = 1;
         }
     }
@@ -104,8 +104,7 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *f
             s[7] = s[8];
             s[8] = s[9];
             s[9] = c;
-            if (s[0] == t[0] && s[1] == t[1] && s[2] == t[2] && s[3] == t[3] && s[4] == t[4] &&
-                s[5] == t[5] && s[6] == t[6] && s[7] == t[7] && s[8] == t[8] && s[9] == t[9])
+            if (!memcmp(s, t, 10))
                 state = 1;
         } else {
             if (c == '<') {

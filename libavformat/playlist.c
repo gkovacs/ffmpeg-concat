@@ -240,3 +240,4 @@ int ff_playlist_streams_offset_from_playidx(PlaylistContext *ctx, int playidx)
         total += ctx->nb_streams_list[i++];
     return total;
 }
+
