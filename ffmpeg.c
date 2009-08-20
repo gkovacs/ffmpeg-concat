@@ -1252,11 +1252,11 @@ static int output_packet(AVInputStream *ist, int ist_index,
     int got_subtitle;
     int stream_offset = 0;
     AVPacket avpkt;
-    AVPlaylistContext *pl_ctx = ff_playlist_get_context(ic);
+    AVPlaylistContext *pl_ctx = av_playlist_get_context(ic);
 
     if (pl_ctx && pkt) {
         ist->st = ic->streams[pkt->stream_index];
-        stream_offset = pkt->stream_index - ff_playlist_localstidx_from_streamidx(pl_ctx, pkt->stream_index);
+        stream_offset = pkt->stream_index - av_playlist_localstidx_from_streamidx(pl_ctx, pkt->stream_index);
     }
      
     if(ist->next_pts == AV_NOPTS_VALUE)
@@ -2246,7 +2246,7 @@ static int av_encode(AVFormatContext **output_files,
             av_pkt_dump_log(NULL, AV_LOG_DEBUG, &pkt, do_hex_dump);
         }
 
-        pl_ctx = ff_playlist_get_context(is);
+        pl_ctx = av_playlist_get_context(is);
         if (pl_ctx) {
             if (pkt.stream_index >= nb_istreams &&
                 pkt.stream_index < is->nb_streams &&
@@ -2271,7 +2271,7 @@ static int av_encode(AVFormatContext **output_files,
                 ist->next_pts        = AV_NOPTS_VALUE;
                 input_files_ts_scale[file_index][pkt.stream_index] = 0.0L;
             }
-            stream_offset = pkt.stream_index - ff_playlist_localstidx_from_streamidx(pl_ctx, pkt.stream_index);
+            stream_offset = pkt.stream_index - av_playlist_localstidx_from_streamidx(pl_ctx, pkt.stream_index);
         } else {
             stream_offset = 0;
         }

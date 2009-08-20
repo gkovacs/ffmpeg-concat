@@ -67,9 +67,9 @@ static int m3u_list_files(ByteIOContext *s, AVPlaylistContext *ctx, const char *
         flist[i++][q-linebuf] = 0;
     }
     flist[i] = 0;
-    ff_playlist_relative_paths(flist, i, dirname(filename));
+    av_playlist_relative_paths(flist, i, dirname(filename));
     for (k = 0; k < i; ++k)
-        ff_playlist_add_path(ctx, flist[k]);
+        av_playlist_add_path(ctx, flist[k]);
     av_free(flist);
     return 0;
 }
@@ -80,8 +80,8 @@ static int m3u_read_header(AVFormatContext *s,
     AVPlaylistContext *ctx = av_mallocz(sizeof(*ctx));
     m3u_list_files(s->pb, ctx, s->filename);
     s->priv_data = ctx;
-    ff_playlist_populate_context(ctx, ctx->pe_curidx);
-    ff_playlist_set_streams(s);
+    av_playlist_populate_context(ctx, ctx->pe_curidx);
+    av_playlist_set_streams(s);
     return 0;
 }
 

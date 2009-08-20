@@ -111,9 +111,9 @@ static int xspf_list_files(ByteIOContext *b, AVPlaylistContext *ctx, const char 
     if (!flist) // no files have been found
         return AVERROR_EOF;
     flist[j] = 0;
-    ff_playlist_relative_paths(flist, j, dirname(filename));
+    av_playlist_relative_paths(flist, j, dirname(filename));
     for (k = 0; k < j; ++k)
-        ff_playlist_add_path(ctx, flist[k]);
+        av_playlist_add_path(ctx, flist[k]);
     av_free(flist);
     return 0;
 }
@@ -127,8 +127,8 @@ static int xspf_read_header(AVFormatContext *s,
         return AVERROR_EOF;
     }
     s->priv_data = ctx;
-    ff_playlist_populate_context(ctx, ctx->pe_curidx);
-    ff_playlist_set_streams(s);
+    av_playlist_populate_context(ctx, ctx->pe_curidx);
+    av_playlist_set_streams(s);
     return 0;
 }
 

@@ -1322,12 +1322,12 @@ static int video_thread(void *arg)
     int len1, got_picture;
     AVFrame *frame;
     double pts;
-    PlaylistContext *pl_ctx;
+    AVPlaylistContext *pl_ctx;
     int st_idx = 0;
     char tryswitchalready = 0;
     AVStream *prevst = NULL;
     frame = avcodec_alloc_frame();
-    pl_ctx = ff_playlist_get_context(is->ic);
+    pl_ctx = av_playlist_get_context(is->ic);
     for(;;) {
         while (is->paused && !is->videoq.abort_request) {
             SDL_Delay(10);
@@ -1574,10 +1574,10 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
     int n, len1, data_size;
     double pts;
     int st_idx = 0;
-    PlaylistContext *pl_ctx;
+    AVPlaylistContext *pl_ctx;
     AVStream *prevst = NULL;
     char tryswitchalready = 0;
-    pl_ctx = ff_playlist_get_context(is->ic);
+    pl_ctx = av_playlist_get_context(is->ic);
     for(;;) {
         while (pkt_temp->size > 0) {
             

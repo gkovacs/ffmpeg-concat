@@ -36,7 +36,7 @@
 #include "internal.h"
 #include "concat.h"
 
-AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
+AVFormatContext *av_playlist_alloc_formatcontext(char *filename)
 {
     int err;
     AVFormatContext *ic = avformat_alloc_context();
@@ -49,22 +49,22 @@ AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
     return ic;
 }
 
-void ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
+void av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
 {
     ctx->icl = av_realloc(ctx->icl, sizeof(*(ctx->icl)) * (pe_curidx+2));
     ctx->icl[pe_curidx+1] = NULL;
-    ctx->icl[pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[pe_curidx]);
+    ctx->icl[pe_curidx] = av_playlist_alloc_formatcontext(ctx->flist[pe_curidx]);
     ctx->nb_streams_list[pe_curidx] = ctx->icl[pe_curidx]->nb_streams;
 }
 
-void ff_playlist_set_streams(AVFormatContext *s)
+void av_playlist_set_streams(AVFormatContext *s)
 {
     int i;
     int offset;
     AVFormatContext *ic;
     AVPlaylistContext *ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
-    offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+    offset = av_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
     ic->iformat->read_header(ic, NULL);
     for (i = 0; i < ic->nb_streams; ++i) {
         s->streams[offset + i] = ic->streams[i];
@@ -88,7 +88,7 @@ void ff_playlist_set_streams(AVFormatContext *s)
     s->packet_buffer_end = ic->packet_buffer_end;
 }
 
-AVPlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
+AVPlaylistContext *av_playlist_get_context(AVFormatContext *ic)
 {
     if (ic && ic->iformat && ic->iformat->long_name && ic->priv_data &&
         !strncmp(ic->iformat->long_name, "CONCAT", 6))
@@ -97,13 +97,13 @@ AVPlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
         return NULL;
 }
 
-AVFormatContext *ff_playlist_formatcontext_from_filelist(const char **flist, int len)
+AVFormatContext *av_playlist_formatcontext_from_filelist(const char **flist, int len)
 {
     AVPlaylistContext *ctx;
     AVFormatContext *ic;
-    ctx = ff_playlist_from_filelist(flist, len);
+    ctx = av_playlist_from_filelist(flist, len);
     if (!ctx) {
-        av_log(NULL, AV_LOG_ERROR, "failed to create AVPlaylistContext in ff_playlist_formatcontext_from_filelist\n");
+        av_log(NULL, AV_LOG_ERROR, "failed to create AVPlaylistContext in av_playlist_formatcontext_from_filelist\n");
         return NULL;
     }
     ic = avformat_alloc_context();
@@ -112,7 +112,7 @@ AVFormatContext *ff_playlist_formatcontext_from_filelist(const char **flist, int
     return ic;
 }
 
-void ff_playlist_split_encodedstring(const char *s,
+void av_playlist_split_encodedstring(const char *s,
                                      const char sep,
                                      char ***flist_ptr,
                                      int *len_ptr)
@@ -129,7 +129,7 @@ void ff_playlist_split_encodedstring(const char *s,
             sepidx[len] = ts-s;
             sepidx = av_fast_realloc(sepidx, &buflen, ++len);
             if (!sepidx) {
-                av_log(NULL, AV_LOG_ERROR, "av_fast_realloc error in ff_playlist_split_encodedstring\n");
+                av_log(NULL, AV_LOG_ERROR, "av_fast_realloc error in av_playlist_split_encodedstring\n");
                 continue;
             }
         }
@@ -142,7 +142,7 @@ void ff_playlist_split_encodedstring(const char *s,
     for (i = 0; i < len; ++i) {
         flist[i] = av_malloc(sepidx[i+1]-sepidx[i]);
         if (!flist[i]) {
-            av_log(NULL, AV_LOG_ERROR, "av_malloc error in ff_playlist_split_encodedstring\n");
+            av_log(NULL, AV_LOG_ERROR, "av_malloc error in av_playlist_split_encodedstring\n");
             continue;
         }
         av_strlcpy(flist[i], ts+sepidx[i], sepidx[i+1]-sepidx[i]);
@@ -150,38 +150,38 @@ void ff_playlist_split_encodedstring(const char *s,
     av_free(sepidx);
 }
 
-AVPlaylistContext *ff_playlist_from_filelist(const char **flist, int len)
+AVPlaylistContext *av_playlist_from_filelist(const char **flist, int len)
 {
     int i;
     AVPlaylistContext *ctx;
     ctx = av_mallocz(sizeof(*ctx));
     if (!ctx) {
-        av_log(NULL, AV_LOG_ERROR, "av_mallocz error in ff_playlist_from_encodedstring\n");
+        av_log(NULL, AV_LOG_ERROR, "av_mallocz error in av_playlist_from_encodedstring\n");
         return NULL;
     }
     for (i = 0; i < len; ++i)
-        ff_playlist_add_path(ctx, flist[i]);
+        av_playlist_add_path(ctx, flist[i]);
     return ctx;
 }
 
-AVPlaylistContext *ff_playlist_from_encodedstring(const char *s, const char sep)
+AVPlaylistContext *av_playlist_from_encodedstring(const char *s, const char sep)
 {
     AVPlaylistContext *ctx;
     char **flist;
     int i, len;
-    ff_playlist_split_encodedstring(s, sep, &flist, &len);
+    av_playlist_split_encodedstring(s, sep, &flist, &len);
     if (len <= 1) {
         for (i = 0; i < len; ++i)
             av_free(flist[i]);
         av_free(flist);
         return NULL;
     }
-    ctx = ff_playlist_from_filelist(flist, len);
+    ctx = av_playlist_from_filelist(flist, len);
     av_free(flist);
     return ctx;
 }
 
-void ff_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
+void av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
 {
     ctx->flist = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size+1));
     ctx->flist[ctx->pelist_size] = NULL;
@@ -194,7 +194,7 @@ void ff_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
     ctx->nb_streams_list[ctx->pelist_size] = 0;
 }
 
-void ff_playlist_relative_paths(char **flist,
+void av_playlist_relative_paths(char **flist,
                                 int len,
                                 const char *workingdir)
 {
@@ -213,7 +213,7 @@ void ff_playlist_relative_paths(char **flist,
     }
 }
 
-int64_t ff_playlist_time_offset(const int64_t *durations, int pe_curidx)
+int64_t av_playlist_time_offset(const int64_t *durations, int pe_curidx)
 {
     int i;
     int64_t total = 0;
@@ -223,7 +223,7 @@ int64_t ff_playlist_time_offset(const int64_t *durations, int pe_curidx)
     return total;
 }
 
-int ff_playlist_stream_index_from_time(AVPlaylistContext *ctx,
+int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
                                        int64_t pts,
                                        int64_t *localpts)
 {
@@ -240,7 +240,7 @@ int ff_playlist_stream_index_from_time(AVPlaylistContext *ctx,
     return i;
 }
 
-int ff_playlist_playidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
+int av_playlist_playidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
 {
     int i, total;
     i = total = 0;
@@ -249,7 +249,7 @@ int ff_playlist_playidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
     return i-1;
 }
 
-int ff_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
+int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
 {
     int i, total;
     i = total = 0;
@@ -258,7 +258,7 @@ int ff_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_ind
     return stream_index - (total - ctx->nb_streams_list[i-1]);
 }
 
-int ff_playlist_streams_offset_from_playidx(AVPlaylistContext *ctx, int playidx)
+int av_playlist_streams_offset_from_playidx(AVPlaylistContext *ctx, int playidx)
 {
     int i, total;
     i = total = 0;

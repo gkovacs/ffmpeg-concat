@@ -449,16 +449,16 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
         fmt = av_probe_input_format(pd, 0);
     }
 
-    ff_playlist_split_encodedstring(filename, ',', &flist, &flist_len);
+    av_playlist_split_encodedstring(filename, ',', &flist, &flist_len);
     if (flist && flist_len > 1) {
-        AVFormatContext *ic = ff_playlist_formatcontext_from_filelist(flist, flist_len);
+        AVFormatContext *ic = av_playlist_formatcontext_from_filelist(flist, flist_len);
         if (ic) {
-            AVPlaylistContext *playlist_ctx = ff_playlist_get_context(ic);
+            AVPlaylistContext *playlist_ctx = av_playlist_get_context(ic);
             if (playlist_ctx) {
                 av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
                 av_strlcpy(ic->filename, filename, sizeof(ic->filename));
-                ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
-                ff_playlist_set_streams(ic);
+                av_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
+                av_playlist_set_streams(ic);
                 *ic_ptr = ic;
                 return 0;
             }
