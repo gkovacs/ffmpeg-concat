@@ -30,10 +30,7 @@
  *  implementing file concatenation and support for playlist formats.
  */
 
-#include "avformat.h"
 #include "playlist.h"
-#include "internal.h"
-#include "concat.h"
 
 AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
 {
