@@ -85,11 +85,11 @@ static int pls_list_files(ByteIOContext *b, char ***flist_ptr, int *len_ptr)
             }
         }
     }
+    *flist_ptr = flist;
+    *len_ptr = j;
     if (!flist) // no files have been found
         return AVERROR_EOF;
     flist[j] = 0;
-    *flist_ptr = flist;
-    *len_ptr = j;
     return 0;
 }
 
