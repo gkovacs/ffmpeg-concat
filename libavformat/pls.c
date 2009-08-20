@@ -48,7 +48,7 @@ static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *fi
     char **flist;
     char buf[1024];
     char s[5] = {0};
-    char t[] = "\nFile";
+    const char t[] = "\nFile";
     flist = NULL;
     state = buflen = i = j = 0;
     while ((c = url_fgetc(b))) {

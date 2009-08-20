@@ -38,9 +38,9 @@ static int xspf_probe(AVProbeData *p)
     char fxml;
     char ftag;
     unsigned char c;
-    char t[] = "<?xml";
+    const char t[] = "<?xml";
     char s[5] = {0};
-    char v[] = "<playlist";
+    const char v[] = "<playlist";
     char u[9] = {0};
     fxml = ftag = 0;
     len = p->buf_size;
@@ -87,7 +87,7 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *f
     char **flist;
     char buf[1024];
     char s[10] = {0};
-    char t[] = "<location>";
+    const char t[] = "<location>";
     flist = NULL;
     state = buflen = i = j = 0;
     while ((c = url_fgetc(b))) {
