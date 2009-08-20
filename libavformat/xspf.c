@@ -26,6 +26,9 @@
  */
 
 #include "concatgen.h"
+#include "riff.h"
+#include "libavutil/avstring.h"
+#include "internal.h"
 
 /* The ffmpeg codecs we support, and the IDs they have in the file */
 static const AVCodecTag codec_xspf_tags[] = {

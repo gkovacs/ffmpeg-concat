@@ -31,6 +31,10 @@
  */
 
 #include "playlist.h"
+#include "riff.h"
+#include "libavutil/avstring.h"
+#include "internal.h"
+#include "concat.h"
 
 AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
 {

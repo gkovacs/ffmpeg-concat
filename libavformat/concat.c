@@ -31,6 +31,9 @@
  */
 
 #include "concat.h"
+#include "avformat.h"
+#include "riff.h"
+#include "libavutil/avstring.h"
 
 // The FFmpeg codecs we support, and the IDs they have in the file
 static const AVCodecTag codec_concat_tags[] = {
