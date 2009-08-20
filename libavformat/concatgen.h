@@ -22,7 +22,7 @@
 #ifndef AVFORMAT_CONCATGEN_H
 #define AVFORMAT_CONCATGEN_H
 
-#include "playlist.h"
+#include "libavformat/avplaylist.h"
 
 int ff_concatgen_read_packet(AVFormatContext *s, AVPacket *pkt);
 

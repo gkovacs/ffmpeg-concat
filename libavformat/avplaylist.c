@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/** @file libavformat/playlist.c
+/** @file libavformat/avplaylist.c
  *  @author Geza Kovacs ( gkovacs mit edu )
  *
  *  @brief General components used by playlist formats
@@ -30,7 +30,7 @@
  *  implementing file concatenation and support for playlist formats.
  */
 
-#include "playlist.h"
+#include "libavformat/avplaylist.h"
 #include "riff.h"
 #include "libavutil/avstring.h"
 #include "internal.h"

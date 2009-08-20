@@ -40,7 +40,7 @@
 #include "libavutil/fifo.h"
 #include "libavutil/avstring.h"
 #include "libavformat/os_support.h"
-#include "libavformat/playlist.h"
+#include "libavformat/avplaylist.h"
 
 #if HAVE_SYS_RESOURCE_H
 #include <sys/types.h>

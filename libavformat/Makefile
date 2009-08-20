@@ -3,7 +3,7 @@ include $(SUBDIR)../config.mak
 NAME = avformat
 FFLIBS = avcodec avutil
 
-HEADERS = avformat.h avio.h
+HEADERS = avformat.h avio.h avplaylist.h
 
 OBJS = allformats.o cutils.o metadata.o metadata_compat.o options.o os_support.o sdp.o utils.o
 
@@ -33,7 +33,7 @@ OBJS-$(CONFIG_BETHSOFTVID_DEMUXER)       += bethsoftvid.o
 OBJS-$(CONFIG_BFI_DEMUXER)               += bfi.o
 OBJS-$(CONFIG_C93_DEMUXER)               += c93.o vocdec.o voc.o
 OBJS-$(CONFIG_CAVSVIDEO_DEMUXER)         += raw.o
-OBJS-$(CONFIG_CONCAT_DEMUXER)            += playlist.o concat.o concatgen.o
+OBJS-$(CONFIG_CONCAT_DEMUXER)            += avplaylist.o concat.o concatgen.o
 OBJS-$(CONFIG_CRC_MUXER)                 += crcenc.o
 OBJS-$(CONFIG_DAUD_DEMUXER)              += daud.o
 OBJS-$(CONFIG_DAUD_MUXER)                += daud.o
@@ -80,7 +80,7 @@ OBJS-$(CONFIG_INGENIENT_DEMUXER)         += raw.o
 OBJS-$(CONFIG_IPMOVIE_DEMUXER)           += ipmovie.o
 OBJS-$(CONFIG_ISS_DEMUXER)               += iss.o
 OBJS-$(CONFIG_LMLM4_DEMUXER)             += lmlm4.o
-OBJS-$(CONFIG_M3U_DEMUXER)               += m3u.o playlist.o concatgen.o
+OBJS-$(CONFIG_M3U_DEMUXER)               += m3u.o avplaylist.o concatgen.o
 OBJS-$(CONFIG_M4V_DEMUXER)               += raw.o
 OBJS-$(CONFIG_M4V_MUXER)                 += raw.o
 OBJS-$(CONFIG_MATROSKA_DEMUXER)          += matroskadec.o matroska.o riff.o isom.o
@@ -171,7 +171,7 @@ OBJS-$(CONFIG_PCM_U32LE_DEMUXER)         += raw.o
 OBJS-$(CONFIG_PCM_U32LE_MUXER)           += raw.o
 OBJS-$(CONFIG_PCM_U8_DEMUXER)            += raw.o
 OBJS-$(CONFIG_PCM_U8_MUXER)              += raw.o
-OBJS-$(CONFIG_PLS_DEMUXER)               += pls.o playlist.o concatgen.o
+OBJS-$(CONFIG_PLS_DEMUXER)               += pls.o avplaylist.o concatgen.o
 OBJS-$(CONFIG_PVA_DEMUXER)               += pva.o
 OBJS-$(CONFIG_QCP_DEMUXER)               += qcp.o
 OBJS-$(CONFIG_R3D_DEMUXER)               += r3d.o
@@ -227,7 +227,7 @@ OBJS-$(CONFIG_WSAUD_DEMUXER)             += westwood.o
 OBJS-$(CONFIG_WSVQA_DEMUXER)             += westwood.o
 OBJS-$(CONFIG_WV_DEMUXER)                += wv.o
 OBJS-$(CONFIG_XA_DEMUXER)                += xa.o
-OBJS-$(CONFIG_XSPF_DEMUXER)              += xspf.o playlist.o concatgen.o
+OBJS-$(CONFIG_XSPF_DEMUXER)              += xspf.o avplaylist.o concatgen.o
 OBJS-$(CONFIG_YUV4MPEGPIPE_MUXER)        += yuv4mpeg.o
 OBJS-$(CONFIG_YUV4MPEGPIPE_DEMUXER)      += yuv4mpeg.o
 

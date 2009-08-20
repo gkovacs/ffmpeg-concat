@@ -27,7 +27,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <strings.h>
-#include "playlist.h"
+#include "libavformat/avplaylist.h"
 
 #undef NDEBUG
 #include <assert.h>

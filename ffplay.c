@@ -29,7 +29,7 @@
 #include "libavcodec/colorspace.h"
 #include "libavcodec/opt.h"
 
-#include "libavformat/playlist.h"
+#include "libavformat/avplaylist.h"
 
 #include "cmdutils.h"
 
