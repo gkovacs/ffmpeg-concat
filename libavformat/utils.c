@@ -453,7 +453,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
     if (flist && flist_len > 1) {
         AVFormatContext *ic = ff_playlist_formatcontext_from_filelist(flist, flist_len);
         if (ic) {
-            PlaylistContext *playlist_ctx = ff_playlist_get_context(ic);
+            AVPlaylistContext *playlist_ctx = ff_playlist_get_context(ic);
             if (playlist_ctx) {
                 av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
                 av_strlcpy(ic->filename, filename, sizeof(ic->filename));

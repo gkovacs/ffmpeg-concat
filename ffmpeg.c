@@ -1252,7 +1252,7 @@ static int output_packet(AVInputStream *ist, int ist_index,
     int got_subtitle;
     int stream_offset = 0;
     AVPacket avpkt;
-    PlaylistContext *pl_ctx = ff_playlist_get_context(ic);
+    AVPlaylistContext *pl_ctx = ff_playlist_get_context(ic);
 
     if (pl_ctx && pkt) {
         ist->st = ic->streams[pkt->stream_index];
@@ -2158,7 +2158,7 @@ static int av_encode(AVFormatContext **output_files,
         AVPacket pkt;
         double ipts_min;
         double opts_min;
-        PlaylistContext *pl_ctx;
+        AVPlaylistContext *pl_ctx;
         int stream_offset;
 
     redo:

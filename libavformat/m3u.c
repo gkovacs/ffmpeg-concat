@@ -43,7 +43,7 @@ static int m3u_probe(AVProbeData *p)
         return 0;
 }
 
-static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx, const char *filename)
+static int m3u_list_files(ByteIOContext *s, AVPlaylistContext *ctx, const char *filename)
 {
     char **flist;
     int i, k, bufsize;
@@ -77,7 +77,7 @@ static int m3u_list_files(ByteIOContext *s, PlaylistContext *ctx, const char *fi
 static int m3u_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
-    PlaylistContext *ctx = av_mallocz(sizeof(*ctx));
+    AVPlaylistContext *ctx = av_mallocz(sizeof(*ctx));
     m3u_list_files(s->pb, ctx, s->filename);
     s->priv_data = ctx;
     ff_playlist_populate_context(ctx, ctx->pe_curidx);
@@ -88,7 +88,7 @@ static int m3u_read_header(AVFormatContext *s,
 AVInputFormat m3u_demuxer = {
     "m3u",
     NULL_IF_CONFIG_SMALL("CONCAT M3U format"),
-    sizeof(PlaylistContext),
+    sizeof(AVPlaylistContext),
     m3u_probe,
     m3u_read_header,
     ff_concatgen_read_packet,

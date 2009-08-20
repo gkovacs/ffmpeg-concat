@@ -25,7 +25,7 @@
  *  @brief General components used by playlist formats
  *
  *  @details These functions are used to initialize and manipulate playlists
- *  (PlaylistContext) and their individual playlist elements (PlayElem), each
+ *  (AVPlaylistContext) and their individual playlist elements (PlayElem), each
  *  of which encapsulates its own AVFormatContext. This abstraction is used for
  *  implementing file concatenation and support for playlist formats.
  */
@@ -49,7 +49,7 @@ AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
     return ic;
 }
 
-void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx)
+void ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
 {
     ctx->icl = av_realloc(ctx->icl, sizeof(*(ctx->icl)) * (pe_curidx+2));
     ctx->icl[pe_curidx+1] = NULL;
@@ -62,7 +62,7 @@ void ff_playlist_set_streams(AVFormatContext *s)
     int i;
     int offset;
     AVFormatContext *ic;
-    PlaylistContext *ctx = s->priv_data;
+    AVPlaylistContext *ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
     offset = ff_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
     ic->iformat->read_header(ic, NULL);
@@ -88,7 +88,7 @@ void ff_playlist_set_streams(AVFormatContext *s)
     s->packet_buffer_end = ic->packet_buffer_end;
 }
 
-PlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
+AVPlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
 {
     if (ic && ic->iformat && ic->iformat->long_name && ic->priv_data &&
         !strncmp(ic->iformat->long_name, "CONCAT", 6))
@@ -99,11 +99,11 @@ PlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
 
 AVFormatContext *ff_playlist_formatcontext_from_filelist(const char **flist, int len)
 {
-    PlaylistContext *ctx;
+    AVPlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = ff_playlist_from_filelist(flist, len);
     if (!ctx) {
-        av_log(NULL, AV_LOG_ERROR, "failed to create PlaylistContext in ff_playlist_formatcontext_from_filelist\n");
+        av_log(NULL, AV_LOG_ERROR, "failed to create AVPlaylistContext in ff_playlist_formatcontext_from_filelist\n");
         return NULL;
     }
     ic = avformat_alloc_context();
@@ -150,10 +150,10 @@ void ff_playlist_split_encodedstring(const char *s,
     av_free(sepidx);
 }
 
-PlaylistContext *ff_playlist_from_filelist(const char **flist, int len)
+AVPlaylistContext *ff_playlist_from_filelist(const char **flist, int len)
 {
     int i;
-    PlaylistContext *ctx;
+    AVPlaylistContext *ctx;
     ctx = av_mallocz(sizeof(*ctx));
     if (!ctx) {
         av_log(NULL, AV_LOG_ERROR, "av_mallocz error in ff_playlist_from_encodedstring\n");
@@ -164,9 +164,9 @@ PlaylistContext *ff_playlist_from_filelist(const char **flist, int len)
     return ctx;
 }
 
-PlaylistContext *ff_playlist_from_encodedstring(const char *s, const char sep)
+AVPlaylistContext *ff_playlist_from_encodedstring(const char *s, const char sep)
 {
-    PlaylistContext *ctx;
+    AVPlaylistContext *ctx;
     char **flist;
     int i, len;
     ff_playlist_split_encodedstring(s, sep, &flist, &len);
@@ -181,7 +181,7 @@ PlaylistContext *ff_playlist_from_encodedstring(const char *s, const char sep)
     return ctx;
 }
 
-void ff_playlist_add_path(PlaylistContext *ctx, const char *itempath)
+void ff_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
 {
     ctx->flist = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size+1));
     ctx->flist[ctx->pelist_size] = NULL;
@@ -223,7 +223,7 @@ int64_t ff_playlist_time_offset(const int64_t *durations, int pe_curidx)
     return total;
 }
 
-int ff_playlist_stream_index_from_time(PlaylistContext *ctx,
+int ff_playlist_stream_index_from_time(AVPlaylistContext *ctx,
                                        int64_t pts,
                                        int64_t *localpts)
 {
@@ -240,7 +240,7 @@ int ff_playlist_stream_index_from_time(PlaylistContext *ctx,
     return i;
 }
 
-int ff_playlist_playidx_from_streamidx(PlaylistContext *ctx, int stream_index)
+int ff_playlist_playidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
 {
     int i, total;
     i = total = 0;
@@ -249,7 +249,7 @@ int ff_playlist_playidx_from_streamidx(PlaylistContext *ctx, int stream_index)
     return i-1;
 }
 
-int ff_playlist_localstidx_from_streamidx(PlaylistContext *ctx, int stream_index)
+int ff_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
 {
     int i, total;
     i = total = 0;
@@ -258,7 +258,7 @@ int ff_playlist_localstidx_from_streamidx(PlaylistContext *ctx, int stream_index
     return stream_index - (total - ctx->nb_streams_list[i-1]);
 }
 
-int ff_playlist_streams_offset_from_playidx(PlaylistContext *ctx, int playidx)
+int ff_playlist_streams_offset_from_playidx(AVPlaylistContext *ctx, int playidx)
 {
     int i, total;
     i = total = 0;

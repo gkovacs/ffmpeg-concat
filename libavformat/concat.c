@@ -26,8 +26,8 @@
  *
  *  @details This is a minimal concat-type demuxer that can be constructed
  *  by allocating a PlayElem for each playlist item and setting its filename,
- *  then allocating a PlaylistContext, creating a list of PlayElem, and setting
- *  the PlaylistContext in the AVFormatContext.
+ *  then allocating a AVPlaylistContext, creating a list of PlayElem, and setting
+ *  the AVPlaylistContext in the AVFormatContext.
  */
 
 #include "concat.h"
@@ -46,7 +46,7 @@ static int concat_probe(AVProbeData *p)
     return 0;
 }
 
-// PlaylistContext should be constructed externally
+// AVPlaylistContext should be constructed externally
 static int concat_read_header(AVFormatContext *s,
                               AVFormatParameters *ap)
 {
@@ -58,7 +58,7 @@ AVInputFormat* ff_concat_alloc_demuxer(void)
     AVInputFormat *cdm  = av_malloc(sizeof(*cdm));
     cdm->name           = "concat";
     cdm->long_name      = NULL_IF_CONFIG_SMALL("CONCAT format");
-    cdm->priv_data_size = sizeof(PlaylistContext);
+    cdm->priv_data_size = sizeof(AVPlaylistContext);
     cdm->read_probe     = concat_probe;
     cdm->read_header    = concat_read_header;
     cdm->read_packet    = ff_concatgen_read_packet;

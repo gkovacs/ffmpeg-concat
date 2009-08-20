@@ -71,7 +71,7 @@ static int xspf_probe(AVProbeData *p)
         return 0;
 }
 
-static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *filename)
+static int xspf_list_files(ByteIOContext *b, AVPlaylistContext *ctx, const char *filename)
 {
     int i, j, k, c;
     unsigned int buflen;
@@ -121,7 +121,7 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *f
 static int xspf_read_header(AVFormatContext *s,
                             AVFormatParameters *ap)
 {
-    PlaylistContext *ctx = av_mallocz(sizeof(*ctx));
+    AVPlaylistContext *ctx = av_mallocz(sizeof(*ctx));
     if (xspf_list_files(s->pb, ctx, s->filename)) {
         fprintf(stderr, "no playlist items found in %s\n", s->filename);
         return AVERROR_EOF;
@@ -135,7 +135,7 @@ static int xspf_read_header(AVFormatContext *s,
 AVInputFormat xspf_demuxer = {
     "xspf",
     NULL_IF_CONFIG_SMALL("CONCAT XSPF format"),
-    sizeof(PlaylistContext),
+    sizeof(AVPlaylistContext),
     xspf_probe,
     xspf_read_header,
     ff_concatgen_read_packet,

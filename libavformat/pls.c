@@ -43,7 +43,7 @@ static int pls_probe(AVProbeData *p)
         return 0;
 }
 
-static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *filename)
+static int pls_list_files(ByteIOContext *b, AVPlaylistContext *ctx, const char *filename)
 {
     int i, j, k, c;
     unsigned int buflen;
@@ -98,7 +98,7 @@ static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *fi
 static int pls_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
-    PlaylistContext *ctx = av_mallocz(sizeof(*ctx));
+    AVPlaylistContext *ctx = av_mallocz(sizeof(*ctx));
     if (pls_list_files(s->pb, ctx, s->filename)) {
         fprintf(stderr, "no playlist items found in %s\n", s->filename);
         return AVERROR_EOF;
@@ -112,7 +112,7 @@ static int pls_read_header(AVFormatContext *s,
 AVInputFormat pls_demuxer = {
     "pls",
     NULL_IF_CONFIG_SMALL("CONCAT PLS format"),
-    sizeof(PlaylistContext),
+    sizeof(AVPlaylistContext),
     pls_probe,
     pls_read_header,
     ff_concatgen_read_packet,

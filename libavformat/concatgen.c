@@ -35,7 +35,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                              AVPacket *pkt)
 {
     int ret, i, stream_index;
-    PlaylistContext *ctx;
+    AVPlaylistContext *ctx;
     AVFormatContext *ic;
     char have_switched_streams = 0;
     ctx = s->priv_data;
@@ -99,7 +99,7 @@ int ff_concatgen_read_seek(AVFormatContext *s,
 {
     int i;
     int64_t localpts_avtimebase, localpts, pts_avtimebase;
-    PlaylistContext *ctx;
+    AVPlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
@@ -127,7 +127,7 @@ int64_t ff_concatgen_read_timestamp(AVFormatContext *s,
                                     int64_t *pos,
                                     int64_t pos_limit)
 {
-    PlaylistContext *ctx;
+    AVPlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
@@ -138,7 +138,7 @@ int64_t ff_concatgen_read_timestamp(AVFormatContext *s,
 
 int ff_concatgen_read_close(AVFormatContext *s)
 {
-    PlaylistContext *ctx;
+    AVPlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
@@ -149,7 +149,7 @@ int ff_concatgen_read_close(AVFormatContext *s)
 
 int ff_concatgen_read_play(AVFormatContext *s)
 {
-    PlaylistContext *ctx;
+    AVPlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
@@ -158,7 +158,7 @@ int ff_concatgen_read_play(AVFormatContext *s)
 
 int ff_concatgen_read_pause(AVFormatContext *s)
 {
-    PlaylistContext *ctx;
+    AVPlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
     ic = ctx->icl[ctx->pe_curidx];
