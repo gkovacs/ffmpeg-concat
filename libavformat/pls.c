@@ -55,10 +55,7 @@ static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *fi
         if (c == EOF)
             break;
         if (state == 0) {
-            s[0] = s[1];
-            s[1] = s[2];
-            s[2] = s[3];
-            s[3] = s[4];
+            memmove(s, s+1, 4);
             s[4] = c;
             if (!memcmp(s, t, 5))
                 state = 1;

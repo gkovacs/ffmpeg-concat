@@ -49,23 +49,13 @@ static int xspf_probe(AVProbeData *p)
             break;
         c = p->buf[i];
         if (!fxml) {
-            s[0] = s[1];
-            s[1] = s[2];
-            s[2] = s[3];
-            s[3] = s[4];
+            memmove(s, s+1, 4);
             s[4] = c;
             if (!memcmp(s, t, 5))
                 fxml = 1;
         }
         if (!ftag) {
-            u[0] = u[1];
-            u[1] = u[2];
-            u[2] = u[3];
-            u[3] = u[4];
-            u[4] = u[5];
-            u[5] = u[6];
-            u[6] = u[7];
-            u[7] = u[8];
+            memmove(u, u+1, 8);
             u[8] = c;
             if (!memcmp(u, v, 9))
                 ftag = 1;
@@ -94,15 +84,7 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *f
         if (c == EOF)
             break;
         if (state == 0) {
-            s[0] = s[1];
-            s[1] = s[2];
-            s[2] = s[3];
-            s[3] = s[4];
-            s[4] = s[5];
-            s[5] = s[6];
-            s[6] = s[7];
-            s[7] = s[8];
-            s[8] = s[9];
+            memmove(s, s+1, 9);
             s[9] = c;
             if (!memcmp(s, t, 10))
                 state = 1;
