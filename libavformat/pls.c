@@ -43,7 +43,7 @@ static int pls_probe(AVProbeData *p)
         return 0;
 }
 
-static int pls_list_files(ByteIOContext *b, AVPlaylistContext *ctx, const char *filename)
+static int pls_list_files(ByteIOContext *b, char ***flist_ptr, int *len_ptr)
 {
     int i, j, k, c;
     unsigned int buflen;
@@ -88,21 +88,25 @@ static int pls_list_files(ByteIOContext *b, AVPlaylistContext *ctx, const char *
     if (!flist) // no files have been found
         return AVERROR_EOF;
     flist[j] = 0;
-    av_playlist_relative_paths(flist, j, dirname(filename));
-    for (k = 0; k < j; ++k)
-        av_playlist_add_path(ctx, flist[k]);
-    av_free(flist);
+    *flist_ptr = flist;
+    *len_ptr = j;
     return 0;
 }
 
 static int pls_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
-    AVPlaylistContext *ctx = av_mallocz(sizeof(*ctx));
-    if (pls_list_files(s->pb, ctx, s->filename)) {
+    AVPlaylistContext *ctx;
+    char **flist;
+    int flist_len;
+    pls_list_files(s->pb, &flist, &flist_len);
+    if (!flist || flist_len <= 0) {
         fprintf(stderr, "no playlist items found in %s\n", s->filename);
         return AVERROR_EOF;
     }
+    av_playlist_relative_paths(flist, flist_len, dirname(s->filename));
+    ctx = av_playlist_from_filelist(flist, flist_len);
+    av_free(flist);
     s->priv_data = ctx;
     av_playlist_populate_context(ctx, ctx->pe_curidx);
     av_playlist_set_streams(s);
