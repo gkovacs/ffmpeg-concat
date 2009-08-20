@@ -40,13 +40,13 @@ static const AVCodecTag codec_concat_tags[] = {
     { 0, 0 },
 };
 
-// concat demuxer should only be manually constructed in ffmpeg
+// concat demuxer should only be manually constructed in ffmpeg; should never be autodetected
 static int concat_probe(AVProbeData *p)
 {
     return 0;
 }
 
-// AVPlaylistContext should be constructed externally
+// AVPlaylistContext must be constructed and set to s->priv manually, not here, since no data on playlist items is available
 static int concat_read_header(AVFormatContext *s,
                               AVFormatParameters *ap)
 {
