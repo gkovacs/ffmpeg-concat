@@ -60,7 +60,7 @@ static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *fi
             s[2] = s[3];
             s[3] = s[4];
             s[4] = c;
-            if (s[0] == t[0] && s[1] == t[1] && s[2] == t[2] && s[3] == t[3] && s[4] == t[4])
+            if (!strncmp(s, t, 5))
                 state = 1;
         } else if (state == 1) {
             if (c == '=')

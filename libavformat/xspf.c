@@ -54,7 +54,7 @@ static int xspf_probe(AVProbeData *p)
             s[2] = s[3];
             s[3] = s[4];
             s[4] = c;
-            if (s[0] == t[0] && s[1] == t[1] && s[2] == t[2] && s[3] == t[3] && s[4] == t[4])
+            if (!strncmp(s, t, 5))
                 fxml = 1;
         }
         if (!ftag) {
@@ -67,8 +67,7 @@ static int xspf_probe(AVProbeData *p)
             u[6] = u[7];
             u[7] = u[8];
             u[8] = c;
-            if (u[0] == v[0] && u[1] == v[1] && u[2] == v[2] && u[3] == v[3] && u[4] == v[4] &&
-                u[5] == v[5] && u[6] == v[6] && u[7] == v[7] && u[8] == v[8])
+            if (!strncmp(u, v, 9))
                 ftag = 1;
         }
     }
