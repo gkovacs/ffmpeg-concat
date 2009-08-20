@@ -27,7 +27,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <strings.h>
-#include "concat.h"
+#include "playlist.h"
 
 #undef NDEBUG
 #include <assert.h>
