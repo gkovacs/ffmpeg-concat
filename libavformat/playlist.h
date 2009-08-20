@@ -77,13 +77,6 @@ void ff_playlist_set_streams(AVFormatContext *s);
  */
 PlaylistContext* ff_playlist_get_context(AVFormatContext *ic);
 
-/** @fn void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx)
- *  @brief Sets PlaylistContext for a concat-type demuxer.
- *  @param ic AVFormatContext of the concat-type demuxer.
- *  @param ctx PlaylistContext that will be set in the concat-type demuxer.
- */
-void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx);
-
 /** @fn void ff_playlist_relative_paths(char **flist, int len, const char *workingdir)
  *  @brief Converts a list of mixed relative or absolute paths into all absolute paths.
  *  @param flist List of null-terminated strings of relative or absolute paths.

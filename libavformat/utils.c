@@ -464,7 +464,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
         av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
         av_strlcpy(ic->filename, filename, sizeof(ic->filename));
         ic->iformat = ff_concat_alloc_demuxer();
-        ff_playlist_set_context(ic, playlist_ctx);
+        ic->priv_data = playlist_ctx;
         ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
         ff_playlist_set_streams(ic);
         return 0;

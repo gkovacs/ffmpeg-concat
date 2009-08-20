@@ -95,12 +95,6 @@ PlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
         return NULL;
 }
 
-void ff_playlist_set_context(AVFormatContext *ic, PlaylistContext *ctx)
-{
-    if (ic && ctx)
-        ic->priv_data = ctx;
-}
-
 void ff_playlist_split_encodedstring(const char *s,
                                      const char sep,
                                      char ***flist_ptr,
