@@ -433,8 +433,8 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
                        int buf_size,
                        AVFormatParameters *ap)
 {
-    int err, probe_size;
-    PlaylistContext *playlist_ctx;
+    int err, probe_size, flist_len;
+    char **flist;
     AVProbeData probe_data, *pd = &probe_data;
     ByteIOContext *pb = NULL;
 
@@ -449,25 +449,20 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
         fmt = av_probe_input_format(pd, 0);
     }
 
-    playlist_ctx = ff_playlist_from_encodedstring(filename, ',');
-    if (playlist_ctx) {
-        AVFormatContext *ic;
-        AVFormatParameters default_ap;
-        if(!ap){
-            ap=&default_ap;
-            memset(ap, 0, sizeof(default_ap));
+    ff_playlist_split_encodedstring(filename, ',', &flist, &flist_len);
+    if (flist && flist_len > 1) {
+        AVFormatContext *ic = ff_playlist_formatcontext_from_filelist(flist, flist_len);
+        if (ic) {
+            PlaylistContext *playlist_ctx = ff_playlist_get_context(ic);
+            if (playlist_ctx) {
+                av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
+                av_strlcpy(ic->filename, filename, sizeof(ic->filename));
+                ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
+                ff_playlist_set_streams(ic);
+                *ic_ptr = ic;
+                return 0;
+            }
         }
-        if(!ap->prealloced_context)
-            ic = *ic_ptr = avformat_alloc_context();
-        else
-            ic = *ic_ptr;
-        av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
-        av_strlcpy(ic->filename, filename, sizeof(ic->filename));
-        ic->iformat = ff_concat_alloc_demuxer();
-        ic->priv_data = playlist_ctx;
-        ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
-        ff_playlist_set_streams(ic);
-        return 0;
     }
 
     /* Do not open file if the format does not need it. XXX: specific

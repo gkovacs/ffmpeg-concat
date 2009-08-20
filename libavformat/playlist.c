@@ -105,11 +105,9 @@ AVFormatContext *ff_playlist_formatcontext_from_filelist(const char **flist, int
         av_log(NULL, AV_LOG_ERROR, "failed to create PlaylistContext in ff_playlist_formatcontext_from_filelist\n");
         return NULL;
     }
-    avformat_alloc_context();
+    ic = avformat_alloc_context();
     ic->iformat = ff_concat_alloc_demuxer();
     ic->priv_data = ctx;
-    ff_playlist_populate_context(ctx, ctx->pe_curidx);
-    ff_playlist_set_streams(ic);
     return ic;
 }
 
