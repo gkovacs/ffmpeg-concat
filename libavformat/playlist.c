@@ -33,6 +33,7 @@
 #include "avformat.h"
 #include "playlist.h"
 #include "internal.h"
+#include "concat.h"
 
 AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
 {
@@ -95,6 +96,23 @@ PlaylistContext *ff_playlist_get_context(AVFormatContext *ic)
         return NULL;
 }
 
+AVFormatContext *ff_playlist_formatcontext_from_filelist(const char **flist, int len)
+{
+    PlaylistContext *ctx;
+    AVFormatContext *ic;
+    ctx = ff_playlist_from_filelist(flist, len);
+    if (!ctx) {
+        av_log(NULL, AV_LOG_ERROR, "failed to create PlaylistContext in ff_playlist_formatcontext_from_filelist\n");
+        return NULL;
+    }
+    avformat_alloc_context();
+    ic->iformat = ff_concat_alloc_demuxer();
+    ic->priv_data = ctx;
+    ff_playlist_populate_context(ctx, ctx->pe_curidx);
+    ff_playlist_set_streams(ic);
+    return ic;
+}
+
 void ff_playlist_split_encodedstring(const char *s,
                                      const char sep,
                                      char ***flist_ptr,
@@ -133,6 +151,20 @@ void ff_playlist_split_encodedstring(const char *s,
     av_free(sepidx);
 }
 
+PlaylistContext *ff_playlist_from_filelist(const char **flist, int len)
+{
+    int i;
+    PlaylistContext *ctx;
+    ctx = av_mallocz(sizeof(*ctx));
+    if (!ctx) {
+        av_log(NULL, AV_LOG_ERROR, "av_mallocz error in ff_playlist_from_encodedstring\n");
+        return NULL;
+    }
+    for (i = 0; i < len; ++i)
+        ff_playlist_add_path(ctx, flist[i]);
+    return ctx;
+}
+
 PlaylistContext *ff_playlist_from_encodedstring(const char *s, const char sep)
 {
     PlaylistContext *ctx;
@@ -145,13 +177,8 @@ PlaylistContext *ff_playlist_from_encodedstring(const char *s, const char sep)
         av_free(flist);
         return NULL;
     }
-    ctx = av_mallocz(sizeof(*ctx));
-    if (!ctx) {
-        av_log(NULL, AV_LOG_ERROR, "av_mallocz error in ff_playlist_from_encodedstring\n");
-        return NULL;
-    }
-    for (i = 0; i < len; ++i)
-        ff_playlist_add_path(ctx, flist[i]);
+    ctx = ff_playlist_from_filelist(flist, len);
+    av_free(flist);
     return ctx;
 }
 

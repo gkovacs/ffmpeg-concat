@@ -70,10 +70,18 @@ void ff_playlist_populate_context(PlaylistContext *ctx, int pe_curidx);
  */
 void ff_playlist_set_streams(AVFormatContext *s);
 
+/** @fn ff_playlist_formatcontext_from_filelist(const char **flist, int len)
+ *  @brief Allocates and populates a new AVFormatContext for a concat-type demuxer.
+ *  @param flist List of filenames from which to construct the playlist.
+ *  @param len Length of filename list.
+ *  @return Returns NULL if failed, or AVFormatContext if succeeded.
+ */
+AVFormatContext *ff_playlist_formatcontext_from_filelist(const char **flist, int len);
+
 /** @fn PlaylistContext* ff_playlist_get_context(AVFormatContext *ic)
  *  @brief Returns PlaylistContext continaed within a concat-type demuxer.
  *  @param ic AVFormatContext of the concat-type demuxer, which contains the PlaylistContext.
- *  @return Returnes NULL if failed (not concat-type demuxer or Playlist not yet allocated), or PlaylistContext if succeeded.
+ *  @return Returns NULL if failed (not concat-type demuxer or Playlist not yet allocated), or PlaylistContext if succeeded.
  */
 PlaylistContext* ff_playlist_get_context(AVFormatContext *ic);
 
@@ -98,6 +106,14 @@ void ff_playlist_split_encodedstring(const char *s,
                                      const char sep,
                                      char ***flist_ptr,
                                      int *len_ptr);
+
+/** @fn PlaylistContext *ff_playlist_from_filelist(const char **flist, int len)
+ *  @brief Allocates and returns a PlaylistContext with playlist elements specified by a file list.
+ *  @param flist List of filenames from which to construct the playlist.
+ *  @param len Length of filename list.
+ *  @return Returns the allocated PlaylistContext.
+ */
+PlaylistContext *ff_playlist_from_filelist(const char **flist, int len);
 
 /** @fn PlaylistContext *ff_playlist_from_encodedstring(char *s, char sep)
  *  @brief Allocates and returns a PlaylistContext with playlist elements specified by a character-delimited string.
