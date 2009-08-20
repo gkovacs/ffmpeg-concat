@@ -111,6 +111,10 @@ void ff_playlist_split_encodedstring(const char *s,
         if (c == sep) {
             sepidx[len] = ts-s;
             sepidx = av_fast_realloc(sepidx, &buflen, ++len);
+            if (!sepidx) {
+                av_log(NULL, AV_LOG_ERROR, "av_fast_realloc error in ff_playlist_split_encodedstring\n");
+                continue;
+            }
         }
     }
     sepidx[len] = ts-s;
@@ -120,6 +124,10 @@ void ff_playlist_split_encodedstring(const char *s,
     flist[len] = 0;
     for (i = 0; i < len; ++i) {
         flist[i] = av_malloc(sepidx[i+1]-sepidx[i]);
+        if (!flist[i]) {
+            av_log(NULL, AV_LOG_ERROR, "av_malloc error in ff_playlist_split_encodedstring\n");
+            continue;
+        }
         av_strlcpy(flist[i], ts+sepidx[i], sepidx[i+1]-sepidx[i]);
     }
     av_free(sepidx);
@@ -138,6 +146,10 @@ PlaylistContext *ff_playlist_from_encodedstring(const char *s, const char sep)
         return NULL;
     }
     ctx = av_mallocz(sizeof(*ctx));
+    if (!ctx) {
+        av_log(NULL, AV_LOG_ERROR, "av_mallocz error in ff_playlist_from_encodedstring\n");
+        return NULL;
+    }
     for (i = 0; i < len; ++i)
         ff_playlist_add_path(ctx, flist[i]);
     return ctx;
