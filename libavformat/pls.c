@@ -47,17 +47,17 @@ static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *fi
     char state;
     char **flist;
     char buf[1024];
-    char s[5] = {0};
-    const char t[] = "\nFile";
+    char buf_tag[5] = {0};
+    const char match_tag[] = "\nFile";
     flist = NULL;
     state = buflen = i = j = 0;
     while ((c = url_fgetc(b))) {
         if (c == EOF)
             break;
         if (state == 0) {
-            memmove(s, s+1, 4);
-            s[4] = c;
-            if (!memcmp(s, t, 5))
+            memmove(buf_tag, buf_tag+1, 4);
+            buf_tag[4] = c;
+            if (!memcmp(buf_tag, match_tag, 5))
                 state = 1;
         } else if (state == 1) {
             if (c == '=')
@@ -73,7 +73,7 @@ static int pls_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *fi
                 av_strlcpy(flist[j++], buf, i);
                 i = 0;
                 state = 0;
-                s[sizeof(s)-1] = c;
+                buf_tag[sizeof(buf_tag)-1] = c;
                 continue;
             } else {
                 buf[i++] = c;

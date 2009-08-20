@@ -35,35 +35,34 @@ static const AVCodecTag codec_xspf_tags[] = {
 static int xspf_probe(AVProbeData *p)
 {
     int i, len;
-    char fxml;
-    char ftag;
+    char found_xml, found_tag;
     unsigned char c;
-    const char t[] = "<?xml";
-    char s[5] = {0};
-    const char v[] = "<playlist";
-    char u[9] = {0};
-    fxml = ftag = 0;
+    const char match_xml[] = "<?xml";
+    char buf_xml[5] = {0};
+    const char match_tag[] = "<playlist";
+    char buf_tag[9] = {0};
+    found_xml = found_tag = 0;
     len = p->buf_size;
     for (i = 0; i < len; i++) {
-        if (ftag)
+        if (found_tag)
             break;
         c = p->buf[i];
-        if (!fxml) {
-            memmove(s, s+1, 4);
-            s[4] = c;
-            if (!memcmp(s, t, 5))
-                fxml = 1;
+        if (!found_xml) {
+            memmove(buf_xml, buf_xml+1, 4);
+            buf_xml[4] = c;
+            if (!memcmp(buf_xml, match_xml, 5))
+                found_xml = 1;
         }
-        if (!ftag) {
-            memmove(u, u+1, 8);
-            u[8] = c;
-            if (!memcmp(u, v, 9))
-                ftag = 1;
+        if (!found_tag) {
+            memmove(buf_tag, buf_tag+1, 8);
+            buf_tag[8] = c;
+            if (!memcmp(buf_tag, match_tag, 9))
+                found_tag = 1;
         }
     }
-    if (fxml && ftag)
+    if (found_xml && found_tag)
         return AVPROBE_SCORE_MAX;
-    else if (fxml || ftag)
+    else if (found_xml || found_tag)
         return AVPROBE_SCORE_MAX / 2;
     else
         return 0;
@@ -76,17 +75,17 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *f
     char state;
     char **flist;
     char buf[1024];
-    char s[10] = {0};
-    const char t[] = "<location>";
+    char buf_tag[10] = {0};
+    const char match_tag[] = "<location>";
     flist = NULL;
     state = buflen = i = j = 0;
     while ((c = url_fgetc(b))) {
         if (c == EOF)
             break;
         if (state == 0) {
-            memmove(s, s+1, 9);
-            s[9] = c;
-            if (!memcmp(s, t, 10))
+            memmove(buf_tag, buf_tag+1, 9);
+            buf_tag[9] = c;
+            if (!memcmp(buf_tag, match_tag, 10))
                 state = 1;
         } else {
             if (c == '<') {
@@ -97,7 +96,7 @@ static int xspf_list_files(ByteIOContext *b, PlaylistContext *ctx, const char *f
                 av_strlcpy(flist[j++], buf, i);
                 i = 0;
                 state = 0;
-                s[sizeof(s)-1] = c;
+                buf_tag[sizeof(buf_tag)-1] = c;
                 continue;
             } else {
                 buf[i++] = c;
