@@ -60,11 +60,9 @@ void av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
 void av_playlist_set_streams(AVFormatContext *s)
 {
     int i;
-    int offset;
-    AVFormatContext *ic;
     AVPlaylistContext *ctx = s->priv_data;
-    ic = ctx->icl[ctx->pe_curidx];
-    offset = av_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+    AVFormatContext *ic = ctx->icl[ctx->pe_curidx];
+    int offset = av_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
     ic->iformat->read_header(ic, NULL);
     for (i = 0; i < ic->nb_streams; ++i) {
         s->streams[offset + i] = ic->streams[i];
