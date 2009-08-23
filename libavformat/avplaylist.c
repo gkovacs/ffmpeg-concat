@@ -243,15 +243,6 @@ int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
     return i;
 }
 
-int av_playlist_playidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
-{
-    int i, total;
-    i = total = 0;
-    while (stream_index >= total)
-        total += ctx->nb_streams_list[i++];
-    return i-1;
-}
-
 int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
 {
     int i, total;

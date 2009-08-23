@@ -135,13 +135,6 @@ int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
                                        int64_t pts,
                                        int64_t *localpts);
 
-/** @brief Calculates the index of the playlist item which contains the specified stream index.
- *  @param ctx AVPlaylistContext within which the list of playlist elements and durations are stored.
- *  @param stream_index Global stream index, the index of the stream within the playlist demuxer.
- *  @return Returns the index of the playlist item which contains the specified stream index.
- */
-int av_playlist_playidx_from_streamidx(AVPlaylistContext *ctx, int stream_index);
-
 /** @brief Calculates the local stream index which corresponds to a global stream index.
  *  @param ctx AVPlaylistContext within which the list of playlist elements and durations are stored.
  *  @param stream_index Global stream index, the index of the stream within the playlist demuxer.
