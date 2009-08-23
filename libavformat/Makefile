@@ -5,7 +5,7 @@ FFLIBS = avcodec avutil
 
 HEADERS = avformat.h avio.h avplaylist.h
 
-OBJS = allformats.o cutils.o metadata.o metadata_compat.o options.o os_support.o sdp.o utils.o
+OBJS = allformats.o cutils.o metadata.o metadata_compat.o options.o os_support.o sdp.o seek.o utils.o
 
 # muxers/demuxers
 OBJS-$(CONFIG_AAC_DEMUXER)               += raw.o id3v1.o id3v2.o
@@ -202,6 +202,7 @@ OBJS-$(CONFIG_SMACKER_DEMUXER)           += smacker.o
 OBJS-$(CONFIG_SOL_DEMUXER)               += sol.o raw.o
 OBJS-$(CONFIG_SOX_DEMUXER)               += soxdec.o raw.o
 OBJS-$(CONFIG_SOX_MUXER)                 += soxenc.o
+OBJS-$(CONFIG_SPDIF_MUXER)               += spdif.o
 OBJS-$(CONFIG_STR_DEMUXER)               += psxstr.o
 OBJS-$(CONFIG_SWF_DEMUXER)               += swfdec.o
 OBJS-$(CONFIG_SWF_MUXER)                 += swfenc.o

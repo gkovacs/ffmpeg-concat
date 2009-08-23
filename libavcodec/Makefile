@@ -227,6 +227,7 @@ OBJS-$(CONFIG_TRUEMOTION2_DECODER)     += truemotion2.o
 OBJS-$(CONFIG_TRUESPEECH_DECODER)      += truespeech.o
 OBJS-$(CONFIG_TSCC_DECODER)            += tscc.o msrledec.o
 OBJS-$(CONFIG_TTA_DECODER)             += tta.o
+OBJS-$(CONFIG_TWINVQ_DECODER)          += twinvq.o
 OBJS-$(CONFIG_TXD_DECODER)             += txd.o s3tc.o
 OBJS-$(CONFIG_ULTI_DECODER)            += ulti.o
 OBJS-$(CONFIG_V210_DECODER)            += v210dec.o
@@ -542,6 +543,11 @@ OBJS-$(HAVE_MMI)                       += ps2/dsputil_mmi.o             \
 OBJS-$(HAVE_VIS)                       += sparc/dsputil_vis.o           \
                                           sparc/simple_idct_vis.o       \
 
+SKIPHEADERS-$(CONFIG_LIBDIRAC)         += libdirac.h
+SKIPHEADERS-$(CONFIG_LIBSCHROEDINGER)  += libschroedinger.h
+SKIPHEADERS-$(CONFIG_VAAPI)            += vaapi_internal.h
+SKIPHEADERS-$(CONFIG_VDPAU)            += vdpau.h
+SKIPHEADERS-$(CONFIG_XVMC)             += xvmc.h
 
 EXAMPLES = api
 

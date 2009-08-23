@@ -22,14 +22,14 @@ CPPFLAGS := -DHAVE_AV_CONFIG_H -I$(BUILD_ROOT_REL) -I$(SRC_PATH) $(CPPFLAGS)
 
 %.o: %.c
 	$(CCDEP)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(CC_DEPFLAGS) $(LIBOBJFLAGS) -c $(CC_O) $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(CC_DEPFLAGS) -c $(CC_O) $<
 
 %.o: %.S
 	$(ASDEP)
-	$(AS) $(CPPFLAGS) $(ASFLAGS) $(AS_DEPFLAGS) $(LIBOBJFLAGS) -c -o $@ $<
+	$(AS) $(CPPFLAGS) $(ASFLAGS) $(AS_DEPFLAGS) -c -o $@ $<
 
 %.ho: %.h
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(LIBOBJFLAGS) -Wno-unused -c -o $@ -x c $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) -Wno-unused -c -o $@ -x c $<
 
 %$(EXESUF): %.c
 
@@ -65,7 +65,8 @@ TESTPROGS := $(addprefix $(SUBDIR),$(addsuffix -test$(EXESUF),$(TESTPROGS)))
 DEP_LIBS := $(foreach NAME,$(FFLIBS),$(BUILD_ROOT_REL)/lib$(NAME)/$($(CONFIG_SHARED:yes=S)LIBNAME))
 
 ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(ARCH)/*.h))
-checkheaders: $(filter-out %_template.ho,$(ALLHEADERS:.h=.ho))
+SKIPHEADERS = $(addprefix $(SUBDIR),$(SKIPHEADERS-))
+checkheaders: $(filter-out $(SKIPHEADERS:.h=.ho),$(ALLHEADERS:.h=.ho))
 
 DEPS := $(OBJS:.o=.d)
 depend dep: $(DEPS)

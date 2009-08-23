@@ -1,13 +1,13 @@
 ffmpeg:
-svn: 19666
-git: 753d52cbd2428454b531965be08d924c761c4cc0
+svn: 19688
+git: 6a3f0e960e6e07079743821db16a238754b5f7a3
 committer: mru
-commitdate: Mon, 17 Aug 2009 02:23:53 +0000
-commitlog: AVR32: optimised mathops.h
+commitdate: Sun, 23 Aug 2009 15:39:42 +0000
+commitlog: Add myself as maintainer for AVR32 and MIPS
 
 libswscale:
-svn: 19666
-git: bb5f66040578ce22cca08e3605333a39ed048e0c
+svn: 19688
+git: 30c6a4d2f849809c0d1f9ca6d548f786990b1d38
 committer: ramiro
-commitdate: Mon, 17 Aug 2009 02:06:00 +0000
-commitlog: swscale-example: Make selection of dstW, dstH, and flags more clear.
+commitdate: Sun, 23 Aug 2009 20:31:38 +0000
+commitlog: swscale-example: Rename src->ref so as to not confuse with src being used in doTest().

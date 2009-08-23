@@ -94,6 +94,7 @@ library:
 @item id Quake II CIN video     @tab   @tab X
 @item id RoQ                    @tab X @tab X
     @tab Used in Quake III, Jedi Knight 2, other computer games.
+@item IEC61937 encapsulation @tab X @tab
 @item IFF                       @tab   @tab X
     @tab Interchange File Format
 @item Interplay MVE             @tab   @tab X
@@ -612,6 +613,7 @@ following image formats are supported:
 @item True Audio (TTA)       @tab     @tab  X
 @item TrueHD                 @tab     @tab  X
     @tab Used in HD-DVD and Blu-Ray discs.
+@item TwinVQ (VQF flavor)    @tab     @tab  X
 @item Vorbis                 @tab  E  @tab  X
     @ A native but very primitive encoder exists.
 @item WavPack                @tab     @tab  X
