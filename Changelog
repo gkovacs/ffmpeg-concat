@@ -32,13 +32,10 @@ version <next>:
 - RTMP support in libavformat
 - noX handling for OPT_BOOL X options
 - Wave64 demuxer
-<<<<<<< HEAD
-- playlist API and concatenation support for ffmpeg
-- demuxers for M3U, PLS, and XSPF playlist formats
-=======
 - IEC-61937 compatible Muxer
 - TwinVQ decoder
->>>>>>> 6a3f0e960e6e07079743821db16a238754b5f7a3
+- playlist API and concatenation support for ffmpeg
+- demuxers for M3U, PLS, and XSPF playlist formats
 
 
 
