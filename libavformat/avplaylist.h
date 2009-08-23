@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/** @file libavformat/playlist.h
+/** @file libavformat/avplaylist.h
  *  @author Geza Kovacs ( gkovacs mit edu )
  *
  *  @brief General components used by playlist formats
@@ -30,8 +30,8 @@
  *  implementing file concatenation and support for playlist formats.
  */
 
-#ifndef AVFORMAT_PLAYLIST_H
-#define AVFORMAT_PLAYLIST_H
+#ifndef AVFORMAT_AVPLAYLIST_H
+#define AVFORMAT_AVPLAYLIST_H
 
 #include <libgen.h>
 #include "avformat.h"
@@ -156,4 +156,4 @@ int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_ind
  */
 int av_playlist_streams_offset_from_playidx(AVPlaylistContext *ctx, int playidx);
 
-#endif /* AVFORMAT_PLAYLIST_H */
+#endif /* AVFORMAT_AVPLAYLIST_H */
