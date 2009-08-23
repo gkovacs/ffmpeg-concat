@@ -70,15 +70,20 @@ void av_playlist_set_streams(AVFormatContext *s)
         if (!ic->streams[i]->codec->codec) {
             AVCodec *codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
             if (!codec) {
-                av_log(ic->streams[i]->codec, AV_LOG_ERROR, "Decoder (codec id %d) not found for input stream #%d\n",
-                       ic->streams[i]->codec->codec_id, ic->streams[i]->index);
-                return;
-             }
-             if (avcodec_open(ic->streams[i]->codec, codec) < 0) {
-                av_log(ic->streams[i]->codec, AV_LOG_ERROR, "Error while opening decoder for input stream #%d\n",
+                av_log(ic->streams[i]->codec,
+                       AV_LOG_ERROR,
+                       "Decoder (codec id %d) not found for input stream #%d\n",
+                       ic->streams[i]->codec->codec_id,
                        ic->streams[i]->index);
                 return;
-             }
+            }
+            if (avcodec_open(ic->streams[i]->codec, codec) < 0) {
+                av_log(ic->streams[i]->codec,
+                       AV_LOG_ERROR,
+                       "Error while opening decoder for input stream #%d\n",
+                       ic->streams[i]->index);
+                return;
+            }
         }
     }
     s->nb_streams        = ic->nb_streams + offset;
