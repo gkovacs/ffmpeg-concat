@@ -25,9 +25,9 @@
  *  @brief General components used by playlist formats
  *
  *  @details These functions are used to initialize and manipulate playlists
- *  (AVPlaylistContext) and their individual playlist elements (PlayElem), each
- *  of which encapsulates its own AVFormatContext. This abstraction is used for
- *  implementing file concatenation and support for playlist formats.
+ *  (AVPlaylistContext) and AVFormatContext for each playlist item.
+ *  This abstraction is used to implement file concatenation and
+ *  support for playlist formats.
  */
 
 #ifndef AVFORMAT_AVPLAYLIST_H
@@ -37,7 +37,7 @@
 #include "avformat.h"
 
 /** @struct AVPlaylistContext
- *  @brief Represents the playlist and contains PlayElem for each playlist item.
+ *  @brief Represents the playlist and contains AVFormatContext for each playlist item.
  */
 typedef struct AVPlaylistContext {
     char **flist;          /**< List of file names for each playlist item */
@@ -112,7 +112,7 @@ AVPlaylistContext *av_playlist_from_filelist(const char **flist, int len);
  */
 AVPlaylistContext *av_playlist_from_encodedstring(const char *s, const char sep);
 
-/** @brief Adds PlayElem for item located at specified path to a AVPlaylistContext.
+/** @brief Creates and adds AVFormatContext for item located at specified path to a AVPlaylistContext.
  *  @param ctx Pre-allocated AVPlaylistContext to add elements to.
  *  @param itempath Absolute path to item for which to add a playlist element.
  */
