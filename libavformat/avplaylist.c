@@ -208,8 +208,8 @@ void av_playlist_relative_paths(char **flist,
         int filename_len = strlen(flist[i]);
         full_file_path = av_malloc(workingdir_len + filename_len + 2);
         av_strlcpy(full_file_path, workingdir, workingdir_len + 1);
-        fullfpath[workingdir_len] = '/';
-        fullfpath[workingdir_len + 1] = 0;
+        full_file_path[workingdir_len] = '/';
+        full_file_path[workingdir_len + 1] = 0;
         av_strlcat(full_file_path, flist[i], workingdir_len + filename_len + 2);
         if (url_exist(full_file_path))
             flist[i] = full_file_path;
