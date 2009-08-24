@@ -31,6 +31,7 @@
 
 #include "concatgen.h"
 #include "avformat.h"
+#include "avplaylist.h"
 
 int ff_concatgen_read_packet(AVFormatContext *s,
                              AVPacket *pkt)
@@ -152,10 +153,14 @@ int64_t ff_concatgen_read_timestamp(AVFormatContext *s,
 
 int ff_concatgen_read_close(AVFormatContext *s)
 {
+    int i;
     AVPlaylistContext *ctx = s->priv_data;
-    AVFormatContext *ic = ctx->formatcontext_list[ctx->pe_curidx];
-    if (ic->iformat->read_close)
-        return ic->iformat->read_close(ic);
+    AVFormatContext *ic;
+    for (i = 0; i < ctx->pelist_size; ++i) {
+        ic = ctx->formatcontext_list[i];
+        if (ic->iformat->read_close)
+            return ic->iformat->read_close(ic);
+    }
     return 0;
 }
 
