@@ -63,8 +63,9 @@ int av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx);
 
 /** @brief Sets the master concat-type demuxer's streams to those of its currently opened playlist element.
  *  @param s AVFormatContext of the concat-type demuxer, which contains the AVPlaylistContext and substreams.
+ *  @return Returns 0 upon success, or negative upon failure.
  */
-void av_playlist_set_streams(AVFormatContext *s);
+int av_playlist_set_streams(AVFormatContext *s);
 
 /** @brief Allocates and populates a new AVFormatContext for a concat-type demuxer.
  *  @param flist List of filenames from which to construct the playlist.

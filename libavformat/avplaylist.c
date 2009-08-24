@@ -73,7 +73,7 @@ int av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
     return 0;
 }
 
-void av_playlist_set_streams(AVFormatContext *s)
+int av_playlist_set_streams(AVFormatContext *s)
 {
     int i;
     AVPlaylistContext *ctx = s->priv_data;
@@ -91,14 +91,14 @@ void av_playlist_set_streams(AVFormatContext *s)
                        "Decoder (codec id %d) not found for input stream #%d\n",
                        ic->streams[i]->codec->codec_id,
                        ic->streams[i]->index);
-                return;
+                return AVERROR_NOFMT;
             }
             if (avcodec_open(ic->streams[i]->codec, codec) < 0) {
                 av_log(ic->streams[i]->codec,
                        AV_LOG_ERROR,
                        "Error while opening decoder for input stream #%d\n",
                        ic->streams[i]->index);
-                return;
+                return AVERROR_IO;
             }
         }
     }
@@ -109,6 +109,7 @@ void av_playlist_set_streams(AVFormatContext *s)
         s->iformat->read_timestamp = ff_concatgen_read_timestamp;
     else
         s->iformat->read_timestamp = NULL;
+    return 0;
 }
 
 AVPlaylistContext *av_playlist_get_context(AVFormatContext *ic)
