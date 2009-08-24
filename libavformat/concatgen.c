@@ -68,7 +68,8 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             break;
         } else {
             if (!have_switched_streams &&
-                ctx->pe_curidx < ctx->pelist_size - 1) {
+                ctx->pe_curidx < ctx->pelist_size - 1 &&
+                ret != AVERROR(EAGAIN)) {
             // TODO switch from AVERROR_EOF to AVERROR_EOS
             // -32 AVERROR_EOF for avi, -51 for ogg
 
