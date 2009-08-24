@@ -157,7 +157,9 @@ void av_playlist_split_encodedstring(const char *s,
         flist[i] = av_malloc(sepidx[i+1]-sepidx[i]);
         if (!flist[i]) {
             av_log(NULL, AV_LOG_ERROR, "av_malloc error in av_playlist_split_encodedstring\n");
-            continue;
+            *flist_ptr = NULL;
+            *len_ptr = 0;
+            return;
         }
         av_strlcpy(flist[i], ts+sepidx[i], sepidx[i+1]-sepidx[i]);
     }
