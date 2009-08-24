@@ -42,8 +42,8 @@
 typedef struct AVPlaylistContext {
     char **flist;                         /**< List of file names for each playlist item */
     AVFormatContext **formatcontext_list; /**< List of AVFormatContext for each playlist item */
-    int pelist_size;                      /**< Number of playlist elements stored in icl */
-    int pe_curidx;                        /**< Index of the AVFormatContext in icl that packets are being read from */
+    int pelist_size;                      /**< Number of playlist elements stored in formatcontext_list */
+    int pe_curidx;                        /**< Index of the AVFormatContext in formatcontext_list that packets are being read from */
     int64_t *durations;                   /**< Durations, in AV_TIME_BASE units, for each playlist item */
     int *nb_streams_list;                 /**< List of the number of streams in each playlist item*/
 } AVPlaylistContext;
@@ -139,7 +139,7 @@ int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_ind
 
 /** @brief Calculates the stream offset which corresponds to the given playlist item index.
  *  @param ctx AVPlaylistContext within which the list of playlist elements and durations are stored.
- *  @param playidx Playlist item index, the index of the child demuxer within ctx->icl.
+ *  @param playidx Playlist item index, the index of the child demuxer within ctx->formatcontext_list.
  *  @return Returns the stream offset, which is global stream index - local stream index.
  */
 int av_playlist_streams_offset_from_playidx(AVPlaylistContext *ctx, int playidx);
