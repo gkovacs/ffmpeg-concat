@@ -139,7 +139,7 @@ void av_playlist_split_encodedstring(const char *s,
             sepidx[len] = ts-s;
             sepidx_tmp = av_fast_realloc(sepidx, &buflen, ++len);
             if (!sepidx_tmp) {
-                free(sepidx);
+                av_free(sepidx);
                 av_log(NULL, AV_LOG_ERROR, "av_fast_realloc error in av_playlist_split_encodedstring\n");
                 continue;
             } else
