@@ -1253,12 +1253,10 @@ static int output_packet(AVInputStream *ist, int ist_index,
     int stream_offset = 0;
     AVPacket avpkt;
     AVPlaylistContext *pl_ctx = av_playlist_get_context(ic);
-
     if (pl_ctx && pkt) {
         ist->st = ic->streams[pkt->stream_index];
         stream_offset = pkt->stream_index - av_playlist_localstidx_from_streamidx(pl_ctx, pkt->stream_index);
     }
-     
     if(ist->next_pts == AV_NOPTS_VALUE)
         ist->next_pts= ist->pts;
 
