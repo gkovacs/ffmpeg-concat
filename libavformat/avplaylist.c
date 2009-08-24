@@ -53,17 +53,17 @@ AVFormatContext *av_playlist_alloc_formatcontext(char *filename)
 
 void av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
 {
-    ctx->icl = av_realloc(ctx->icl, sizeof(*(ctx->icl)) * (pe_curidx+2));
-    ctx->icl[pe_curidx+1] = NULL;
-    ctx->icl[pe_curidx] = av_playlist_alloc_formatcontext(ctx->flist[pe_curidx]);
-    ctx->nb_streams_list[pe_curidx] = ctx->icl[pe_curidx]->nb_streams;
+    ctx->formatcontext_list = av_realloc(ctx->formatcontext_list, sizeof(*(ctx->formatcontext_list)) * (pe_curidx+2));
+    ctx->formatcontext_list[pe_curidx+1] = NULL;
+    ctx->formatcontext_list[pe_curidx] = av_playlist_alloc_formatcontext(ctx->flist[pe_curidx]);
+    ctx->nb_streams_list[pe_curidx] = ctx->formatcontext_list[pe_curidx]->nb_streams;
 }
 
 void av_playlist_set_streams(AVFormatContext *s)
 {
     int i;
     AVPlaylistContext *ctx = s->priv_data;
-    AVFormatContext *ic = ctx->icl[ctx->pe_curidx];
+    AVFormatContext *ic = ctx->formatcontext_list[ctx->pe_curidx];
     int offset = av_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
     ic->iformat->read_header(ic, NULL);
     for (i = 0; i < ic->nb_streams; ++i) {

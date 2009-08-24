@@ -40,12 +40,12 @@
  *  @brief Represents the playlist and contains AVFormatContext for each playlist item.
  */
 typedef struct AVPlaylistContext {
-    char **flist;          /**< List of file names for each playlist item */
-    AVFormatContext **icl; /**< List of FormatContext for each playlist items */
-    int pelist_size;       /**< Number of playlist elements stored in icl */
-    int pe_curidx;         /**< Index of the AVFormatContext in icl that packets are being read from */
-    int64_t *durations;    /**< Durations, in AV_TIME_BASE units, for each playlist item */
-    int *nb_streams_list;  /**< List of the number of streams in each playlist item*/
+    char **flist;                         /**< List of file names for each playlist item */
+    AVFormatContext **formatcontext_list; /**< List of AVFormatContext for each playlist items */
+    int pelist_size;                      /**< Number of playlist elements stored in icl */
+    int pe_curidx;                        /**< Index of the AVFormatContext in icl that packets are being read from */
+    int64_t *durations;                   /**< Durations, in AV_TIME_BASE units, for each playlist item */
+    int *nb_streams_list;                 /**< List of the number of streams in each playlist item*/
 } AVPlaylistContext;
 
 /** @brief Allocates and opens file, codecs, and streams associated with filename.

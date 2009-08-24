@@ -41,7 +41,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
     ctx = s->priv_data;
     stream_index = 0;
     for (;;) {
-        ic = ctx->icl[ctx->pe_curidx];
+        ic = ctx->formatcontext_list[ctx->pe_curidx];
         av_init_packet(pkt);
         if (s->packet_buffer) {
             *pkt = s->packet_buffer->pkt;
@@ -105,7 +105,7 @@ int ff_concatgen_read_seek(AVFormatContext *s,
     AVPlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
-    ic = ctx->icl[ctx->pe_curidx];
+    ic = ctx->formatcontext_list[ctx->pe_curidx];
     ctx->durations[ctx->pe_curidx] = ic->duration;
     pts_avtimebase = av_rescale_q(pts,
                                   ic->streams[stream_index]->time_base,
@@ -115,7 +115,7 @@ int ff_concatgen_read_seek(AVFormatContext *s,
                                                         &localpts_avtimebase);
     av_playlist_populate_context(ctx, ctx->pe_curidx);
     av_playlist_set_streams(s);
-    ic = ctx->icl[ctx->pe_curidx];
+    ic = ctx->formatcontext_list[ctx->pe_curidx];
     localpts = av_rescale_q(localpts_avtimebase,
                             AV_TIME_BASE_Q,
                             ic->streams[stream_index]->time_base);
@@ -133,7 +133,7 @@ int64_t ff_concatgen_read_timestamp(AVFormatContext *s,
     AVPlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
-    ic = ctx->icl[ctx->pe_curidx];
+    ic = ctx->formatcontext_list[ctx->pe_curidx];
     if (ic->iformat->read_timestamp)
         return ic->iformat->read_timestamp(ic, stream_index, pos, pos_limit);
     return 0;
@@ -144,7 +144,7 @@ int ff_concatgen_read_close(AVFormatContext *s)
     AVPlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
-    ic = ctx->icl[ctx->pe_curidx];
+    ic = ctx->formatcontext_list[ctx->pe_curidx];
     if (ic->iformat->read_close)
         return ic->iformat->read_close(ic);
     return 0;
@@ -155,7 +155,7 @@ int ff_concatgen_read_play(AVFormatContext *s)
     AVPlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
-    ic = ctx->icl[ctx->pe_curidx];
+    ic = ctx->formatcontext_list[ctx->pe_curidx];
     return av_read_play(ic);
 }
 
@@ -164,6 +164,6 @@ int ff_concatgen_read_pause(AVFormatContext *s)
     AVPlaylistContext *ctx;
     AVFormatContext *ic;
     ctx = s->priv_data;
-    ic = ctx->icl[ctx->pe_curidx];
+    ic = ctx->formatcontext_list[ctx->pe_curidx];
     return av_read_pause(ic);
 }
