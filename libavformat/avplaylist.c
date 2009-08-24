@@ -141,7 +141,9 @@ void av_playlist_split_encodedstring(const char *s,
             if (!sepidx_tmp) {
                 av_free(sepidx);
                 av_log(NULL, AV_LOG_ERROR, "av_fast_realloc error in av_playlist_split_encodedstring\n");
-                continue;
+                *flist_ptr = NULL;
+                *len_ptr = 0;
+                return;
             } else
                 sepidx = sepidx_tmp;
         }
