@@ -105,13 +105,6 @@ void av_playlist_split_encodedstring(const char *s,
  */
 AVPlaylistContext *av_playlist_from_filelist(const char **flist, int len);
 
-/** @brief Allocates and returns a AVPlaylistContext with playlist elements specified by a character-delimited string.
- *  @param s The input character-delimited string ("one,two,three").
- *  @param sep The delimiter character (',').
- *  @return Returns the allocated AVPlaylistContext.
- */
-AVPlaylistContext *av_playlist_from_encodedstring(const char *s, const char sep);
-
 /** @brief Creates and adds AVFormatContext for item located at specified path to a AVPlaylistContext.
  *  @param ctx Pre-allocated AVPlaylistContext to add elements to.
  *  @param itempath Absolute path to item for which to add a playlist element.

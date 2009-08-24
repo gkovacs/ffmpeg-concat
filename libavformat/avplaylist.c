@@ -165,28 +165,11 @@ AVPlaylistContext *av_playlist_from_filelist(const char **flist, int len)
     AVPlaylistContext *ctx;
     ctx = av_mallocz(sizeof(*ctx));
     if (!ctx) {
-        av_log(NULL, AV_LOG_ERROR, "av_mallocz error in av_playlist_from_encodedstring\n");
+        av_log(NULL, AV_LOG_ERROR, "av_mallocz error in av_playlist_from_filelist\n");
         return NULL;
     }
     for (i = 0; i < len; ++i)
         av_playlist_add_path(ctx, flist[i]);
-    return ctx;
-}
-
-AVPlaylistContext *av_playlist_from_encodedstring(const char *s, const char sep)
-{
-    AVPlaylistContext *ctx;
-    char **flist;
-    int i, len;
-    av_playlist_split_encodedstring(s, sep, &flist, &len);
-    if (len <= 1) {
-        for (i = 0; i < len; ++i)
-            av_free(flist[i]);
-        av_free(flist);
-        return NULL;
-    }
-    ctx = av_playlist_from_filelist(flist, len);
-    av_free(flist);
     return ctx;
 }
 
