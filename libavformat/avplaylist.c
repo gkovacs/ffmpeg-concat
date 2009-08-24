@@ -229,20 +229,12 @@ void av_playlist_relative_paths(char **flist,
 
 int64_t av_playlist_time_offset(const int64_t *durations, int stream_index)
 {
-    int i, cache_num;
+    int i;
     int64_t total = 0;
-    static int cache_stidx[STREAM_CACHE_SIZE] = {-1};
-    static int64_t cache_timeoffset[STREAM_CACHE_SIZE] = {-1};
-    for (i = 0; i < STREAM_CACHE_SIZE; ++i) {
-        if (cache_stidx[i] == stream_index)
-            return cache_timeoffset[i];
-    }
-    cache_num = stream_index % STREAM_CACHE_SIZE;
-    cache_stidx[cache_num] = stream_index;
     for (i = 0; i < stream_index; ++i) {
         total += durations[i];
     }
-    return (cache_timeoffset[cache_num] = total);
+    return total;
 }
 
 int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
@@ -264,35 +256,19 @@ int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
 
 int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
 {
-    int i, total, cache_num;
-    static int cache_globalstidx[STREAM_CACHE_SIZE] = {-1};
-    static int cache_localstidx[STREAM_CACHE_SIZE] = {-1};
-    for (i = 0; i < STREAM_CACHE_SIZE; ++i) {
-        if (cache_globalstidx[i] == stream_index)
-            return cache_localstidx[i];
-    }
+    int i, total;
     i = total = 0;
-    cache_num = stream_index % STREAM_CACHE_SIZE;
-    cache_globalstidx[cache_num] = stream_index;
     while (stream_index >= total)
         total += ctx->nb_streams_list[i++];
-    return (cache_localstidx[cache_num] = stream_index - (total - ctx->nb_streams_list[i-1]));
+    return stream_index - (total - ctx->nb_streams_list[i-1]);
 }
 
 int av_playlist_streams_offset_from_playidx(AVPlaylistContext *ctx, int playidx)
 {
-    int i, total, cache_num;
-    static int cache_playidx[STREAM_CACHE_SIZE] = {-1};
-    static int cache_offset[STREAM_CACHE_SIZE] = {-1};
-    for (i = 0; i < STREAM_CACHE_SIZE; ++i) {
-        if (cache_playidx[i] == playidx)
-            return cache_offset[i];
-    }
+    int i, total;
     i = total = 0;
-    cache_num = playidx % STREAM_CACHE_SIZE;
-    cache_playidx[cache_num] = playidx;
     while (playidx > i)
         total += ctx->nb_streams_list[i++];
-    return (cache_offset[cache_num] = total);
+    return total;
 }
 
