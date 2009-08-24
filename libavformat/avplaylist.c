@@ -69,7 +69,10 @@ int av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
     if (!(ctx->formatcontext_list[pe_curidx] = av_playlist_alloc_formatcontext(ctx->flist[pe_curidx])))
         return AVERROR_NOFMT;
     ctx->nb_streams_list[pe_curidx] = ctx->formatcontext_list[pe_curidx]->nb_streams;
-    ctx->durations[pe_curidx] = ctx->formatcontext_list[pe_curidx]->duration;
+    if (pe_curidx > 0)
+        ctx->durations[pe_curidx] = ctx->durations[pe_curidx - 1] + ctx->formatcontext_list[pe_curidx]->duration;
+    else
+        ctx->durations[pe_curidx] = 0;
     return 0;
 }
 
@@ -227,16 +230,6 @@ void av_playlist_relative_paths(char **flist,
     }
 }
 
-int64_t av_playlist_time_offset(const int64_t *durations, int stream_index)
-{
-    int i;
-    int64_t total = 0;
-    for (i = 0; i < stream_index; ++i) {
-        total += durations[i];
-    }
-    return total;
-}
-
 int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
                                        int64_t pts,
                                        int64_t *localpts)
@@ -247,7 +240,7 @@ int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
     while (pts >= total) {
         if (i >= ctx->pelist_size)
             break;
-        total += ctx->durations[i++];
+        total = ctx->durations[i++];
     }
     if (localpts)
         *localpts = pts-(total-ctx->durations[i-1]);
@@ -271,4 +264,3 @@ int av_playlist_streams_offset_from_playidx(AVPlaylistContext *ctx, int playidx)
         total += ctx->nb_streams_list[i++];
     return total;
 }
-

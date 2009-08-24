@@ -44,7 +44,7 @@ typedef struct AVPlaylistContext {
     AVFormatContext **formatcontext_list; /**< List of AVFormatContext for each playlist item */
     int pelist_size;                      /**< Number of playlist elements stored in formatcontext_list */
     int pe_curidx;                        /**< Index of the AVFormatContext in formatcontext_list that packets are being read from */
-    int64_t *durations;                   /**< Durations, in AV_TIME_BASE units, for each playlist item */
+    int64_t *durations;                   /**< Sum of previous durations, in AV_TIME_BASE units, for each playlist item */
     int *nb_streams_list;                 /**< List of the number of streams in each playlist item*/
 } AVPlaylistContext;
 
@@ -112,13 +112,6 @@ AVPlaylistContext *av_playlist_from_filelist(const char **flist, int len);
  *  @param itempath Absolute path to item for which to add a playlist element.
  */
 void av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath);
-
-/** @brief Calculates the total time offset of an element in a AVPlaylistContext in AV_TIME_BASE units.
- *  @param durations Durations of playlist items in AV_TIME_BASE units, array must be of size greater than or equal to pe_curidx.
- *  @param pe_curidx Index of the playlist element for which to calculate the time offset.
- *  @return Returns the time offset in AV_TIME_BASE units.
- */
-int64_t av_playlist_time_offset(const int64_t *durations, int stream_index);
 
 /** @brief Calculates the index of the playlist item which would contain the timestamp specified in AV_TIME_BASE units.
  *  @param ctx AVPlaylistContext within which the list of playlist elements and durations are stored.
