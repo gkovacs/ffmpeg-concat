@@ -123,7 +123,7 @@ void av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath);
  *  @param pe_curidx Index of the playlist element for which to calculate the time offset.
  *  @return Returns the time offset in AV_TIME_BASE units.
  */
-int64_t av_playlist_time_offset(const int64_t *durations, int pe_curidx);
+int64_t av_playlist_time_offset(const int64_t *durations, int stream_index);
 
 /** @brief Calculates the index of the playlist item which would contain the timestamp specified in AV_TIME_BASE units.
  *  @param ctx AVPlaylistContext within which the list of playlist elements and durations are stored.
