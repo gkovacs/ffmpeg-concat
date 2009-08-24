@@ -25,9 +25,9 @@
  *  @brief General components used by playlist formats
  *
  *  @details These functions are used to initialize and manipulate playlists
- *  (AVPlaylistContext) and their individual playlist elements (PlayElem), each
- *  of which encapsulates its own AVFormatContext. This abstraction is used for
- *  implementing file concatenation and support for playlist formats.
+ *  (AVPlaylistContext) and AVFormatContext for each playlist item.
+ *  This abstraction is used to implement file concatenation and
+ *  support for playlist formats.
  */
 
 #include "libavformat/avplaylist.h"
