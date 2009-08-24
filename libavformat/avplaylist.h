@@ -50,7 +50,7 @@ typedef struct AVPlaylistContext {
 
 /** @brief Allocates and opens file, codecs, and streams associated with filename.
  *  @param filename Null-terminated string of file to open.
- *  @return Returns an allocated AVFormatContext.
+ *  @return Returns an allocated AVFormatContext upon success, or NULL upon failure.
  */
 AVFormatContext *av_playlist_alloc_formatcontext(char *filename);
 
