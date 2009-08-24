@@ -56,10 +56,13 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                 pkt->stream_index = stream_index + av_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
                 if (!ic->streams[stream_index]->codec->has_b_frames ||
                     ic->streams[stream_index]->codec->codec->id == CODEC_ID_MPEG1VIDEO) {
-                    pkt->dts += av_rescale_q(av_playlist_time_offset(ctx->durations, ctx->pe_curidx),
-                                             AV_TIME_BASE_Q,
-                                             ic->streams[stream_index]->time_base);
-                    pkt->pts = pkt->dts + 1;
+                    int time_offset_avbase = av_playlist_time_offset(ctx->durations, ctx->pe_curidx);
+                    int time_offset_localbase = av_rescale_q(time_offset_avbase,
+                                                             AV_TIME_BASE_Q,
+                                                             ic->streams[stream_index]->time_base);
+                    pkt->dts += time_offset_localbase;
+                    if (pkt->pts != AV_NOPTS_VALUE)
+                        pkt->pts += time_offset_localbase;
                 }
             }
             break;
