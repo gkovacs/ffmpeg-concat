@@ -158,7 +158,7 @@ int ff_concatgen_read_close(AVFormatContext *s)
     AVFormatContext *ic;
     for (i = 0; i < ctx->pelist_size; ++i) {
         ic = ctx->formatcontext_list[i];
-        if (ic->iformat->read_close)
+        if (ic && ic->iformat->read_close)
             return ic->iformat->read_close(ic);
     }
     return 0;
