@@ -61,7 +61,8 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                     int64_t time_offset_localbase = av_rescale_q(ctx->durations[ctx->pe_curidx],
                                                                  AV_TIME_BASE_Q,
                                                                  ic->streams[stream_index]->time_base);
-                    pkt->dts += time_offset_localbase;
+                    if (pkt->dts != AV_NOPTS_VALUE)
+                        pkt->dts += time_offset_localbase;
                     if (pkt->pts != AV_NOPTS_VALUE)
                         pkt->pts += time_offset_localbase;
                 }
