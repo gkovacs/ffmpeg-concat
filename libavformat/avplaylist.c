@@ -91,6 +91,10 @@ void av_playlist_set_streams(AVFormatContext *s)
     s->nb_streams        = ic->nb_streams + offset;
     s->packet_buffer     = ic->packet_buffer;
     s->packet_buffer_end = ic->packet_buffer_end;
+    if (ic->iformat->read_timestamp)
+        s->iformat->read_timestamp = ff_concatgen_read_timestamp;
+    else
+        s->iformat->read_timestamp = NULL;
 }
 
 AVPlaylistContext *av_playlist_get_context(AVFormatContext *ic)
