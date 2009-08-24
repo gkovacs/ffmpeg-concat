@@ -36,8 +36,6 @@
 #include "internal.h"
 #include "concat.h"
 
-#define STREAM_CACHE_SIZE (6)
-
 AVFormatContext *av_playlist_alloc_formatcontext(char *filename)
 {
     int err;
