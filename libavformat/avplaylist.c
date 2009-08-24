@@ -135,12 +135,15 @@ void av_playlist_split_encodedstring(const char *s,
     ts = s;
     while ((c = *ts++) != 0) {
         if (c == sep) {
+            int *sepidx_tmp;
             sepidx[len] = ts-s;
-            sepidx = av_fast_realloc(sepidx, &buflen, ++len);
-            if (!sepidx) {
+            sepidx_tmp = av_fast_realloc(sepidx, &buflen, ++len);
+            if (!sepidx_tmp) {
+                free(sepidx);
                 av_log(NULL, AV_LOG_ERROR, "av_fast_realloc error in av_playlist_split_encodedstring\n");
                 continue;
-            }
+            } else
+                sepidx = sepidx_tmp;
         }
     }
     sepidx[len] = ts-s;
