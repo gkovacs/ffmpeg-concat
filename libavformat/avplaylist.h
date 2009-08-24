@@ -41,7 +41,7 @@
  */
 typedef struct AVPlaylistContext {
     char **flist;                         /**< List of file names for each playlist item */
-    AVFormatContext **formatcontext_list; /**< List of AVFormatContext for each playlist items */
+    AVFormatContext **formatcontext_list; /**< List of AVFormatContext for each playlist item */
     int pelist_size;                      /**< Number of playlist elements stored in icl */
     int pe_curidx;                        /**< Index of the AVFormatContext in icl that packets are being read from */
     int64_t *durations;                   /**< Durations, in AV_TIME_BASE units, for each playlist item */
