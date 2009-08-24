@@ -36,6 +36,8 @@
 #include "internal.h"
 #include "concat.h"
 
+#define STREAM_CACHE_SIZE (6)
+
 AVFormatContext *av_playlist_alloc_formatcontext(char *filename)
 {
     int err;
@@ -245,11 +247,20 @@ int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
 
 int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
 {
-    int i, total;
+    int i, total, cache_num;
+    static int cache_globalstidx[STREAM_CACHE_SIZE] = {-1};
+    static int cache_localstidx[STREAM_CACHE_SIZE] = {-1};
+    for (i = 0; i < STREAM_CACHE_SIZE; ++i) {
+        if (cache_globalstidx[i] == stream_index)
+            return cache_localstidx[i];
+    }
     i = total = 0;
+    cache_num = stream_index % STREAM_CACHE_SIZE;
+    cache_globalstidx[cache_num] = stream_index;
     while (stream_index >= total)
         total += ctx->nb_streams_list[i++];
-    return stream_index - (total - ctx->nb_streams_list[i-1]);
+    cache_localstidx[cache_num] = stream_index - (total - ctx->nb_streams_list[i-1]);
+    return cache_localstidx[cache_num];
 }
 
 int av_playlist_streams_offset_from_playidx(AVPlaylistContext *ctx, int playidx)
