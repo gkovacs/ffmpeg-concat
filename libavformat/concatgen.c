@@ -82,7 +82,10 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                     av_log(NULL, AV_LOG_ERROR, "Failed to switch to AVFormatContext %d\n", ctx->pe_curidx);
                     break;
                 }
-                av_playlist_set_streams(s);
+                if ((av_playlist_set_streams(s)) < 0) {
+                    av_log(NULL, AV_LOG_ERROR, "Failed to open codecs for streams in %d\n", ctx->pe_curidx);
+                    break;
+                }
                 // have_switched_streams is set to avoid infinite loop
                 have_switched_streams = 1;
                 // duration is updated in case it's checked by a parent demuxer (chained concat demuxers)
@@ -122,7 +125,11 @@ int ff_concatgen_read_seek(AVFormatContext *s,
         av_log(NULL, AV_LOG_ERROR, "Failed to switch to AVFormatContext %d\n", ctx->pe_curidx);
         return err;
     }
-    av_playlist_set_streams(s);
+    err = av_playlist_set_streams(s);
+    if (err < 0) {
+        av_log(NULL, AV_LOG_ERROR, "Failed to open codecs for streams in %d\n", ctx->pe_curidx);
+        return err;
+    }
     ic = ctx->formatcontext_list[ctx->pe_curidx];
     localpts = av_rescale_q(localpts_avtimebase,
                             AV_TIME_BASE_Q,
