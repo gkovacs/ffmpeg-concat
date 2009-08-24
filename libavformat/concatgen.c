@@ -58,7 +58,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                 pkt->stream_index = stream_index + streams_offset;
                 if (!ic->streams[stream_index]->codec->has_b_frames ||
                     ic->streams[stream_index]->codec->codec->id == CODEC_ID_MPEG1VIDEO) {
-                    int64_t time_offset_localbase = av_rescale_q(av_playlist_time_offset(ctx->durations, streams_offset),
+                    int64_t time_offset_localbase = av_rescale_q(av_playlist_time_offset(ctx->durations, ctx->pe_curidx),
                                                                  AV_TIME_BASE_Q,
                                                                  ic->streams[stream_index]->time_base);
                     pkt->dts += time_offset_localbase;
