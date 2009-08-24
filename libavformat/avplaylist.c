@@ -57,12 +57,20 @@ AVFormatContext *av_playlist_alloc_formatcontext(char *filename)
     return ic;
 }
 
-void av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
+int av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
 {
-    ctx->formatcontext_list = av_realloc(ctx->formatcontext_list, sizeof(*(ctx->formatcontext_list)) * (pe_curidx+2));
+    AVFormatContext **formatcontext_list_tmp = av_realloc(ctx->formatcontext_list, sizeof(*(ctx->formatcontext_list)) * (pe_curidx+2));
+    if (!formatcontext_list_tmp) {
+        av_log(NULL, AV_LOG_ERROR, "av_realloc error in av_playlist_populate_context\n");
+        av_free(ctx->formatcontext_list);
+        return AVERROR_NOMEM;
+    }
+    ctx->formatcontext_list = formatcontext_list_tmp;
     ctx->formatcontext_list[pe_curidx+1] = NULL;
-    ctx->formatcontext_list[pe_curidx] = av_playlist_alloc_formatcontext(ctx->flist[pe_curidx]);
+    if (!(ctx->formatcontext_list[pe_curidx] = av_playlist_alloc_formatcontext(ctx->flist[pe_curidx])))
+        return AVERROR_NOFMT;
     ctx->nb_streams_list[pe_curidx] = ctx->formatcontext_list[pe_curidx]->nb_streams;
+    return 0;
 }
 
 void av_playlist_set_streams(AVFormatContext *s)
