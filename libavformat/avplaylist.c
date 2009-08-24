@@ -272,10 +272,18 @@ int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_ind
 
 int av_playlist_streams_offset_from_playidx(AVPlaylistContext *ctx, int playidx)
 {
-    int i, total;
+    int i, total, cache_num;
+    static int cache_playidx[STREAM_CACHE_SIZE] = {-1};
+    static int cache_offset[STREAM_CACHE_SIZE] = {-1};
+    for (i = 0; i < STREAM_CACHE_SIZE; ++i) {
+        if (cache_playidx[i] == playidx)
+            return cache_offset[i];
+    }
     i = total = 0;
+    cache_num = playidx % STREAM_CACHE_SIZE;
+    cache_playidx[cache_num] = playidx;
     while (playidx > i)
         total += ctx->nb_streams_list[i++];
-    return total;
+    return (cache_offset[cache_num] = total);
 }
 
