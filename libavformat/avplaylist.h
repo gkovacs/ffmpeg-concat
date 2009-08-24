@@ -48,8 +48,8 @@ typedef struct AVPlaylistContext {
     int *nb_streams_list;                 /**< List of the number of streams in each playlist item*/
 } AVPlaylistContext;
 
-/** @brief Allocates and opens file, codecs, and streams associated with filename.
- *  @param filename Null-terminated string of file to open.
+/** @brief Allocates AVFormatContext, then opens file, and probes and opens streams.
+ *  @param filename Null-terminated string of path to file to open.
  *  @return Returns an allocated AVFormatContext upon success, or NULL upon failure.
  */
 AVFormatContext *av_playlist_alloc_formatcontext(char *filename);
