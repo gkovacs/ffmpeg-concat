@@ -203,16 +203,16 @@ void av_playlist_relative_paths(char **flist,
 {
     int i;
     for (i = 0; i < len; ++i) { // determine if relative paths
-        char *fullfpath;
-        int wdslen = strlen(workingdir);
-        int flslen = strlen(flist[i]);
-        fullfpath = av_malloc(wdslen+flslen+2);
-        av_strlcpy(fullfpath, workingdir, wdslen+1);
-        fullfpath[wdslen] = '/';
-        fullfpath[wdslen+1] = 0;
-        av_strlcat(fullfpath, flist[i], wdslen+flslen+2);
-        if (url_exist(fullfpath))
-            flist[i] = fullfpath;
+        char *full_file_path;
+        int workingdir_len = strlen(workingdir);
+        int filename_len = strlen(flist[i]);
+        full_file_path = av_malloc(workingdir_len + filename_len + 2);
+        av_strlcpy(full_file_path, workingdir, workingdir_len + 1);
+        fullfpath[workingdir_len] = '/';
+        fullfpath[workingdir_len + 1] = 0;
+        av_strlcat(full_file_path, flist[i], workingdir_len + filename_len + 2);
+        if (url_exist(full_file_path))
+            flist[i] = full_file_path;
     }
 }
 
