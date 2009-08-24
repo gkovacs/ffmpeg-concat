@@ -75,7 +75,6 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             // -32 AVERROR_EOF for avi, -51 for ogg
 
                 av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
-                ctx->durations[ctx->pe_curidx] = ic->duration;
                 ctx->pe_curidx = av_playlist_stream_index_from_time(ctx,
                                                                     av_playlist_time_offset(ctx->durations, ctx->pe_curidx),
                                                                     NULL);
@@ -112,7 +111,6 @@ int ff_concatgen_read_seek(AVFormatContext *s,
     int64_t localpts_avtimebase, localpts, pts_avtimebase;
     AVPlaylistContext *ctx = s->priv_data;
     AVFormatContext *ic = ctx->formatcontext_list[ctx->pe_curidx];
-    ctx->durations[ctx->pe_curidx] = ic->duration;
     pts_avtimebase = av_rescale_q(pts,
                                   ic->streams[stream_index]->time_base,
                                   AV_TIME_BASE_Q);

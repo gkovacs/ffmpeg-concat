@@ -35,6 +35,7 @@
 #include "libavutil/avstring.h"
 #include "internal.h"
 #include "concat.h"
+#include "avplaylist.h"
 
 AVFormatContext *av_playlist_alloc_formatcontext(char *filename)
 {
@@ -68,6 +69,7 @@ int av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
     if (!(ctx->formatcontext_list[pe_curidx] = av_playlist_alloc_formatcontext(ctx->flist[pe_curidx])))
         return AVERROR_NOFMT;
     ctx->nb_streams_list[pe_curidx] = ctx->formatcontext_list[pe_curidx]->nb_streams;
+    ctx->durations[pe_curidx] = ctx->formatcontext_list[pe_curidx]->duration;
     return 0;
 }
 
