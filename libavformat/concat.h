@@ -24,10 +24,8 @@
  *
  *  @brief Minimal playlist/concatenation demuxer
  *
- *  @details This is a minimal concat-type demuxer that can be constructed
- *  by allocating a PlayElem for each playlist item and setting its filename,
- *  then allocating a PlaylistContext, creating a list of PlayElem, and setting
- *  the PlaylistContext in the AVFormatContext.
+ *  @details This is a minimal concat-type demuxer to which elements can be
+ *  added externally via av_playlist_add_filelist.
  */
 
 #ifndef AVFORMAT_CONCAT_H
