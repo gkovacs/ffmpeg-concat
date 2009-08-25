@@ -110,8 +110,9 @@ AVPlaylistContext *av_playlist_from_filelist(const char **flist, int len);
 /** @brief Creates and adds AVFormatContext for item located at specified path to a AVPlaylistContext.
  *  @param ctx Pre-allocated AVPlaylistContext to add elements to.
  *  @param itempath Absolute path to item for which to add a playlist element.
+ *  @return Returns 0 upon success, or negative upon failure.
  */
-void av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath);
+int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath);
 
 /** @brief Calculates the index of the playlist item which would contain the timestamp specified in AV_TIME_BASE units.
  *  @param ctx AVPlaylistContext within which the list of playlist elements and durations are stored.
