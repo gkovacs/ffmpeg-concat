@@ -48,7 +48,7 @@ static int pls_list_files(ByteIOContext *b, char ***flist_ptr, int *len_ptr)
     int i, j, c;
     unsigned int buflen;
     char state;
-    char **flist;
+    char **flist, **flist_tmp;
     char buf[1024];
     char buf_tag[5] = {0};
     const char match_tag[] = "\nFile";
@@ -71,7 +71,13 @@ static int pls_list_files(ByteIOContext *b, char ***flist_ptr, int *len_ptr)
             if (c == '\n' || c == '#') {
                 termfn:
                 buf[i++] = 0;
-                flist = av_fast_realloc(flist, &buflen, sizeof(*flist) * (j+2));
+                flist_tmp = av_fast_realloc(flist, &buflen, sizeof(*flist) * (j+2));
+                if (!flist_tmp) {
+                    av_log(NULL, AV_LOG_ERROR, "av_realloc error in m3u_list_files\n");
+                    av_free(flist);
+                    return AVERROR_NOMEM;
+                } else
+                    flist = flist_tmp;
                 flist[j] = av_malloc(i);
                 av_strlcpy(flist[j++], buf, i);
                 i = 0;
