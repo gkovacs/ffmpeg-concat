@@ -45,7 +45,7 @@ static int m3u_probe(AVProbeData *p)
 
 static int m3u_list_files(ByteIOContext *s, char ***flist_ptr, int *len_ptr)
 {
-    char **flist;
+    char **flist, **flist_tmp;
     int i, bufsize;
     flist = NULL;
     i = bufsize = 0;
@@ -61,7 +61,13 @@ static int m3u_list_files(ByteIOContext *s, char ***flist_ptr, int *len_ptr)
         }
         if (*linebuf == 0) // hashed out
             continue;
-        flist = av_fast_realloc(flist, &bufsize, i+2);
+        flist_tmp = av_fast_realloc(flist, &bufsize, i+2);
+        if (!flist_tmp) {
+            av_log(NULL, AV_LOG_ERROR, "av_realloc error in m3u_list_files\n");
+            av_free(flist);
+            return AVERROR_NOMEM;
+        } else
+            flist = flist_tmp;
         flist[i] = av_malloc(q-linebuf+1);
         av_strlcpy(flist[i], linebuf, q-linebuf+1);
         flist[i++][q-linebuf] = 0;
