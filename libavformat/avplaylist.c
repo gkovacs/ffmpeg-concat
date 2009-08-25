@@ -140,9 +140,9 @@ AVFormatContext *av_playlist_formatcontext_from_filelist(const char **flist, int
 }
 
 int av_playlist_split_encodedstring(const char *s,
-                                     const char sep,
-                                     char ***flist_ptr,
-                                     int *len_ptr)
+                                    const char sep,
+                                    char ***flist_ptr,
+                                    int *len_ptr)
 {
     char c, *ts, **flist;
     int i, len, buflen, *sepidx, *sepidx_tmp;

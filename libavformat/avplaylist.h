@@ -97,9 +97,9 @@ void av_playlist_relative_paths(char **flist,
  *  @return Returns 0 upon success, or negative upon failure.
  */
 int av_playlist_split_encodedstring(const char *s,
-                                     const char sep,
-                                     char ***flist_ptr,
-                                     int *len_ptr);
+                                    const char sep,
+                                    char ***flist_ptr,
+                                    int *len_ptr);
 
 /** @brief Allocates and returns a AVPlaylistContext with playlist elements specified by a file list.
  *  @param flist List of filenames from which to construct the playlist.
