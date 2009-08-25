@@ -134,7 +134,12 @@ static int xspf_read_header(AVFormatContext *s,
         return AVERROR_EOF;
     }
     av_playlist_relative_paths(flist, flist_len, dirname(s->filename));
-    ctx = av_playlist_from_filelist(flist, flist_len);
+    ctx = av_mallocz(sizeof(*ctx));
+    if (!ctx) {
+        av_log(NULL, AV_LOG_ERROR, "failed to allocate AVPlaylistContext in xspf_read_header\n");
+        return AVERROR_NOMEM;
+    }
+    av_playlist_add_filelist(ctx, flist, flist_len);
     av_free(flist);
     s->priv_data = ctx;
     av_playlist_populate_context(ctx, ctx->pe_curidx);

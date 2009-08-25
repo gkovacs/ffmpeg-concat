@@ -126,13 +126,13 @@ AVPlaylistContext *av_playlist_get_context(AVFormatContext *ic)
 
 AVFormatContext *av_playlist_formatcontext_from_filelist(const char **flist, int len)
 {
-    AVPlaylistContext *ctx;
     AVFormatContext *ic;
-    ctx = av_playlist_from_filelist(flist, len);
+    AVPlaylistContext *ctx = av_mallocz(sizeof(*ctx));
     if (!ctx) {
-        av_log(NULL, AV_LOG_ERROR, "failed to create AVPlaylistContext in av_playlist_formatcontext_from_filelist\n");
+        av_log(NULL, AV_LOG_ERROR, "failed to allocate AVPlaylistContext in av_playlist_formatcontext_from_filelist\n");
         return NULL;
     }
+    av_playlist_add_filelist(ctx, flist, len);
     ic = avformat_alloc_context();
     ic->iformat = ff_concat_alloc_demuxer();
     ic->priv_data = ctx;
@@ -190,18 +190,15 @@ int av_playlist_split_encodedstring(const char *s,
     av_free(sepidx);
 }
 
-AVPlaylistContext *av_playlist_from_filelist(const char **flist, int len)
+int av_playlist_add_filelist(AVPlaylistContext *ctx, const char **flist, int len)
 {
-    int i;
-    AVPlaylistContext *ctx;
-    ctx = av_mallocz(sizeof(*ctx));
-    if (!ctx) {
-        av_log(NULL, AV_LOG_ERROR, "av_mallocz error in av_playlist_from_filelist\n");
-        return NULL;
+    int i, err;
+    for (i = 0; i < len; ++i) {
+        err = av_playlist_add_path(ctx, flist[i]);
+        if (err)
+            return err;
     }
-    for (i = 0; i < len; ++i)
-        av_playlist_add_path(ctx, flist[i]);
-    return ctx;
+    return 0;
 }
 
 int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
