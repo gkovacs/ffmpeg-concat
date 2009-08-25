@@ -206,11 +206,13 @@ AVPlaylistContext *av_playlist_from_filelist(const char **flist, int len)
 
 int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
 {
+    int64_t *durations_tmp;
+    int *nb_streams_list_tmp;
     ctx->flist = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size+1));
     ctx->flist[ctx->pelist_size] = NULL;
     ctx->flist[ctx->pelist_size-1] = itempath;
-    int64_t *durations_tmp = av_realloc(ctx->durations,
-                                        sizeof(*(ctx->durations)) * (ctx->pelist_size+1));
+    durations_tmp = av_realloc(ctx->durations,
+                               sizeof(*(ctx->durations)) * (ctx->pelist_size+1));
     if (!durations_tmp) {
         av_log(NULL, AV_LOG_ERROR, "av_realloc error in av_playlist_add_path\n");
         av_free(ctx->durations);
@@ -220,8 +222,8 @@ int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
     else
         ctx->durations = durations_tmp;
     ctx->durations[ctx->pelist_size] = 0;
-    int *nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
-                                          sizeof(*(ctx->nb_streams_list)) * (ctx->pelist_size+1));
+    nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
+                                     sizeof(*(ctx->nb_streams_list)) * (ctx->pelist_size+1));
     if (!nb_streams_list_tmp) {
         av_log(NULL, AV_LOG_ERROR, "av_realloc error in av_playlist_add_path\n");
         av_free(ctx->nb_streams_list);
