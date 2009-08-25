@@ -208,7 +208,16 @@ int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
 {
     int64_t *durations_tmp;
     int *nb_streams_list_tmp;
-    ctx->flist = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size+1));
+    char **flist_tmp;
+    flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size+1));
+    if (!flist_tmp) {
+        av_log(NULL, AV_LOG_ERROR, "av_realloc error in av_playlist_add_path\n");
+        av_free(ctx->durations);
+        ctx->durations = NULL;
+        return AVERROR_NOMEM;
+    }
+    else
+        ctx->flist = flist_tmp;
     ctx->flist[ctx->pelist_size] = NULL;
     ctx->flist[ctx->pelist_size-1] = itempath;
     durations_tmp = av_realloc(ctx->durations,
