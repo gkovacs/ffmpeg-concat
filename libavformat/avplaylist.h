@@ -67,12 +67,10 @@ int av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx);
  */
 int av_playlist_set_streams(AVFormatContext *s);
 
-/** @brief Allocates and populates a new AVFormatContext for a concat-type demuxer.
- *  @param flist List of filenames from which to construct the playlist.
- *  @param len Length of filename list.
+/** @brief Allocates a new AVFormatContext for a concat-type demuxer.
  *  @return Returns NULL if failed, or AVFormatContext if succeeded.
  */
-AVFormatContext *av_playlist_formatcontext_from_filelist(const char **flist, int len);
+AVFormatContext *av_playlist_alloc_concat_formatcontext(void);
 
 /** @brief Returns AVPlaylistContext continaed within a concat-type demuxer.
  *  @param ic AVFormatContext of the concat-type demuxer, which contains the AVPlaylistContext.

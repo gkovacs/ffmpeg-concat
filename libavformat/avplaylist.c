@@ -124,15 +124,14 @@ AVPlaylistContext *av_playlist_get_context(AVFormatContext *ic)
         return NULL;
 }
 
-AVFormatContext *av_playlist_formatcontext_from_filelist(const char **flist, int len)
+AVFormatContext *av_playlist_alloc_concat_formatcontext(void)
 {
     AVFormatContext *ic;
     AVPlaylistContext *ctx = av_mallocz(sizeof(*ctx));
     if (!ctx) {
-        av_log(NULL, AV_LOG_ERROR, "failed to allocate AVPlaylistContext in av_playlist_formatcontext_from_filelist\n");
+        av_log(NULL, AV_LOG_ERROR, "failed to allocate AVPlaylistContext in av_playlist_alloc_playlist_formatcontext\n");
         return NULL;
     }
-    av_playlist_add_filelist(ctx, flist, len);
     ic = avformat_alloc_context();
     ic->iformat = ff_concat_alloc_demuxer();
     ic->priv_data = ctx;

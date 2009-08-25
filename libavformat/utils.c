@@ -451,11 +451,12 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
 
     av_playlist_split_encodedstring(filename, ',', &flist, &flist_len);
     if (flist && flist_len > 1) {
-        AVFormatContext *ic = av_playlist_formatcontext_from_filelist(flist, flist_len);
+        AVFormatContext *ic = av_playlist_alloc_concat_formatcontext();
         if (ic) {
             AVPlaylistContext *playlist_ctx = av_playlist_get_context(ic);
             if (playlist_ctx) {
                 av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
+                av_playlist_add_filelist(playlist_ctx, flist, flist_len);
                 av_strlcpy(ic->filename, filename, sizeof(ic->filename));
                 av_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
                 av_playlist_set_streams(ic);
