@@ -243,8 +243,9 @@ void av_playlist_relative_paths(char **flist,
     int i;
     for (i = 0; i < len; ++i) { // determine if relative paths
         char *full_file_path;
-        int workingdir_len = strlen(workingdir);
-        int filename_len = strlen(flist[i]);
+        int workingdir_len, filename_len;
+        workingdir_len = strlen(workingdir);
+        filename_len = strlen(flist[i]);
         full_file_path = av_malloc(workingdir_len + filename_len + 2);
         av_strlcpy(full_file_path, workingdir, workingdir_len + 1);
         full_file_path[workingdir_len] = '/';
