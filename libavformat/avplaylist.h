@@ -94,8 +94,9 @@ void av_playlist_relative_paths(char **flist,
  *  @param sep The delimiter character (',').
  *  @param flist_ptr Pointer to string list which will be allocated by function.
  *  @param len_ptr Number of segments the string was split into.
+ *  @return Returns 0 upon success, or negative upon failure.
  */
-void av_playlist_split_encodedstring(const char *s,
+int av_playlist_split_encodedstring(const char *s,
                                      const char sep,
                                      char ***flist_ptr,
                                      int *len_ptr);

@@ -139,21 +139,27 @@ AVFormatContext *av_playlist_formatcontext_from_filelist(const char **flist, int
     return ic;
 }
 
-void av_playlist_split_encodedstring(const char *s,
+int av_playlist_split_encodedstring(const char *s,
                                      const char sep,
                                      char ***flist_ptr,
                                      int *len_ptr)
 {
     char c, *ts, **flist;
-    int i, len, buflen, *sepidx;
+    int i, len, buflen, *sepidx, *sepidx_tmp;
     sepidx = NULL;
     buflen = len = 0;
-    sepidx = av_fast_realloc(sepidx, &buflen, ++len);
+    sepidx_tmp = av_fast_realloc(sepidx, &buflen, ++len);
+    if (!sepidx_tmp) {
+        av_log(NULL, AV_LOG_ERROR, "av_realloc error in av_playlist_split_encodedstring\n");
+        av_free(sepidx);
+        return AVERROR_NOMEM;
+    }
+    else
+        sepidx = sepidx_tmp;
     sepidx[0] = 0;
     ts = s;
     while ((c = *ts++) != 0) {
         if (c == sep) {
-            int *sepidx_tmp;
             sepidx[len] = ts-s;
             sepidx_tmp = av_fast_realloc(sepidx, &buflen, ++len);
             if (!sepidx_tmp) {
@@ -161,7 +167,7 @@ void av_playlist_split_encodedstring(const char *s,
                 av_log(NULL, AV_LOG_ERROR, "av_fast_realloc error in av_playlist_split_encodedstring\n");
                 *flist_ptr = NULL;
                 *len_ptr = 0;
-                return;
+                return AVERROR_NOMEM;
             } else
                 sepidx = sepidx_tmp;
         }
@@ -177,7 +183,7 @@ void av_playlist_split_encodedstring(const char *s,
             av_log(NULL, AV_LOG_ERROR, "av_malloc error in av_playlist_split_encodedstring\n");
             *flist_ptr = NULL;
             *len_ptr = 0;
-            return;
+            return AVERROR_NOMEM;
         }
         av_strlcpy(flist[i], ts+sepidx[i], sepidx[i+1]-sepidx[i]);
     }
