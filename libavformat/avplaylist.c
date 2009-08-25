@@ -215,8 +215,7 @@ int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
         av_free(ctx->durations);
         ctx->durations = NULL;
         return AVERROR_NOMEM;
-    }
-    else
+    } else
         ctx->flist = flist_tmp;
     ctx->flist[ctx->pelist_size] = NULL;
     ctx->flist[ctx->pelist_size-1] = itempath;
@@ -227,8 +226,7 @@ int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
         av_free(ctx->durations);
         ctx->durations = NULL;
         return AVERROR_NOMEM;
-    }
-    else
+    } else
         ctx->durations = durations_tmp;
     ctx->durations[ctx->pelist_size] = 0;
     nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
@@ -238,8 +236,7 @@ int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
         av_free(ctx->nb_streams_list);
         ctx->nb_streams_list = NULL;
         return AVERROR_NOMEM;
-    }
-    else
+    } else
         ctx->nb_streams_list = nb_streams_list_tmp;
     ctx->nb_streams_list[ctx->pelist_size] = 0;
     return 0;
