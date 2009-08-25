@@ -63,8 +63,8 @@ int av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
         av_log(NULL, AV_LOG_ERROR, "av_realloc error in av_playlist_populate_context\n");
         av_free(ctx->formatcontext_list);
         return AVERROR_NOMEM;
-    }
-    ctx->formatcontext_list = formatcontext_list_tmp;
+    } else
+        ctx->formatcontext_list = formatcontext_list_tmp;
     ctx->formatcontext_list[pe_curidx+1] = NULL;
     if (!(ctx->formatcontext_list[pe_curidx] = av_playlist_alloc_formatcontext(ctx->flist[pe_curidx])))
         return AVERROR_NOFMT;
