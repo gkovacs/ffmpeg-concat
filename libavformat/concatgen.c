@@ -118,7 +118,7 @@ int ff_concatgen_read_seek(AVFormatContext *s,
     pts_avtimebase = av_rescale_q(pts,
                                   ic->streams[stream_index]->time_base,
                                   AV_TIME_BASE_Q);
-    ctx->pe_curidx = av_playlist_stream_index_from_time(ctx,
+    ctx->pe_curidx = ff_playlist_stream_index_from_time(ctx,
                                                         pts_avtimebase,
                                                         &localpts_avtimebase);
     err = ff_playlist_populate_context(ctx, ctx->pe_curidx);

@@ -157,22 +157,6 @@ void av_playlist_relative_paths(char **flist,
     }
 }
 
-int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
-                                       int64_t pts,
-                                       int64_t *localpts)
-{
-    int64_t total = 0;
-    int i = ctx->pe_curidx;
-    while (pts >= total) {
-        if (i >= ctx->pelist_size)
-            break;
-        total = ctx->durations[i++];
-    }
-    if (localpts)
-        *localpts = pts-(total-ctx->durations[i-1]);
-    return i;
-}
-
 int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
 {
     unsigned int i, cur, prev;

@@ -58,5 +58,15 @@ int ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx);
  */
 int ff_playlist_set_streams(AVPlaylistContext *ctx);
 
+/** @brief Calculates the index of the playlist item which would contain the timestamp specified in AV_TIME_BASE units.
+ *  @param ctx AVPlaylistContext within which the list of playlist elements and durations are stored.
+ *  @param pts Timestamp in AV_TIME_BASE.
+ *  @param localpts Time in the local demuxer's timeframe in AV_TIME_BASE units; if null, not calculated.
+ *  @return Returns the index of the stream which covers the specified time range.
+ */
+int ff_playlist_stream_index_from_time(AVPlaylistContext *ctx,
+                                       int64_t pts,
+                                       int64_t *localpts);
+
 #endif /* AVFORMAT_PLAYLIST_H */
 

@@ -134,3 +134,19 @@ int ff_playlist_set_streams(AVPlaylistContext *ctx)
         s->iformat->read_timestamp = NULL;
     return 0;
 }
+
+int ff_playlist_stream_index_from_time(AVPlaylistContext *ctx,
+                                       int64_t pts,
+                                       int64_t *localpts)
+{
+    int64_t total = 0;
+    int i = ctx->pe_curidx;
+    while (pts >= total) {
+        if (i >= ctx->pelist_size)
+            break;
+        total = ctx->durations[i++];
+    }
+    if (localpts)
+        *localpts = pts-(total-ctx->durations[i-1]);
+    return i;
+}
