@@ -52,16 +52,6 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         return AVERROR_NOMEM;
     } else
         ctx->flist = flist_tmp;
-    for (i = ctx->pelist_size; i > pos; --i)
-        ctx->flist[i] = ctx->flist[i - 1];
-    itempath_len = strlen(itempath);
-    ctx->flist[pos] = av_malloc(itempath_len + 1);
-    if (!ctx->flist[pos]) {
-        av_log(NULL, AV_LOG_ERROR, "av_malloc error in av_playlist_insert_item\n");
-        return AVERROR_NOMEM;
-    }
-    av_strlcpy(ctx->flist[pos], itempath, itempath_len + 1);
-    ctx->flist[ctx->pelist_size] = NULL;
     durations_tmp = av_realloc(ctx->durations,
                                sizeof(*(ctx->durations)) * (ctx->pelist_size+1));
     if (!durations_tmp) {
@@ -69,10 +59,6 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         return AVERROR_NOMEM;
     } else
         ctx->durations = durations_tmp;
-    for (i = ctx->pelist_size; i > pos; --i)
-        ctx->durations[i] = ctx->durations[i - 1];
-    ctx->durations[pos] = 0;
-    ctx->durations[ctx->pelist_size] = 0;
     nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
                                      sizeof(*(ctx->nb_streams_list)) * (ctx->pelist_size+1));
     if (!nb_streams_list_tmp) {
@@ -80,10 +66,23 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         return AVERROR_NOMEM;
     } else
         ctx->nb_streams_list = nb_streams_list_tmp;
-    for (i = ctx->pelist_size; i > pos; --i)
+    for (i = ctx->pelist_size; i > pos; --i) {
+        ctx->flist[i] = ctx->flist[i - 1];
+        ctx->durations[i] = ctx->durations[i - 1];
         ctx->nb_streams_list[i] = ctx->nb_streams_list[i - 1];
-    ctx->nb_streams_list[pos] = 0;
+    }
+    ctx->flist[ctx->pelist_size] = NULL;
+    ctx->durations[ctx->pelist_size] = 0;
     ctx->nb_streams_list[ctx->pelist_size] = 0;
+    ctx->durations[pos] = 0;
+    ctx->nb_streams_list[pos] = 0;
+    itempath_len = strlen(itempath);
+    ctx->flist[pos] = av_malloc(itempath_len + 1);
+    if (!ctx->flist[pos]) {
+        av_log(NULL, AV_LOG_ERROR, "av_malloc error in av_playlist_insert_item\n");
+        return AVERROR_NOMEM;
+    }
+    av_strlcpy(ctx->flist[pos], itempath, itempath_len + 1);
     return 0;
 }
 
