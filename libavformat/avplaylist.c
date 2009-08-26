@@ -37,30 +37,6 @@
 #include "concat.h"
 #include "playlist.h"
 
-AVFormatContext *av_playlist_alloc_formatcontext(char *filename)
-{
-    int err;
-    AVFormatContext *ic = avformat_alloc_context();
-    if (!ic) {
-        av_log(NULL, AV_LOG_ERROR, "unable to allocate AVFormatContext in av_playlist_alloc_formatcontext\n");
-        return NULL;
-    }
-    err = av_open_input_file(&ic, filename, ic->iformat, 0, NULL);
-    if (err < 0) {
-        av_log(ic, AV_LOG_ERROR, "Error during av_open_input_file\n");
-        av_free(ic);
-        return NULL;
-    }
-    err = av_find_stream_info(ic);
-    if (err < 0) {
-        av_log(ic, AV_LOG_ERROR, "Could not find stream info\n");
-        av_close_input_file(ic);
-        av_free(ic);
-        return NULL;
-    }
-    return ic;
-}
-
 AVPlaylistContext *av_playlist_get_context(AVFormatContext *ic)
 {
     if (ic && ic->iformat && ic->iformat->long_name && ic->priv_data &&

@@ -33,6 +33,12 @@
 
 #include "avplaylist.h"
 
+/** @brief Allocates AVFormatContext, then opens file, and probes and opens streams.
+ *  @param filename Null-terminated string of path to file to open.
+ *  @return Returns an allocated AVFormatContext upon success, or NULL upon failure.
+ */
+AVFormatContext *ff_playlist_alloc_formatcontext(char *filename);
+
 /** @brief Opens the playlist element with the specified index from the AVPlaylistContext.
  *  @param ctx AVPlaylistContext containing the desired playlist element.
  *  @param pe_curidx Index of the playlist element to be opened.
