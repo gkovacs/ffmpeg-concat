@@ -57,6 +57,7 @@ AVFormatContext *av_playlist_alloc_concat_formatcontext(void)
     ic = avformat_alloc_context();
     ic->iformat = ff_concat_alloc_demuxer();
     ic->priv_data = ctx;
+    ctx->master_formatcontext = ic;
     return ic;
 }
 

@@ -46,6 +46,7 @@ typedef struct AVPlaylistContext {
     int pe_curidx;                        /**< Index of the AVFormatContext in formatcontext_list that packets are being read from */
     int64_t *durations;                   /**< Sum of previous durations, in AV_TIME_BASE units, for each playlist item */
     int *nb_streams_list;                 /**< List of the number of streams in each playlist item*/
+    AVFormatContext *master_formatcontext;/**< Parent AVFormatContext of which priv_data is this playlist. NULL if playlist is used standalone. */
 } AVPlaylistContext;
 
 /** @brief Allocates a new AVFormatContext for a concat-type demuxer.
