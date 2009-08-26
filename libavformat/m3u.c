@@ -92,7 +92,7 @@ static int m3u_read_header(AVFormatContext *s,
         fprintf(stderr, "no playlist items found in %s\n", s->filename);
         return AVERROR_EOF;
     }
-    av_playlist_relative_paths(flist, flist_len, dirname(s->filename));
+    ff_playlist_relative_paths(flist, flist_len, dirname(s->filename));
     ctx = av_mallocz(sizeof(*ctx));
     if (!ctx) {
         av_log(NULL, AV_LOG_ERROR, "failed to allocate AVPlaylistContext in m3u_read_header\n");

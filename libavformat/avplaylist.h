@@ -49,27 +49,6 @@ typedef struct AVPlaylistContext {
     AVFormatContext *master_formatcontext; /**< Parent AVFormatContext of which priv_data is this playlist. NULL if playlist is used standalone. */
 } AVPlaylistContext;
 
-/** @brief Converts a list of mixed relative or absolute paths into all absolute paths.
- *  @param flist List of null-terminated strings of relative or absolute paths.
- *  @param len Number of paths in flist.
- *  @param workingdir Path that strings in flist are relative to.
- */
-void av_playlist_relative_paths(char **flist,
-                                int len,
-                                const char *workingdir);
-
-/** @brief Splits a character-delimited string into a list of strings.
- *  @param s The input character-delimited string ("one,two,three").
- *  @param sep The delimiter character (',').
- *  @param flist_ptr Pointer to string list which will be allocated by function.
- *  @param len_ptr Number of segments the string was split into.
- *  @return Returns 0 upon success, or negative upon failure.
- */
-int av_playlist_split_encodedstring(const char *s,
-                                    const char sep,
-                                    char ***flist_ptr,
-                                    int *len_ptr);
-
 /** @brief Creates and adds AVFormatContext for item located at specified path to a AVPlaylistContext.
  *  @param ctx Pre-allocated AVPlaylistContext to add elements to.
  *  @param itempath Absolute path to item for which to add a playlist element.

@@ -450,7 +450,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
         fmt = av_probe_input_format(pd, 0);
     }
 
-    av_playlist_split_encodedstring(filename, ',', &flist, &flist_len);
+    ff_playlist_split_encodedstring(filename, ',', &flist, &flist_len);
     if (flist && flist_len > 1) {
         AVFormatContext *ic = ff_playlist_alloc_concat_formatcontext();
         if (ic) {

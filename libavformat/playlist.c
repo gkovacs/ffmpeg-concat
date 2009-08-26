@@ -136,6 +136,77 @@ int ff_playlist_set_streams(AVPlaylistContext *ctx)
     return 0;
 }
 
+int ff_playlist_split_encodedstring(const char *s,
+                                    const char sep,
+                                    char ***flist_ptr,
+                                    int *len_ptr)
+{
+    char c, *ts, **flist;
+    int i, len, buflen, *sepidx, *sepidx_tmp;
+    sepidx = NULL;
+    buflen = len = 0;
+    sepidx_tmp = av_fast_realloc(sepidx, &buflen, ++len);
+    if (!sepidx_tmp) {
+        av_log(NULL, AV_LOG_ERROR, "av_realloc error in av_playlist_split_encodedstring\n");
+        av_free(sepidx);
+        return AVERROR_NOMEM;
+    }
+    else
+        sepidx = sepidx_tmp;
+    sepidx[0] = 0;
+    ts = s;
+    while ((c = *ts++) != 0) {
+        if (c == sep) {
+            sepidx[len] = ts-s;
+            sepidx_tmp = av_fast_realloc(sepidx, &buflen, ++len);
+            if (!sepidx_tmp) {
+                av_free(sepidx);
+                av_log(NULL, AV_LOG_ERROR, "av_fast_realloc error in av_playlist_split_encodedstring\n");
+                *flist_ptr = NULL;
+                *len_ptr = 0;
+                return AVERROR_NOMEM;
+            } else
+                sepidx = sepidx_tmp;
+        }
+    }
+    sepidx[len] = ts-s;
+    ts = s;
+    *len_ptr = len;
+    *flist_ptr = flist = av_malloc(sizeof(*flist) * (len+1));
+    flist[len] = 0;
+    for (i = 0; i < len; ++i) {
+        flist[i] = av_malloc(sepidx[i+1]-sepidx[i]);
+        if (!flist[i]) {
+            av_log(NULL, AV_LOG_ERROR, "av_malloc error in av_playlist_split_encodedstring\n");
+            *flist_ptr = NULL;
+            *len_ptr = 0;
+            return AVERROR_NOMEM;
+        }
+        av_strlcpy(flist[i], ts+sepidx[i], sepidx[i+1]-sepidx[i]);
+    }
+    av_free(sepidx);
+}
+
+void ff_playlist_relative_paths(char **flist,
+                                int len,
+                                const char *workingdir)
+{
+    int i;
+    for (i = 0; i < len; ++i) { // determine if relative paths
+        char *full_file_path;
+        int workingdir_len, filename_len;
+        workingdir_len = strlen(workingdir);
+        filename_len = strlen(flist[i]);
+        full_file_path = av_malloc(workingdir_len + filename_len + 2);
+        av_strlcpy(full_file_path, workingdir, workingdir_len + 1);
+        full_file_path[workingdir_len] = '/';
+        full_file_path[workingdir_len + 1] = 0;
+        av_strlcat(full_file_path, flist[i], workingdir_len + filename_len + 2);
+        if (url_exist(full_file_path))
+            flist[i] = full_file_path;
+    }
+}
+
 int ff_playlist_stream_index_from_time(AVPlaylistContext *ctx,
                                        int64_t pts,
                                        int64_t *localpts)

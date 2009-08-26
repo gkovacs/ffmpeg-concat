@@ -58,6 +58,27 @@ int ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx);
  */
 int ff_playlist_set_streams(AVPlaylistContext *ctx);
 
+/** @brief Converts a list of mixed relative or absolute paths into all absolute paths.
+ *  @param flist List of null-terminated strings of relative or absolute paths.
+ *  @param len Number of paths in flist.
+ *  @param workingdir Path that strings in flist are relative to.
+ */
+void ff_playlist_relative_paths(char **flist,
+                                int len,
+                                const char *workingdir);
+
+/** @brief Splits a character-delimited string into a list of strings.
+ *  @param s The input character-delimited string ("one,two,three").
+ *  @param sep The delimiter character (',').
+ *  @param flist_ptr Pointer to string list which will be allocated by function.
+ *  @param len_ptr Number of segments the string was split into.
+ *  @return Returns 0 upon success, or negative upon failure.
+ */
+int ff_playlist_split_encodedstring(const char *s,
+                                    const char sep,
+                                    char ***flist_ptr,
+                                    int *len_ptr);
+
 /** @brief Calculates the index of the playlist item which would contain the timestamp specified in AV_TIME_BASE units.
  *  @param ctx AVPlaylistContext within which the list of playlist elements and durations are stored.
  *  @param pts Timestamp in AV_TIME_BASE.
