@@ -37,15 +37,6 @@
 #include "concat.h"
 #include "playlist.h"
 
-AVPlaylistContext *av_playlist_get_context(AVFormatContext *ic)
-{
-    if (ic && ic->iformat && ic->iformat->long_name && ic->priv_data &&
-        !strncmp(ic->iformat->long_name, "CONCAT", 6))
-        return ic->priv_data;
-    else
-        return NULL;
-}
-
 int av_playlist_split_encodedstring(const char *s,
                                     const char sep,
                                     char ***flist_ptr,

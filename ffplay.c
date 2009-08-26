@@ -1322,12 +1322,14 @@ static int video_thread(void *arg)
     int len1, got_picture;
     AVFrame *frame;
     double pts;
-    AVPlaylistContext *pl_ctx;
+    AVPlaylistContext *pl_ctx = NULL;
     int st_idx = 0;
     char tryswitchalready = 0;
     AVStream *prevst = NULL;
     frame = avcodec_alloc_frame();
-    pl_ctx = av_playlist_get_context(is->ic);
+    if (is->ic && is->ic->iformat && is->ic->iformat->long_name && is->ic->priv_data &&
+        !strncmp(is->ic->iformat->long_name, "CONCAT", 6))
+        pl_ctx = is->ic->priv_data;
     for(;;) {
         while (is->paused && !is->videoq.abort_request) {
             SDL_Delay(10);
@@ -1574,10 +1576,12 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
     int n, len1, data_size;
     double pts;
     int st_idx = 0;
-    AVPlaylistContext *pl_ctx;
+    AVPlaylistContext *pl_ctx = NULL;
     AVStream *prevst = NULL;
     char tryswitchalready = 0;
-    pl_ctx = av_playlist_get_context(is->ic);
+    if (is->ic && is->ic->iformat && is->ic->iformat->long_name && is->ic->priv_data &&
+        !strncmp(is->ic->iformat->long_name, "CONCAT", 6))
+        pl_ctx = is->ic->priv_data;
     for(;;) {
         while (pkt_temp->size > 0) {
             

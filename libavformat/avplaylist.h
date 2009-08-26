@@ -49,12 +49,6 @@ typedef struct AVPlaylistContext {
     AVFormatContext *master_formatcontext; /**< Parent AVFormatContext of which priv_data is this playlist. NULL if playlist is used standalone. */
 } AVPlaylistContext;
 
-/** @brief Returns AVPlaylistContext continaed within a concat-type demuxer.
- *  @param ic AVFormatContext of the concat-type demuxer, which contains the AVPlaylistContext.
- *  @return Returns NULL if failed (not concat-type demuxer or Playlist not yet allocated), or AVPlaylistContext if succeeded.
- */
-AVPlaylistContext* av_playlist_get_context(AVFormatContext *ic);
-
 /** @brief Converts a list of mixed relative or absolute paths into all absolute paths.
  *  @param flist List of null-terminated strings of relative or absolute paths.
  *  @param len Number of paths in flist.
