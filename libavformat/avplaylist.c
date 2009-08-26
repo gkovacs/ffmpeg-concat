@@ -178,7 +178,7 @@ int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_ind
     int i, total;
     i = total = 0;
     while (stream_index >= total)
-        total += ctx->nb_streams_list[i++];
+        total = ctx->nb_streams_list[i++];
     return stream_index - (total - ctx->nb_streams_list[i-1]);
 }
 
@@ -187,6 +187,6 @@ int av_playlist_streams_offset_from_playidx(AVPlaylistContext *ctx, int playidx)
     int i, total;
     i = total = 0;
     while (playidx > i)
-        total += ctx->nb_streams_list[i++];
+        total = ctx->nb_streams_list[i++];
     return total;
 }
