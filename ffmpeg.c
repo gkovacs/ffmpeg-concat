@@ -2163,8 +2163,8 @@ static int av_encode(AVFormatContext **output_files,
         AVPacket pkt;
         double ipts_min;
         double opts_min;
-        AVPlaylistContext *pl_ctx;
-        int stream_offset;
+        AVPlaylistContext *pl_ctx = NULL;
+        int stream_offset = 0;
 
     redo:
         ipts_min= 1e100;
@@ -2251,11 +2251,12 @@ static int av_encode(AVFormatContext **output_files,
             av_pkt_dump_log(NULL, AV_LOG_DEBUG, &pkt, do_hex_dump);
         }
 
-        pl_ctx = NULL;
+        stream_offset = 0;
         if (is && is->iformat && is->iformat->long_name && is->priv_data &&
         !strncmp(is->iformat->long_name, "CONCAT", 6))
             pl_ctx = is->priv_data;
         if (pl_ctx) {
+            unsigned int stream_total = 0;
             if (pkt.stream_index >= nb_istreams &&
                 pkt.stream_index < is->nb_streams &&
                 pkt.stream_index > 0 &&
@@ -2278,9 +2279,10 @@ static int av_encode(AVFormatContext **output_files,
                 ist->next_pts        = AV_NOPTS_VALUE;
                 input_files_ts_scale[file_index][pkt.stream_index] = 0.0L;
             }
-            stream_offset = pkt.stream_index - av_playlist_localstidx_from_streamidx(pl_ctx, pkt.stream_index);
-        } else {
-            stream_offset = 0;
+            for (i = 0; pkt.stream_index >= stream_total; ++i) {
+                stream_offset = stream_total;
+                stream_total = pl_ctx->nb_streams_list[i];
+            }
         }
 
         /* the following test is needed in case new streams appear
