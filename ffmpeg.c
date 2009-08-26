@@ -1257,8 +1257,12 @@ static int output_packet(AVInputStream *ist, int ist_index,
         !strncmp(ic->iformat->long_name, "CONCAT", 6))
         pl_ctx = ic->priv_data;
     if (pl_ctx && pkt) {
+        unsigned int stream_total = 0;
+        for (i = 0; pkt->stream_index >= stream_total; ++i) {
+            stream_offset = stream_total;
+            stream_total = pl_ctx->nb_streams_list[i];
+        }
         ist->st = ic->streams[pkt->stream_index];
-        stream_offset = pkt->stream_index - av_playlist_localstidx_from_streamidx(pl_ctx, pkt->stream_index);
     }
     if(ist->next_pts == AV_NOPTS_VALUE)
         ist->next_pts= ist->pts;
