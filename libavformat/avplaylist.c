@@ -34,7 +34,6 @@
 #include "riff.h"
 #include "libavutil/avstring.h"
 #include "internal.h"
-#include "playlist.h"
 
 int av_playlist_split_encodedstring(const char *s,
                                     const char sep,
