@@ -86,6 +86,31 @@ int av_playlist_split_encodedstring(const char *s,
     av_free(sepidx);
 }
 
+void av_playlist_relative_paths(char **flist,
+                                int len,
+                                const char *workingdir)
+{
+    int i;
+    for (i = 0; i < len; ++i) { // determine if relative paths
+        char *full_file_path;
+        int workingdir_len, filename_len;
+        workingdir_len = strlen(workingdir);
+        filename_len = strlen(flist[i]);
+        full_file_path = av_malloc(workingdir_len + filename_len + 2);
+        av_strlcpy(full_file_path, workingdir, workingdir_len + 1);
+        full_file_path[workingdir_len] = '/';
+        full_file_path[workingdir_len + 1] = 0;
+        av_strlcat(full_file_path, flist[i], workingdir_len + filename_len + 2);
+        if (url_exist(full_file_path))
+            flist[i] = full_file_path;
+    }
+}
+
+int av_playlist_add_item(AVPlaylistContext *ctx, const char *itempath)
+{
+    return av_playlist_insert_item(ctx, itempath, ctx->pelist_size);
+}
+
 int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int pos)
 {
     int i;
@@ -131,11 +156,6 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
     ctx->nb_streams_list[pos] = 0;
     ctx->nb_streams_list[ctx->pelist_size] = 0;
     return 0;
-}
-
-int av_playlist_add_item(AVPlaylistContext *ctx, const char *itempath)
-{
-    return av_playlist_insert_item(ctx, itempath, ctx->pelist_size);
 }
 
 int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
@@ -200,26 +220,6 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
         ctx->formatcontext_list = formatcontext_list_tmp;
     ctx->formatcontext_list[ctx->pelist_size] = NULL;
     return 0;
-}
-
-void av_playlist_relative_paths(char **flist,
-                                int len,
-                                const char *workingdir)
-{
-    int i;
-    for (i = 0; i < len; ++i) { // determine if relative paths
-        char *full_file_path;
-        int workingdir_len, filename_len;
-        workingdir_len = strlen(workingdir);
-        filename_len = strlen(flist[i]);
-        full_file_path = av_malloc(workingdir_len + filename_len + 2);
-        av_strlcpy(full_file_path, workingdir, workingdir_len + 1);
-        full_file_path[workingdir_len] = '/';
-        full_file_path[workingdir_len + 1] = 0;
-        av_strlcat(full_file_path, flist[i], workingdir_len + filename_len + 2);
-        if (url_exist(full_file_path))
-            flist[i] = full_file_path;
-    }
 }
 
 int av_playlist_close(AVPlaylistContext *ctx)
