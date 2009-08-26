@@ -452,7 +452,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
 
     av_playlist_split_encodedstring(filename, ',', &flist, &flist_len);
     if (flist && flist_len > 1) {
-        AVFormatContext *ic = av_playlist_alloc_concat_formatcontext();
+        AVFormatContext *ic = ff_playlist_alloc_concat_formatcontext();
         if (ic) {
             AVPlaylistContext *playlist_ctx = av_playlist_get_context(ic);
             if (playlist_ctx) {

@@ -49,11 +49,6 @@ typedef struct AVPlaylistContext {
     AVFormatContext *master_formatcontext; /**< Parent AVFormatContext of which priv_data is this playlist. NULL if playlist is used standalone. */
 } AVPlaylistContext;
 
-/** @brief Allocates a new AVFormatContext for a concat-type demuxer.
- *  @return Returns NULL if failed, or AVFormatContext if succeeded.
- */
-AVFormatContext *av_playlist_alloc_concat_formatcontext(void);
-
 /** @brief Returns AVPlaylistContext continaed within a concat-type demuxer.
  *  @param ic AVFormatContext of the concat-type demuxer, which contains the AVPlaylistContext.
  *  @return Returns NULL if failed (not concat-type demuxer or Playlist not yet allocated), or AVPlaylistContext if succeeded.

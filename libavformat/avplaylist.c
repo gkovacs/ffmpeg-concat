@@ -46,21 +46,6 @@ AVPlaylistContext *av_playlist_get_context(AVFormatContext *ic)
         return NULL;
 }
 
-AVFormatContext *av_playlist_alloc_concat_formatcontext(void)
-{
-    AVFormatContext *ic;
-    AVPlaylistContext *ctx = av_mallocz(sizeof(*ctx));
-    if (!ctx) {
-        av_log(NULL, AV_LOG_ERROR, "failed to allocate AVPlaylistContext in av_playlist_alloc_playlist_formatcontext\n");
-        return NULL;
-    }
-    ic = avformat_alloc_context();
-    ic->iformat = ff_concat_alloc_demuxer();
-    ic->priv_data = ctx;
-    ctx->master_formatcontext = ic;
-    return ic;
-}
-
 int av_playlist_split_encodedstring(const char *s,
                                     const char sep,
                                     char ***flist_ptr,

@@ -39,6 +39,11 @@
  */
 AVFormatContext *ff_playlist_alloc_formatcontext(char *filename);
 
+/** @brief Allocates a new AVFormatContext for a concat-type demuxer.
+ *  @return Returns NULL if failed, or AVFormatContext if succeeded.
+ */
+AVFormatContext *ff_playlist_alloc_concat_formatcontext(void);
+
 /** @brief Opens the playlist element with the specified index from the AVPlaylistContext.
  *  @param ctx AVPlaylistContext containing the desired playlist element.
  *  @param pe_curidx Index of the playlist element to be opened.
