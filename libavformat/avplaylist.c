@@ -87,6 +87,18 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
     return 0;
 }
 
+int av_playlist_insert_playlist(AVPlaylistContext *ctx, AVPlaylistContext *insert_ctx, int pos)
+{
+    int i, err;
+    for (i = 0; i < insert_ctx->pelist_size; ++i) {
+        err = av_playlist_insert_item(ctx, insert_ctx->flist[i], pos + i);
+        if (err) {
+            av_log(NULL, AV_LOG_ERROR, "failed to insert item %d to new position %d in av_playlist_insert_playlist\n", i, pos + i);
+        }
+    }
+    return 0;
+}
+
 int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
 {
     int i;

@@ -63,6 +63,16 @@ AVPlaylistContext *av_playlist_alloc(void);
  */
 int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int pos);
 
+/** @brief Creates and adds AVFormatContext for all items in another playlist,
+ *  starting at the specified index and appending until the end of the other
+ *  playlist. Existing items will be shifted up in the list.
+ *  @param ctx Pre-allocated AVPlaylistContext to add elements to.
+ *  @param insert_ctx Pre-allocated AVPlaylistContext from which to add items from.
+ *  @param pos Zero-based index which the newly inserted item will occupy.
+ *  @return Returns 0 upon success, or negative upon failure.
+ */
+int av_playlist_insert_playlist(AVPlaylistContext *ctx, AVPlaylistContext *insert_ctx, int pos);
+
 /** @brief Removes AVFormatContext for item located at speified index from AVPlaylistContext.
  *  Existing items will be shifted down in the list.
  *  @param ctx Pre-allocated AVPlaylistContext to remove elements from.
