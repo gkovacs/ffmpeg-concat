@@ -145,6 +145,10 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     unsigned int *nb_streams_list_tmp;
     AVFormatContext **formatcontext_list_tmp;
     char **flist_tmp;
+    if (pos >= ctx->pelist_size || !ctx->flist || !ctx->durations || !ctx->nb_streams_list)
+        return AVERROR_INVALIDDATA;
+    for (i = pos; i < ctx->pelist_size; ++i)
+        ctx->flist[i] = ctx->flist[i + 1];
     flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (--ctx->pelist_size+1));
     if (!flist_tmp) {
         av_log(NULL, AV_LOG_ERROR, "av_realloc error in av_playlist_remove_item\n");
@@ -153,9 +157,9 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
         return AVERROR_NOMEM;
     } else
         ctx->flist = flist_tmp;
-    for (i = pos; i < ctx->pelist_size; ++i)
-        ctx->flist[i] = ctx->flist[i + 1];
     ctx->flist[ctx->pelist_size] = NULL;
+    for (i = pos; i < ctx->pelist_size; ++i)
+        ctx->durations[i] = ctx->durations[i + 1];
     durations_tmp = av_realloc(ctx->durations,
                                sizeof(*(ctx->durations)) * (ctx->pelist_size+1));
     if (!durations_tmp) {
@@ -165,9 +169,9 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
         return AVERROR_NOMEM;
     } else
         ctx->durations = durations_tmp;
-    for (i = pos; i < ctx->pelist_size; ++i)
-        ctx->durations[i] = ctx->durations[i + 1];
     ctx->durations[ctx->pelist_size] = 0;
+    for (i = pos; i < ctx->pelist_size; ++i)
+        ctx->nb_streams_list[i] = ctx->nb_streams_list[i + 1];
     nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
                                      sizeof(*(ctx->nb_streams_list)) * (ctx->pelist_size+1));
     if (!nb_streams_list_tmp) {
@@ -177,15 +181,15 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
         return AVERROR_NOMEM;
     } else
         ctx->nb_streams_list = nb_streams_list_tmp;
-    for (i = pos; i < ctx->pelist_size; ++i)
-        ctx->nb_streams_list[i] = ctx->nb_streams_list[i + 1];
     ctx->nb_streams_list[ctx->pelist_size] = 0;
-    if (ctx->formatcontext_list[pos]) {
+    if (ctx->formatcontext_list && ctx->formatcontext_list[pos]) {
         av_close_input_file(ctx->formatcontext_list[pos]);
         av_close_input_stream(ctx->formatcontext_list[pos]);
         av_free(ctx->formatcontext_list[pos]);
         ctx->formatcontext_list[pos] = NULL;
     }
+    for (i = pos; i < ctx->pelist_size; ++i)
+        ctx->formatcontext_list[i] = ctx->formatcontext_list[i + 1];
     formatcontext_list_tmp = av_realloc(ctx->formatcontext_list,
                                         sizeof(*(ctx->formatcontext_list)) * (ctx->pelist_size+1));
     if (!formatcontext_list_tmp) {
@@ -194,8 +198,6 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
         return AVERROR_NOMEM;
     } else
         ctx->formatcontext_list = formatcontext_list_tmp;
-    for (i = pos; i < ctx->pelist_size; ++i)
-        ctx->formatcontext_list[i] = ctx->formatcontext_list[i + 1];
     ctx->formatcontext_list[ctx->pelist_size] = NULL;
     return 0;
 }
