@@ -94,6 +94,7 @@ int av_playlist_insert_playlist(AVPlaylistContext *ctx, AVPlaylistContext *inser
         err = av_playlist_insert_item(ctx, insert_ctx->flist[i], pos + i);
         if (err) {
             av_log(NULL, AV_LOG_ERROR, "failed to insert item %d to new position %d in av_playlist_insert_playlist\n", i, pos + i);
+            return err;
         }
     }
     return 0;
