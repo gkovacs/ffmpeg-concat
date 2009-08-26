@@ -35,11 +35,6 @@
 #include "libavutil/avstring.h"
 #include "internal.h"
 
-int av_playlist_add_item(AVPlaylistContext *ctx, const char *itempath)
-{
-    return av_playlist_insert_item(ctx, itempath, ctx->pelist_size);
-}
-
 int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int pos)
 {
     int i;

@@ -49,13 +49,6 @@ typedef struct AVPlaylistContext {
     AVFormatContext *master_formatcontext; /**< Parent AVFormatContext of which priv_data is this playlist. NULL if playlist is used standalone. */
 } AVPlaylistContext;
 
-/** @brief Creates and adds AVFormatContext for item located at specified path to a AVPlaylistContext.
- *  @param ctx Pre-allocated AVPlaylistContext to add elements to.
- *  @param itempath Absolute path to item for which to add a playlist element.
- *  @return Returns 0 upon success, or negative upon failure.
- */
-int av_playlist_add_item(AVPlaylistContext *ctx, const char *itempath);
-
 /** @brief Creates and adds AVFormatContext for item located at specified path to a AVPlaylistContext
  *  at specified index. Existing items will be shifted up in the list.
  *  @param ctx Pre-allocated AVPlaylistContext to add elements to.
