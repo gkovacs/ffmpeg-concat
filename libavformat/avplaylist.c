@@ -50,6 +50,7 @@ AVFormatContext *av_playlist_alloc_formatcontext(char *filename)
     err = av_find_stream_info(ic);
     if (err < 0) {
         av_log(ic, AV_LOG_ERROR, "Could not find stream info\n");
+        av_close_input_file(ic);
         av_free(ic);
         return NULL;
     }
