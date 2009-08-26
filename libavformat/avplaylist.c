@@ -148,11 +148,11 @@ void av_playlist_relative_paths(char **flist,
 
 int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
 {
-    unsigned int i, cur, prev;
-    cur = prev = 0;
-    for (i = 0; stream_index >= cur; ++i) {
-        prev = cur;
-        cur = ctx->nb_streams_list[i];
+    unsigned int i, stream_total, stream_offset;
+    stream_total = stream_offset = 0;
+    for (i = 0; stream_index >= stream_total; ++i) {
+        stream_offset = stream_total;
+        stream_total = ctx->nb_streams_list[i];
     }
-    return stream_index - prev;
+    return stream_index - stream_offset;
 }
