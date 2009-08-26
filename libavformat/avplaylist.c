@@ -221,3 +221,25 @@ void av_playlist_relative_paths(char **flist,
             flist[i] = full_file_path;
     }
 }
+
+int av_playlist_close(AVPlaylistContext *ctx)
+{
+    int i, err;
+    while (ctx->pelist_size > 0) {
+        err = av_playlist_remove_item(ctx->pelist_size-1);
+        if (err) {
+            av_log(NULL, AV_LOG_ERROR, "failed to remove item %d from playlist", ctx->pelist_size-1);
+            return err;
+        }
+    }
+    if (ctx->flist)
+        av_free(ctx->flist);
+    if (ctx->durations)
+        av_free(ctx->durations);
+    if (ctx->nb_streams_list)
+        av_free(ctx->nb_streams_list);
+    if (ctx->formatcontext_list)
+        av_free(ctx->formatcontext_list);
+    av_free(ctx);
+    return 0;
+}

@@ -94,4 +94,10 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
  */
 int av_playlist_remove_item(AVPlaylistContext *ctx, int pos);
 
+/** @brief Removes all items from playlist and frees it.
+ *  @param ctx Pre-allocated AVPlaylistContext to close.
+ *  @return Returns 0 upon success, or negative upon failure.
+ */
+int av_playlist_close(AVPlaylistContext *ctx);
+
 #endif /* AVFORMAT_AVPLAYLIST_H */
