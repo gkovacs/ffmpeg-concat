@@ -86,21 +86,24 @@ int av_playlist_split_encodedstring(const char *s,
     av_free(sepidx);
 }
 
-int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
+int av_playlist_insert_path(AVPlaylistContext *ctx, const char *itempath, int pos)
 {
+    int i;
     int64_t *durations_tmp;
     unsigned int *nb_streams_list_tmp;
     char **flist_tmp;
     flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size+1));
     if (!flist_tmp) {
         av_log(NULL, AV_LOG_ERROR, "av_realloc error in av_playlist_add_path\n");
-        av_free(ctx->durations);
-        ctx->durations = NULL;
+        av_free(ctx->flist);
+        ctx->flist = NULL;
         return AVERROR_NOMEM;
     } else
         ctx->flist = flist_tmp;
+    for (i = ctx->pelist_size; i > pos; --i)
+        ctx->flist[i] = ctx->flist[i - 1];
+    ctx->flist[pos] = itempath;
     ctx->flist[ctx->pelist_size] = NULL;
-    ctx->flist[ctx->pelist_size-1] = itempath;
     durations_tmp = av_realloc(ctx->durations,
                                sizeof(*(ctx->durations)) * (ctx->pelist_size+1));
     if (!durations_tmp) {
@@ -110,6 +113,9 @@ int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
         return AVERROR_NOMEM;
     } else
         ctx->durations = durations_tmp;
+    for (i = ctx->pelist_size; i > pos; --i)
+        ctx->durations[i] = ctx->durations[i - 1];
+    ctx->durations[pos] = 0;
     ctx->durations[ctx->pelist_size] = 0;
     nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
                                      sizeof(*(ctx->nb_streams_list)) * (ctx->pelist_size+1));
@@ -120,8 +126,16 @@ int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
         return AVERROR_NOMEM;
     } else
         ctx->nb_streams_list = nb_streams_list_tmp;
+    for (i = ctx->pelist_size; i > pos; --i)
+        ctx->nb_streams_list[i] = ctx->nb_streams_list[i - 1];
+    ctx->nb_streams_list[pos] = 0;
     ctx->nb_streams_list[ctx->pelist_size] = 0;
     return 0;
+}
+
+int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
+{
+    return av_playlist_insert_path(ctx, itempath, ctx->pelist_size);
 }
 
 void av_playlist_relative_paths(char **flist,
