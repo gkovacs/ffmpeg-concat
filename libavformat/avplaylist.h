@@ -44,7 +44,7 @@ typedef struct AVPlaylistContext {
     AVFormatContext **formatcontext_list;  /**< List of AVFormatContext for each playlist item */
     int pelist_size;                       /**< Number of playlist elements stored in formatcontext_list */
     int pe_curidx;                         /**< Index of the AVFormatContext in formatcontext_list that packets are being read from */
-    int64_t *durations;                    /**< Sum of previous durations, in AV_TIME_BASE units, for each playlist item */
+    int64_t *durations;                    /**< Sum of current and previous durations, in AV_TIME_BASE units, for each playlist item */
     unsigned int *nb_streams_list;         /**< Sum of current and previous number of streams in each playlist item*/
     AVFormatContext *master_formatcontext; /**< Parent AVFormatContext of which priv_data is this playlist. NULL if playlist is used standalone. */
 } AVPlaylistContext;
