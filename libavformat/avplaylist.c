@@ -224,7 +224,7 @@ void av_playlist_relative_paths(char **flist,
 
 int av_playlist_close(AVPlaylistContext *ctx)
 {
-    int i, err;
+    int err;
     while (ctx->pelist_size > 0) {
         err = av_playlist_remove_item(ctx->pelist_size-1);
         if (err) {
