@@ -70,14 +70,6 @@ int av_playlist_split_encodedstring(const char *s,
                                     char ***flist_ptr,
                                     int *len_ptr);
 
-/** @brief Adds playlist elements specified by a file list to a AVPlaylistContext.
- *  @param ctx Pre-allocated AVPlaylistContext to add elements to.
- *  @param flist List of filenames from which to construct the playlist.
- *  @param len Length of filename list.
- *  @return Returns 0 upon success, or negative upon failure.
- */
-int av_playlist_add_filelist(AVPlaylistContext *ctx, const char **flist, int len);
-
 /** @brief Creates and adds AVFormatContext for item located at specified path to a AVPlaylistContext.
  *  @param ctx Pre-allocated AVPlaylistContext to add elements to.
  *  @param itempath Absolute path to item for which to add a playlist element.

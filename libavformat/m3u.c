@@ -86,7 +86,7 @@ static int m3u_read_header(AVFormatContext *s,
 {
     AVPlaylistContext *ctx;
     char **flist;
-    int flist_len;
+    int flist_len, i;
     m3u_list_files(s->pb, &flist, &flist_len);
     if (!flist || flist_len <= 0) {
         fprintf(stderr, "no playlist items found in %s\n", s->filename);
@@ -98,7 +98,8 @@ static int m3u_read_header(AVFormatContext *s,
         av_log(NULL, AV_LOG_ERROR, "failed to allocate AVPlaylistContext in m3u_read_header\n");
         return AVERROR_NOMEM;
     }
-    av_playlist_add_filelist(ctx, flist, flist_len);
+    for (i = 0; i < flist_len; ++i)
+        av_playlist_add_path(ctx, flist[i]);
     av_free(flist);
     s->priv_data = ctx;
     ctx->master_formatcontext = s;

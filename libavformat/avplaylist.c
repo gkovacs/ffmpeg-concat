@@ -88,17 +88,6 @@ int av_playlist_split_encodedstring(const char *s,
     av_free(sepidx);
 }
 
-int av_playlist_add_filelist(AVPlaylistContext *ctx, const char **flist, int len)
-{
-    int i, err;
-    for (i = 0; i < len; ++i) {
-        err = av_playlist_add_path(ctx, flist[i]);
-        if (err)
-            return err;
-    }
-    return 0;
-}
-
 int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
 {
     int64_t *durations_tmp;

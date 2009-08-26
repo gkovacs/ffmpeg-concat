@@ -434,7 +434,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
                        int buf_size,
                        AVFormatParameters *ap)
 {
-    int err, probe_size, flist_len;
+    int err, probe_size, flist_len, i;
     char **flist;
     AVProbeData probe_data, *pd = &probe_data;
     ByteIOContext *pb = NULL;
@@ -457,7 +457,8 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
             AVPlaylistContext *playlist_ctx = ic->priv_data;
             if (playlist_ctx) {
                 av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
-                av_playlist_add_filelist(playlist_ctx, flist, flist_len);
+                for (i = 0; i < flist_len; ++i)
+                    av_playlist_add_path(playlist_ctx, flist[i]);
                 av_strlcpy(ic->filename, filename, sizeof(ic->filename));
                 ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
                 ff_playlist_set_streams(playlist_ctx);
