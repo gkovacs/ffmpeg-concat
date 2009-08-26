@@ -160,14 +160,10 @@ int av_playlist_close(AVPlaylistContext *ctx)
             return err;
         }
     }
-    if (ctx->flist)
-        av_free(ctx->flist);
-    if (ctx->durations)
-        av_free(ctx->durations);
-    if (ctx->nb_streams_list)
-        av_free(ctx->nb_streams_list);
-    if (ctx->formatcontext_list)
-        av_free(ctx->formatcontext_list);
+    av_free(ctx->flist);
+    av_free(ctx->durations);
+    av_free(ctx->nb_streams_list);
+    av_free(ctx->formatcontext_list);
     av_free(ctx);
     return 0;
 }
