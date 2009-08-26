@@ -77,11 +77,4 @@ int av_playlist_split_encodedstring(const char *s,
  */
 int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath);
 
-/** @brief Calculates the local stream index which corresponds to a global stream index.
- *  @param ctx AVPlaylistContext within which the list of playlist elements and durations are stored.
- *  @param stream_index Global stream index, the index of the stream within the playlist demuxer.
- *  @return Returns the local stream index, the index of the stream within the child demuxer.
- */
-int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index);
-
 #endif /* AVFORMAT_AVPLAYLIST_H */

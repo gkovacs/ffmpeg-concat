@@ -150,3 +150,14 @@ int ff_playlist_stream_index_from_time(AVPlaylistContext *ctx,
         *localpts = pts-(total-ctx->durations[i-1]);
     return i;
 }
+
+int ff_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
+{
+    unsigned int i, stream_total, stream_offset;
+    stream_total = stream_offset = 0;
+    for (i = 0; stream_index >= stream_total; ++i) {
+        stream_offset = stream_total;
+        stream_total = ctx->nb_streams_list[i];
+    }
+    return stream_index - stream_offset;
+}
