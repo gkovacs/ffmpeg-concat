@@ -82,9 +82,6 @@ int ff_concatgen_read_packet(AVFormatContext *s,
 
                 av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
                 ctx->pe_curidx++;
-                //ctx->pe_curidx = av_playlist_stream_index_from_time(ctx,
-                                                                    //av_playlist_time_offset(ctx->durations, ctx->pe_curidx),
-                                                                    //NULL);
                 if (ff_playlist_populate_context(ctx, ctx->pe_curidx) < 0) {
                     av_log(NULL, AV_LOG_ERROR, "Failed to switch to AVFormatContext %d\n", ctx->pe_curidx);
                     break;
