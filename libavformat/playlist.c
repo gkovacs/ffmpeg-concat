@@ -59,7 +59,7 @@ AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
 AVFormatContext *ff_playlist_alloc_concat_formatcontext(void)
 {
     AVFormatContext *ic;
-    AVPlaylistContext *ctx = av_mallocz(sizeof(*ctx));
+    AVPlaylistContext *ctx = av_playlist_alloc();
     if (!ctx) {
         av_log(NULL, AV_LOG_ERROR, "failed to allocate AVPlaylistContext in ff_playlist_alloc_concat_formatcontext\n");
         return NULL;

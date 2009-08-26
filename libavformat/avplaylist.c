@@ -35,6 +35,11 @@
 #include "libavutil/avstring.h"
 #include "internal.h"
 
+AVPlaylistContext *av_playlist_alloc(void)
+{
+    return av_mallocz(sizeof(AVPlaylistContext));
+}
+
 int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int pos)
 {
     int i;
