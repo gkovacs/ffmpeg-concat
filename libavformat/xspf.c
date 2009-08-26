@@ -29,6 +29,7 @@
 #include "riff.h"
 #include "libavutil/avstring.h"
 #include "internal.h"
+#include "playlist.h"
 
 /* The ffmpeg codecs we support, and the IDs they have in the file */
 static const AVCodecTag codec_xspf_tags[] = {
@@ -142,7 +143,7 @@ static int xspf_read_header(AVFormatContext *s,
     av_playlist_add_filelist(ctx, flist, flist_len);
     av_free(flist);
     s->priv_data = ctx;
-    av_playlist_populate_context(ctx, ctx->pe_curidx);
+    ff_playlist_populate_context(ctx, ctx->pe_curidx);
     av_playlist_set_streams(s);
     return 0;
 }

@@ -28,3 +28,24 @@
  *  The public playlist API can be found in avplaylist.h
  */
 
+#include "playlist.h"
+
+int ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
+{
+    AVFormatContext **formatcontext_list_tmp = av_realloc(ctx->formatcontext_list, sizeof(*(ctx->formatcontext_list)) * (pe_curidx+2));
+    if (!formatcontext_list_tmp) {
+        av_log(NULL, AV_LOG_ERROR, "av_realloc error in av_playlist_populate_context\n");
+        av_free(ctx->formatcontext_list);
+        return AVERROR_NOMEM;
+    } else
+        ctx->formatcontext_list = formatcontext_list_tmp;
+    ctx->formatcontext_list[pe_curidx+1] = NULL;
+    if (!(ctx->formatcontext_list[pe_curidx] = av_playlist_alloc_formatcontext(ctx->flist[pe_curidx])))
+        return AVERROR_NOFMT;
+    ctx->nb_streams_list[pe_curidx] = ctx->formatcontext_list[pe_curidx]->nb_streams;
+    if (pe_curidx > 0)
+        ctx->durations[pe_curidx] = ctx->durations[pe_curidx - 1] + ctx->formatcontext_list[pe_curidx]->duration;
+    else
+        ctx->durations[pe_curidx] = 0;
+    return 0;
+}

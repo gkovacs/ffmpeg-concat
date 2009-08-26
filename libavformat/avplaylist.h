@@ -54,13 +54,6 @@ typedef struct AVPlaylistContext {
  */
 AVFormatContext *av_playlist_alloc_formatcontext(char *filename);
 
-/** @brief Opens the playlist element with the specified index from the AVPlaylistContext.
- *  @param ctx AVPlaylistContext containing the desired playlist element.
- *  @param pe_curidx Index of the playlist element to be opened.
- *  @return Returns 0 upon success, or negative upon failure.
- */
-int av_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx);
-
 /** @brief Sets the master concat-type demuxer's streams to those of its currently opened playlist element.
  *  @param s AVFormatContext of the concat-type demuxer, which contains the AVPlaylistContext and substreams.
  *  @return Returns 0 upon success, or negative upon failure.

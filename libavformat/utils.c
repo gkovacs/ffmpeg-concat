@@ -28,6 +28,7 @@
 #include <time.h>
 #include <strings.h>
 #include "libavformat/avplaylist.h"
+#include "libavformat/playlist.h"
 
 #undef NDEBUG
 #include <assert.h>
@@ -458,7 +459,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
                 av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
                 av_playlist_add_filelist(playlist_ctx, flist, flist_len);
                 av_strlcpy(ic->filename, filename, sizeof(ic->filename));
-                av_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
+                ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
                 av_playlist_set_streams(ic);
                 *ic_ptr = ic;
                 return 0;

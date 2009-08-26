@@ -31,7 +31,14 @@
 #ifndef AVFORMAT_PLAYLIST_H
 #define AVFORMAT_PLAYLIST_H
 
+#include "avplaylist.h"
 
+/** @brief Opens the playlist element with the specified index from the AVPlaylistContext.
+ *  @param ctx AVPlaylistContext containing the desired playlist element.
+ *  @param pe_curidx Index of the playlist element to be opened.
+ *  @return Returns 0 upon success, or negative upon failure.
+ */
+int ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx);
 
 #endif /* AVFORMAT_PLAYLIST_H */
 

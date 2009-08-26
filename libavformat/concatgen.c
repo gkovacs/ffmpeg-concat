@@ -32,6 +32,7 @@
 #include "concatgen.h"
 #include "avformat.h"
 #include "avplaylist.h"
+#include "playlist.h"
 
 int ff_concatgen_read_packet(AVFormatContext *s,
                              AVPacket *pkt)
@@ -80,7 +81,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                 //ctx->pe_curidx = av_playlist_stream_index_from_time(ctx,
                                                                     //av_playlist_time_offset(ctx->durations, ctx->pe_curidx),
                                                                     //NULL);
-                if (av_playlist_populate_context(ctx, ctx->pe_curidx) < 0) {
+                if (ff_playlist_populate_context(ctx, ctx->pe_curidx) < 0) {
                     av_log(NULL, AV_LOG_ERROR, "Failed to switch to AVFormatContext %d\n", ctx->pe_curidx);
                     break;
                 }
@@ -119,7 +120,7 @@ int ff_concatgen_read_seek(AVFormatContext *s,
     ctx->pe_curidx = av_playlist_stream_index_from_time(ctx,
                                                         pts_avtimebase,
                                                         &localpts_avtimebase);
-    err = av_playlist_populate_context(ctx, ctx->pe_curidx);
+    err = ff_playlist_populate_context(ctx, ctx->pe_curidx);
     if (err < 0) {
         av_log(NULL, AV_LOG_ERROR, "Failed to switch to AVFormatContext %d\n", ctx->pe_curidx);
         return err;
