@@ -86,7 +86,7 @@ int av_playlist_split_encodedstring(const char *s,
     av_free(sepidx);
 }
 
-int av_playlist_insert_path(AVPlaylistContext *ctx, const char *itempath, int pos)
+int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int pos)
 {
     int i;
     int64_t *durations_tmp;
@@ -135,7 +135,7 @@ int av_playlist_insert_path(AVPlaylistContext *ctx, const char *itempath, int po
 
 int av_playlist_add_item(AVPlaylistContext *ctx, const char *itempath)
 {
-    return av_playlist_insert_path(ctx, itempath, ctx->pelist_size);
+    return av_playlist_insert_item(ctx, itempath, ctx->pelist_size);
 }
 
 void av_playlist_relative_paths(char **flist,

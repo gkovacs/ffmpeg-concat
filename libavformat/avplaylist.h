@@ -81,9 +81,17 @@ int av_playlist_add_item(AVPlaylistContext *ctx, const char *itempath);
  *  at specified index. Existing items will be shifted up in the list.
  *  @param ctx Pre-allocated AVPlaylistContext to add elements to.
  *  @param itempath Absolute path to item for which to add a playlist element.
- *  @param pos Index which the newly inserted item will occupy.
+ *  @param pos Zero-based index which the newly inserted item will occupy.
  *  @return Returns 0 upon success, or negative upon failure.
  */
 int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int pos);
+
+/** @brief Removes AVFormatContext for item located at speified index from AVPlaylistContext.
+ *  Existing items will be shifted down in the list.
+ *  @param ctx Pre-allocated AVPlaylistContext to remove elements from.
+ *  @param pos Zero-based index of the item to remove.
+ *  @return Returns 0 upon success, or negative upon failure.
+ */
+int av_playlist_remove_item(AVPlaylistContext *ctx, int pos);
 
 #endif /* AVFORMAT_AVPLAYLIST_H */
