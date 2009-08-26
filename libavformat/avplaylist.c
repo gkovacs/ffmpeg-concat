@@ -42,7 +42,7 @@ AVPlaylistContext *av_playlist_alloc(void)
 
 int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int pos)
 {
-    int i;
+    int i, itempath_len;
     int64_t *durations_tmp;
     unsigned int *nb_streams_list_tmp;
     char **flist_tmp;
@@ -56,7 +56,14 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         ctx->flist = flist_tmp;
     for (i = ctx->pelist_size; i > pos; --i)
         ctx->flist[i] = ctx->flist[i - 1];
-    ctx->flist[pos] = itempath;
+    itempath_len = strlen(itempath);
+    ctx->flist[pos] = av_malloc(itempath_len + 1);
+    if (!ctx->flist[pos]) {
+        av_log(NULL, AV_LOG_ERROR, "av_malloc error in av_playlist_insert_item\n");
+        ctx->flist[pos] = NULL;
+        return AVERROR_NOMEM;
+    }
+    av_strlcpy(ctx->flist[pos], itempath, itempath_len + 1);
     ctx->flist[ctx->pelist_size] = NULL;
     durations_tmp = av_realloc(ctx->durations,
                                sizeof(*(ctx->durations)) * (ctx->pelist_size+1));
@@ -109,6 +116,7 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     char **flist_tmp;
     if (pos >= ctx->pelist_size || !ctx->flist || !ctx->durations || !ctx->nb_streams_list)
         return AVERROR_INVALIDDATA;
+    av_free(ctx->flist[pos]);
     for (i = pos; i < ctx->pelist_size; ++i)
         ctx->flist[i] = ctx->flist[i + 1];
     flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (--ctx->pelist_size+1));

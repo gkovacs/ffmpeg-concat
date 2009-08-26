@@ -117,8 +117,10 @@ static int pls_read_header(AVFormatContext *s,
         av_log(NULL, AV_LOG_ERROR, "failed to allocate AVPlaylistContext in pls_read_header\n");
         return AVERROR_NOMEM;
     }
-    for (i = 0; i < flist_len; ++i)
+    for (i = 0; i < flist_len; ++i) {
         av_playlist_insert_item(ctx, flist[i], ctx->pelist_size);
+        av_free(flist[i]);
+    }
     av_free(flist);
     s->priv_data = ctx;
     ctx->master_formatcontext = s;

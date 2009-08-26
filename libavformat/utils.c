@@ -457,8 +457,11 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
             AVPlaylistContext *playlist_ctx = ic->priv_data;
             if (playlist_ctx) {
                 av_log(ic, AV_LOG_DEBUG, "Generating playlist from %s\n", filename);
-                for (i = 0; i < flist_len; ++i)
+                for (i = 0; i < flist_len; ++i) {
                     av_playlist_insert_item(playlist_ctx, flist[i], playlist_ctx->pelist_size);
+                    av_free(flist[i]);
+                }
+                av_free(flist);
                 av_strlcpy(ic->filename, filename, sizeof(ic->filename));
                 ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
                 ff_playlist_set_streams(playlist_ctx);
