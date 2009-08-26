@@ -102,7 +102,7 @@ int av_playlist_add_filelist(AVPlaylistContext *ctx, const char **flist, int len
 int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
 {
     int64_t *durations_tmp;
-    int *nb_streams_list_tmp;
+    unsigned int *nb_streams_list_tmp;
     char **flist_tmp;
     flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size+1));
     if (!flist_tmp) {
@@ -175,7 +175,7 @@ int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
 
 int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index)
 {
-    int i, cur, prev;
+    unsigned int i, cur, prev;
     cur = prev = 0;
     for (i = 0; stream_index >= cur; ++i) {
         prev = cur;
