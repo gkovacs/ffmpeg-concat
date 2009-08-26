@@ -102,11 +102,4 @@ int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
  */
 int av_playlist_localstidx_from_streamidx(AVPlaylistContext *ctx, int stream_index);
 
-/** @brief Calculates the stream offset which corresponds to the given playlist item index.
- *  @param ctx AVPlaylistContext within which the list of playlist elements and durations are stored.
- *  @param playidx Playlist item index, the index of the child demuxer within ctx->formatcontext_list.
- *  @return Returns the stream offset, which is global stream index - local stream index.
- */
-int av_playlist_streams_offset_from_playidx(AVPlaylistContext *ctx, int playidx);
-
 #endif /* AVFORMAT_AVPLAYLIST_H */

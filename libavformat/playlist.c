@@ -99,7 +99,9 @@ int ff_playlist_set_streams(AVPlaylistContext *ctx)
     if (!(s = ctx->master_formatcontext))
         return 0;
     ic = ctx->formatcontext_list[ctx->pe_curidx];
-    int offset = av_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+    int offset = 0;
+    if (ctx->pe_curidx > 0)
+        offset = ctx->nb_streams_list[ctx->pe_curidx - 1];
     ic->iformat->read_header(ic, NULL);
     for (i = 0; i < ic->nb_streams; ++i) {
         s->streams[offset + i] = ic->streams[i];

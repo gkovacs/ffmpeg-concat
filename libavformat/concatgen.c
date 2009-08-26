@@ -54,7 +54,9 @@ int ff_concatgen_read_packet(AVFormatContext *s,
         }
         if (ret >= 0) {
             if (pkt) {
-                int streams_offset = av_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+                int streams_offset = 0;
+                if (ctx->pe_curidx > 0)
+                    streams_offset = ctx->nb_streams_list[ctx->pe_curidx - 1];
                 stream_index = av_playlist_localstidx_from_streamidx(ctx, pkt->stream_index);
                 pkt->stream_index = stream_index + streams_offset;
                 if (!ic->streams[stream_index]->codec->has_b_frames ||
