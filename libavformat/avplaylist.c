@@ -161,9 +161,8 @@ int av_playlist_stream_index_from_time(AVPlaylistContext *ctx,
                                        int64_t pts,
                                        int64_t *localpts)
 {
-    int i;
-    int64_t total;
-    i = total = 0;
+    int64_t total = 0;
+    int i = ctx->pe_curidx;
     while (pts >= total) {
         if (i >= ctx->pelist_size)
             break;
