@@ -121,7 +121,7 @@ static int pls_read_header(AVFormatContext *s,
     av_free(flist);
     s->priv_data = ctx;
     ff_playlist_populate_context(ctx, ctx->pe_curidx);
-    av_playlist_set_streams(s);
+    ff_playlist_set_streams(s);
     return 0;
 }
 

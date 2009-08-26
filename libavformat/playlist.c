@@ -29,6 +29,7 @@
  */
 
 #include "playlist.h"
+#include "concatgen.h"
 
 int ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
 {
@@ -47,5 +48,44 @@ int ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
         ctx->durations[pe_curidx] = ctx->durations[pe_curidx - 1] + ctx->formatcontext_list[pe_curidx]->duration;
     else
         ctx->durations[pe_curidx] = 0;
+    return 0;
+}
+
+int ff_playlist_set_streams(AVFormatContext *s)
+{
+    int i;
+    AVPlaylistContext *ctx = s->priv_data;
+    AVFormatContext *ic = ctx->formatcontext_list[ctx->pe_curidx];
+    int offset = av_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
+    ic->iformat->read_header(ic, NULL);
+    for (i = 0; i < ic->nb_streams; ++i) {
+        s->streams[offset + i] = ic->streams[i];
+        ic->streams[i]->index += offset;
+        if (!ic->streams[i]->codec->codec) {
+            AVCodec *codec = avcodec_find_decoder(ic->streams[i]->codec->codec_id);
+            if (!codec) {
+                av_log(ic->streams[i]->codec,
+                       AV_LOG_ERROR,
+                       "Decoder (codec id %d) not found for input stream #%d\n",
+                       ic->streams[i]->codec->codec_id,
+                       ic->streams[i]->index);
+                return AVERROR_NOFMT;
+            }
+            if (avcodec_open(ic->streams[i]->codec, codec) < 0) {
+                av_log(ic->streams[i]->codec,
+                       AV_LOG_ERROR,
+                       "Error while opening decoder for input stream #%d\n",
+                       ic->streams[i]->index);
+                return AVERROR_IO;
+            }
+        }
+    }
+    s->nb_streams        = ic->nb_streams + offset;
+    s->packet_buffer     = ic->packet_buffer;
+    s->packet_buffer_end = ic->packet_buffer_end;
+    if (ic->iformat->read_timestamp)
+        s->iformat->read_timestamp = ff_concatgen_read_timestamp;
+    else
+        s->iformat->read_timestamp = NULL;
     return 0;
 }

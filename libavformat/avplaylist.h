@@ -54,12 +54,6 @@ typedef struct AVPlaylistContext {
  */
 AVFormatContext *av_playlist_alloc_formatcontext(char *filename);
 
-/** @brief Sets the master concat-type demuxer's streams to those of its currently opened playlist element.
- *  @param s AVFormatContext of the concat-type demuxer, which contains the AVPlaylistContext and substreams.
- *  @return Returns 0 upon success, or negative upon failure.
- */
-int av_playlist_set_streams(AVFormatContext *s);
-
 /** @brief Allocates a new AVFormatContext for a concat-type demuxer.
  *  @return Returns NULL if failed, or AVFormatContext if succeeded.
  */
