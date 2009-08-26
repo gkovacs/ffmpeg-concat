@@ -118,7 +118,7 @@ static int pls_read_header(AVFormatContext *s,
         return AVERROR_NOMEM;
     }
     for (i = 0; i < flist_len; ++i)
-        av_playlist_add_path(ctx, flist[i]);
+        av_playlist_add_item(ctx, flist[i]);
     av_free(flist);
     s->priv_data = ctx;
     ctx->master_formatcontext = s;

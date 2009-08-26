@@ -133,7 +133,7 @@ int av_playlist_insert_path(AVPlaylistContext *ctx, const char *itempath, int po
     return 0;
 }
 
-int av_playlist_add_path(AVPlaylistContext *ctx, const char *itempath)
+int av_playlist_add_item(AVPlaylistContext *ctx, const char *itempath)
 {
     return av_playlist_insert_path(ctx, itempath, ctx->pelist_size);
 }
