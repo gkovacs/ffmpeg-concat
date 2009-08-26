@@ -47,10 +47,11 @@ AVFormatContext *ff_playlist_alloc_formatcontext(char *filename);
 int ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx);
 
 /** @brief Sets the master concat-type demuxer's streams to those of its currently opened playlist element.
- *  @param s AVFormatContext of the concat-type demuxer, which contains the AVPlaylistContext and substreams.
+ *  Does nothing if using a standalone playlist (master_formatcontext is NULL).
+ *  @param ctx AVPlaylistContext within which the list of playlist elements and durations are stored.
  *  @return Returns 0 upon success, or negative upon failure.
  */
-int ff_playlist_set_streams(AVFormatContext *s);
+int ff_playlist_set_streams(AVPlaylistContext *ctx);
 
 #endif /* AVFORMAT_PLAYLIST_H */
 

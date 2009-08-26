@@ -75,11 +75,13 @@ int ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
     return 0;
 }
 
-int ff_playlist_set_streams(AVFormatContext *s)
+int ff_playlist_set_streams(AVPlaylistContext *ctx)
 {
     int i;
-    AVPlaylistContext *ctx = s->priv_data;
-    AVFormatContext *ic = ctx->formatcontext_list[ctx->pe_curidx];
+    AVFormatContext *s, *ic;
+    if (!(s = ctx->master_formatcontext))
+        return 0;
+    ic = ctx->formatcontext_list[ctx->pe_curidx];
     int offset = av_playlist_streams_offset_from_playidx(ctx, ctx->pe_curidx);
     ic->iformat->read_header(ic, NULL);
     for (i = 0; i < ic->nb_streams; ++i) {

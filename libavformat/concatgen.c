@@ -85,7 +85,7 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                     av_log(NULL, AV_LOG_ERROR, "Failed to switch to AVFormatContext %d\n", ctx->pe_curidx);
                     break;
                 }
-                if (ctx->master_formatcontext == s && (ff_playlist_set_streams(s)) < 0) {
+                if ((ff_playlist_set_streams(ctx)) < 0) {
                     av_log(NULL, AV_LOG_ERROR, "Failed to open codecs for streams in %d\n", ctx->pe_curidx);
                     break;
                 }
@@ -125,8 +125,7 @@ int ff_concatgen_read_seek(AVFormatContext *s,
         av_log(NULL, AV_LOG_ERROR, "Failed to switch to AVFormatContext %d\n", ctx->pe_curidx);
         return err;
     }
-    if (ctx->master_formatcontext == s)
-        err = ff_playlist_set_streams(s);
+    err = ff_playlist_set_streams(ctx);
     if (err < 0) {
         av_log(NULL, AV_LOG_ERROR, "Failed to open codecs for streams in %d\n", ctx->pe_curidx);
         return err;

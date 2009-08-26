@@ -460,7 +460,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
                 av_playlist_add_filelist(playlist_ctx, flist, flist_len);
                 av_strlcpy(ic->filename, filename, sizeof(ic->filename));
                 ff_playlist_populate_context(playlist_ctx, playlist_ctx->pe_curidx);
-                ff_playlist_set_streams(ic);
+                ff_playlist_set_streams(playlist_ctx);
                 *ic_ptr = ic;
                 return 0;
             }

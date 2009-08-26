@@ -103,7 +103,7 @@ static int m3u_read_header(AVFormatContext *s,
     s->priv_data = ctx;
     ctx->master_formatcontext = s;
     ff_playlist_populate_context(ctx, ctx->pe_curidx);
-    ff_playlist_set_streams(s);
+    ff_playlist_set_streams(ctx);
     return 0;
 }
 
