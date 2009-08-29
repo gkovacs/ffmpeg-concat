@@ -100,10 +100,6 @@ int ff_concatgen_read_packet(AVFormatContext *s,
                 }
                 // have_switched_streams is set to avoid infinite loop
                 have_switched_streams = 1;
-                // duration is updated in case it's checked by a parent demuxer (chained concat demuxers)
-                s->duration = 0;
-                for (i = 0; i < ctx->pe_curidx; ++i)
-                    s->duration += ctx->durations[i];
                 continue;
             } else {
                 av_log(ic, AV_LOG_ERROR, "Packet read error %d\n", ret);

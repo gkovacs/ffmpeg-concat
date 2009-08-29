@@ -110,6 +110,9 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         return AVERROR_NOMEM;
     }
     av_strlcpy(ctx->flist[pos], itempath, itempath_len + 1);
+    // duration is updated in case it's checked by a parent demuxer (chained concat demuxers)
+    if (ctx->master_formatcontext)
+        ctx->master_formatcontext->duration = ctx->durations[ctx->pelist_size - 1];
     return 0;
 }
 
@@ -191,6 +194,9 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
         return AVERROR_NOMEM;
     } else
         ctx->formatcontext_list = formatcontext_list_tmp;
+    // duration is updated in case it's checked by a parent demuxer (chained concat demuxers)
+    if (ctx->master_formatcontext)
+        ctx->master_formatcontext->duration = ctx->durations[ctx->pelist_size - 1];
     return 0;
 }
 
