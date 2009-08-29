@@ -30,6 +30,7 @@
 
 #include "playlist.h"
 #include "concatgen.h"
+#include "concat.h"
 
 AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
 {
