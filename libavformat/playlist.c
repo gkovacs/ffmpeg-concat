@@ -163,6 +163,7 @@ int ff_playlist_split_encodedstring(const char *s,
         av_strlcpy(flist[i], ts+sepidx[i], sepidx[i+1]-sepidx[i]);
     }
     av_free(sepidx);
+    return 0;
 }
 
 void ff_playlist_relative_paths(char **flist,
