@@ -38,7 +38,8 @@ AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
     int err;
     AVFormatContext *ic = avformat_alloc_context();
     if (!ic) {
-        av_log(NULL, AV_LOG_ERROR, "unable to allocate AVFormatContext in ff_playlist_alloc_formatcontext\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "unable to allocate AVFormatContext in ff_playlist_alloc_formatcontext\n");
         return NULL;
     }
     err = av_open_input_file(&ic, filename, ic->iformat, 0, NULL);
@@ -61,7 +62,8 @@ AVFormatContext *ff_playlist_alloc_concat_formatcontext(void)
     AVFormatContext *ic;
     AVPlaylistContext *ctx = av_playlist_alloc();
     if (!ctx) {
-        av_log(NULL, AV_LOG_ERROR, "failed to allocate AVPlaylistContext in ff_playlist_alloc_concat_formatcontext\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "failed to allocate AVPlaylistContext in ff_playlist_alloc_concat_formatcontext\n");
         return NULL;
     }
     ic = avformat_alloc_context();
@@ -126,7 +128,8 @@ int ff_playlist_split_encodedstring(const char *s,
     buflen = len = 0;
     sepidx_tmp = av_fast_realloc(sepidx, &buflen, ++len);
     if (!sepidx_tmp) {
-        av_log(NULL, AV_LOG_ERROR, "av_realloc error in av_playlist_split_encodedstring\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "av_realloc error in av_playlist_split_encodedstring\n");
         av_free(sepidx);
         return AVERROR_NOMEM;
     }
@@ -140,7 +143,8 @@ int ff_playlist_split_encodedstring(const char *s,
             sepidx_tmp = av_fast_realloc(sepidx, &buflen, ++len);
             if (!sepidx_tmp) {
                 av_free(sepidx);
-                av_log(NULL, AV_LOG_ERROR, "av_fast_realloc error in av_playlist_split_encodedstring\n");
+                av_log(NULL, AV_LOG_ERROR,
+                       "av_fast_realloc error in av_playlist_split_encodedstring\n");
                 *flist_ptr = NULL;
                 *len_ptr = 0;
                 return AVERROR_NOMEM;
@@ -156,7 +160,8 @@ int ff_playlist_split_encodedstring(const char *s,
     for (i = 0; i < len; ++i) {
         flist[i] = av_malloc(sepidx[i+1]-sepidx[i]);
         if (!flist[i]) {
-            av_log(NULL, AV_LOG_ERROR, "av_malloc error in av_playlist_split_encodedstring\n");
+            av_log(NULL, AV_LOG_ERROR,
+                   "av_malloc error in av_playlist_split_encodedstring\n");
             *flist_ptr = NULL;
             *len_ptr = 0;
             return AVERROR_NOMEM;
