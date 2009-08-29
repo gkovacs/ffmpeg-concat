@@ -106,7 +106,8 @@ static int m3u_read_header(AVFormatContext *s,
     s->priv_data = ctx;
     ctx->master_formatcontext = s;
     if (!ctx->formatcontext_list[ctx->pe_curidx]) {
-        if (!(ctx->formatcontext_list[ctx->pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[ctx->pe_curidx])))
+        if (!(ctx->formatcontext_list[ctx->pe_curidx] =
+            ff_playlist_alloc_formatcontext(ctx->flist[ctx->pe_curidx])))
             return AVERROR_NOFMT;
     }
     ff_playlist_set_streams(ctx);

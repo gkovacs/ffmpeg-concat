@@ -464,7 +464,8 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
                 av_free(flist);
                 av_strlcpy(ic->filename, filename, sizeof(ic->filename));
                 if (!playlist_ctx->formatcontext_list[playlist_ctx->pe_curidx]) {
-                    if (!(playlist_ctx->formatcontext_list[playlist_ctx->pe_curidx] = ff_playlist_alloc_formatcontext(playlist_ctx->flist[playlist_ctx->pe_curidx])))
+                    if (!(playlist_ctx->formatcontext_list[playlist_ctx->pe_curidx] =
+                        ff_playlist_alloc_formatcontext(playlist_ctx->flist[playlist_ctx->pe_curidx])))
                         return AVERROR_NOFMT;
                 }
                 ff_playlist_set_streams(playlist_ctx);
