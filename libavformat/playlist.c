@@ -74,10 +74,10 @@ int ff_playlist_set_streams(AVPlaylistContext *ctx)
 {
     unsigned int i;
     AVFormatContext *s, *ic;
+    unsigned int offset = 0;
     if (!(s = ctx->master_formatcontext))
         return 0;
     ic = ctx->formatcontext_list[ctx->pe_curidx];
-    unsigned int offset = 0;
     if (ctx->pe_curidx > 0)
         offset = ctx->nb_streams_list[ctx->pe_curidx - 1];
     ic->iformat->read_header(ic, NULL);
