@@ -51,35 +51,41 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
     AVFormatContext *ic;
     flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size));
     if (!flist_tmp) {
-        av_log(NULL, AV_LOG_ERROR, "av_realloc error for flist in av_playlist_insert_item\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "av_realloc error for flist in av_playlist_insert_item\n");
         return AVERROR_NOMEM;
     } else
         ctx->flist = flist_tmp;
     durations_tmp = av_realloc(ctx->durations,
                                sizeof(*(ctx->durations)) * (ctx->pelist_size));
     if (!durations_tmp) {
-        av_log(NULL, AV_LOG_ERROR, "av_realloc error for durations in av_playlist_insert_item\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "av_realloc error for durations in av_playlist_insert_item\n");
         return AVERROR_NOMEM;
     } else
         ctx->durations = durations_tmp;
     nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
                                      sizeof(*(ctx->nb_streams_list)) * (ctx->pelist_size));
     if (!nb_streams_list_tmp) {
-        av_log(NULL, AV_LOG_ERROR, "av_realloc error for nb_streams_list in av_playlist_insert_item\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "av_realloc error for nb_streams_list in av_playlist_insert_item\n");
         return AVERROR_NOMEM;
     } else
         ctx->nb_streams_list = nb_streams_list_tmp;
     formatcontext_list_tmp = av_realloc(ctx->formatcontext_list,
                                         sizeof(*(ctx->formatcontext_list)) * (ctx->pelist_size));
     if (!formatcontext_list_tmp) {
-        av_log(NULL, AV_LOG_ERROR, "av_realloc error for formatcontext_list in av_playlist_insert_item\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "av_realloc error for formatcontext_list in av_playlist_insert_item\n");
         return AVERROR_NOMEM;
     } else
         ctx->formatcontext_list = formatcontext_list_tmp;
     ctx->formatcontext_list[pos] = NULL;
     ic = ff_playlist_alloc_formatcontext(itempath);
     if (!ic) {
-        av_log(NULL, AV_LOG_ERROR, "failed to allocate and open %s in av_playlist_insert_item\n", itempath);
+        av_log(NULL, AV_LOG_ERROR,
+               "failed to allocate and open %s in av_playlist_insert_item\n",
+               itempath);
         return AVERROR_NOMEM;
     }
     if (pos > 0) {
@@ -99,7 +105,8 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
     itempath_len = strlen(itempath);
     ctx->flist[pos] = av_malloc(itempath_len + 1);
     if (!ctx->flist[pos]) {
-        av_log(NULL, AV_LOG_ERROR, "av_malloc error in av_playlist_insert_item\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "av_malloc error in av_playlist_insert_item\n");
         return AVERROR_NOMEM;
     }
     av_strlcpy(ctx->flist[pos], itempath, itempath_len + 1);
@@ -112,7 +119,9 @@ int av_playlist_insert_playlist(AVPlaylistContext *ctx, AVPlaylistContext *inser
     for (i = 0; i < insert_ctx->pelist_size; ++i) {
         err = av_playlist_insert_item(ctx, insert_ctx->flist[i], pos + i);
         if (err) {
-            av_log(NULL, AV_LOG_ERROR, "failed to insert item %d to new position %d in av_playlist_insert_playlist\n", i, pos + i);
+            av_log(NULL, AV_LOG_ERROR,
+                   "failed to insert item %d to new position %d in av_playlist_insert_playlist\n",
+                   i, pos + i);
             return err;
         }
     }
@@ -133,7 +142,8 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
         ctx->flist[i] = ctx->flist[i + 1];
     flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (--ctx->pelist_size));
     if (!flist_tmp) {
-        av_log(NULL, AV_LOG_ERROR, "av_realloc error for flist in av_playlist_remove_item\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "av_realloc error for flist in av_playlist_remove_item\n");
         return AVERROR_NOMEM;
     } else
         ctx->flist = flist_tmp;
@@ -146,7 +156,8 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     durations_tmp = av_realloc(ctx->durations,
                                sizeof(*(ctx->durations)) * (ctx->pelist_size));
     if (!durations_tmp) {
-        av_log(NULL, AV_LOG_ERROR, "av_realloc error for durations in av_playlist_remove_item\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "av_realloc error for durations in av_playlist_remove_item\n");
         return AVERROR_NOMEM;
     } else
         ctx->durations = durations_tmp;
@@ -159,7 +170,8 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
                                      sizeof(*(ctx->nb_streams_list)) * (ctx->pelist_size));
     if (!nb_streams_list_tmp) {
-        av_log(NULL, AV_LOG_ERROR, "av_realloc error for nb_stream_list in av_playlist_remove_item\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "av_realloc error for nb_stream_list in av_playlist_remove_item\n");
         return AVERROR_NOMEM;
     } else
         ctx->nb_streams_list = nb_streams_list_tmp;
@@ -174,7 +186,8 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     formatcontext_list_tmp = av_realloc(ctx->formatcontext_list,
                                         sizeof(*(ctx->formatcontext_list)) * (ctx->pelist_size));
     if (!formatcontext_list_tmp) {
-        av_log(NULL, AV_LOG_ERROR, "av_realloc error for formatcontext_list in av_playlist_remove_item\n");
+        av_log(NULL, AV_LOG_ERROR,
+               "av_realloc error for formatcontext_list in av_playlist_remove_item\n");
         return AVERROR_NOMEM;
     } else
         ctx->formatcontext_list = formatcontext_list_tmp;
@@ -187,7 +200,9 @@ int av_playlist_close(AVPlaylistContext *ctx)
     while (ctx->pelist_size > 0) {
         err = av_playlist_remove_item(ctx, ctx->pelist_size-1);
         if (err) {
-            av_log(NULL, AV_LOG_ERROR, "failed to remove item %d from playlist", ctx->pelist_size-1);
+            av_log(NULL, AV_LOG_ERROR,
+                   "failed to remove item %d from playlist",
+                   ctx->pelist_size-1);
             return err;
         }
     }
