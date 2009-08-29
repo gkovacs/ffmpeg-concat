@@ -45,6 +45,7 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
     int i, itempath_len;
     int64_t *durations_tmp;
     unsigned int *nb_streams_list_tmp;
+    AVFormatContext **formatcontext_list_tmp;
     char **flist_tmp;
     AVFormatContext *ic;
     flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size));
@@ -67,11 +68,20 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         return AVERROR_NOMEM;
     } else
         ctx->nb_streams_list = nb_streams_list_tmp;
+    formatcontext_list_tmp = av_realloc(ctx->formatcontext_list,
+                                        sizeof(*(ctx->formatcontext_list)) * (ctx->pelist_size));
+    if (!formatcontext_list_tmp) {
+        av_log(NULL, AV_LOG_ERROR, "av_realloc error for formatcontext_list in av_playlist_insert_item\n");
+        return AVERROR_NOMEM;
+    } else
+        ctx->formatcontext_list = formatcontext_list_tmp;
     for (i = ctx->pelist_size; i > pos; --i) {
         ctx->flist[i] = ctx->flist[i - 1];
         ctx->durations[i] = ctx->durations[i - 1];
         ctx->nb_streams_list[i] = ctx->nb_streams_list[i - 1];
+        ctx->formatcontext_list[i] = ctx->formatcontext_list[i - 1];
     }
+    ctx->formatcontext_list[pos] = NULL;
     itempath_len = strlen(itempath);
     ctx->flist[pos] = av_malloc(itempath_len + 1);
     if (!ctx->flist[pos]) {
