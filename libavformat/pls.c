@@ -124,7 +124,10 @@ static int pls_read_header(AVFormatContext *s,
     av_free(flist);
     s->priv_data = ctx;
     ctx->master_formatcontext = s;
-    ff_playlist_populate_context(ctx, ctx->pe_curidx);
+    if (!ctx->formatcontext_list[ctx->pe_curidx]) {
+        if (!(ctx->formatcontext_list[ctx->pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[ctx->pe_curidx])))
+            return AVERROR_NOFMT;
+    }
     ff_playlist_set_streams(ctx);
     return 0;
 }
