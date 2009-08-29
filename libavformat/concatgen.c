@@ -80,15 +80,22 @@ int ff_concatgen_read_packet(AVFormatContext *s,
             // TODO switch from AVERROR_EOF to AVERROR_EOS
             // -32 AVERROR_EOF for avi, -51 for ogg
 
-                av_log(ic, AV_LOG_DEBUG, "Switching stream %d to %d\n", stream_index, ctx->pe_curidx+1);
+                av_log(ic, AV_LOG_DEBUG,
+                       "Switching stream %d to %d\n",
+                       stream_index, ctx->pe_curidx+1);
                 if (!ctx->formatcontext_list[++ctx->pe_curidx]) {
-                    if (!(ctx->formatcontext_list[ctx->pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[ctx->pe_curidx]))) {
-                        av_log(NULL, AV_LOG_ERROR, "Failed to switch to AVFormatContext %d\n", ctx->pe_curidx);
+                    if (!(ctx->formatcontext_list[ctx->pe_curidx] =
+                        ff_playlist_alloc_formatcontext(ctx->flist[ctx->pe_curidx]))) {
+                        av_log(NULL, AV_LOG_ERROR,
+                               "Failed to switch to AVFormatContext %d\n",
+                               ctx->pe_curidx);
                         break;
                     }
                 }
                 if ((ff_playlist_set_streams(ctx)) < 0) {
-                    av_log(NULL, AV_LOG_ERROR, "Failed to open codecs for streams in %d\n", ctx->pe_curidx);
+                    av_log(NULL, AV_LOG_ERROR,
+                           "Failed to open codecs for streams in %d\n",
+                           ctx->pe_curidx);
                     break;
                 }
                 // have_switched_streams is set to avoid infinite loop
@@ -123,14 +130,19 @@ int ff_concatgen_read_seek(AVFormatContext *s,
                                                         pts_avtimebase,
                                                         &localpts_avtimebase);
     if (!ctx->formatcontext_list[ctx->pe_curidx]) {
-        if (!(ctx->formatcontext_list[ctx->pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[ctx->pe_curidx]))) {
-            av_log(NULL, AV_LOG_ERROR, "Failed to switch to AVFormatContext %d\n", ctx->pe_curidx);
+        if (!(ctx->formatcontext_list[ctx->pe_curidx] =
+            ff_playlist_alloc_formatcontext(ctx->flist[ctx->pe_curidx]))) {
+            av_log(NULL, AV_LOG_ERROR,
+                   "Failed to switch to AVFormatContext %d\n",
+                   ctx->pe_curidx);
             return AVERROR_NOFMT;
         }
     }
     err = ff_playlist_set_streams(ctx);
     if (err < 0) {
-        av_log(NULL, AV_LOG_ERROR, "Failed to open codecs for streams in %d\n", ctx->pe_curidx);
+        av_log(NULL, AV_LOG_ERROR,
+               "Failed to open codecs for streams in %d\n",
+               ctx->pe_curidx);
         return err;
     }
     ic = ctx->formatcontext_list[ctx->pe_curidx];
