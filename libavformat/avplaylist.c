@@ -139,8 +139,12 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     unsigned int *nb_streams_list_tmp;
     AVFormatContext **formatcontext_list_tmp;
     char **flist_tmp;
-    if (pos >= ctx->pelist_size || !ctx->flist || !ctx->durations || !ctx->nb_streams_list)
+    if (pos >= ctx->pelist_size || !ctx->flist || !ctx->durations || !ctx->nb_streams_list) {
+        av_log(NULL, AV_LOG_ERROR,
+               "failed to remove item %d which is not present in playlist\n",
+               pos);
         return AVERROR_INVALIDDATA;
+    }
     --ctx->pelist_size;
     av_free(ctx->flist[pos]);
     for (i = pos; i < ctx->pelist_size; ++i)
