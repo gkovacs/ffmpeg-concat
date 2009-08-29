@@ -46,6 +46,7 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
     int64_t *durations_tmp;
     unsigned int *nb_streams_list_tmp;
     char **flist_tmp;
+    AVFormatContext *ic;
     flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size));
     if (!flist_tmp) {
         av_log(NULL, AV_LOG_ERROR, "av_realloc error for flist in av_playlist_insert_item\n");
@@ -71,8 +72,6 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         ctx->durations[i] = ctx->durations[i - 1];
         ctx->nb_streams_list[i] = ctx->nb_streams_list[i - 1];
     }
-    ctx->durations[pos] = 0;
-    ctx->nb_streams_list[pos] = 0;
     itempath_len = strlen(itempath);
     ctx->flist[pos] = av_malloc(itempath_len + 1);
     if (!ctx->flist[pos]) {
@@ -80,6 +79,19 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         return AVERROR_NOMEM;
     }
     av_strlcpy(ctx->flist[pos], itempath, itempath_len + 1);
+    ic = ff_playlist_alloc_formatcontext(itempath);
+    if (!ic) {
+        av_log(NULL, AV_LOG_ERROR, "failed to allocate and open %s in av_playlist_insert_item\n", itempath);
+        return AVERROR_NOMEM;
+    }
+    if (pos > 0) {
+        ctx->durations[pos] = ic->duration + ctx->durations[pos - 1];
+        ctx->nb_streams_list[pos] = ic->nb_streams + ctx->nb_streams_list[pos - 1];
+    } else {
+        ctx->durations[pos] = ic->duration;
+        ctx->nb_streams_list[pos] = ic->nb_streams;
+    }
+    av_close_input_file(ic);
     return 0;
 }
 

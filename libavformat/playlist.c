@@ -83,13 +83,6 @@ int ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
     ctx->formatcontext_list[pe_curidx+1] = NULL;
     if (!(ctx->formatcontext_list[pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[pe_curidx])))
         return AVERROR_NOFMT;
-    if (pe_curidx > 0) {
-        ctx->durations[pe_curidx] = ctx->durations[pe_curidx - 1] + ctx->formatcontext_list[pe_curidx]->duration;
-        ctx->nb_streams_list[pe_curidx] = ctx->nb_streams_list[pe_curidx - 1] + ctx->formatcontext_list[pe_curidx]->nb_streams;
-    } else {
-        ctx->durations[pe_curidx] = ctx->formatcontext_list[pe_curidx]->duration;
-        ctx->nb_streams_list[pe_curidx] = ctx->formatcontext_list[pe_curidx]->nb_streams;
-    }
     return 0;
 }
 
