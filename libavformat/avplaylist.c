@@ -34,6 +34,7 @@
 #include "riff.h"
 #include "libavutil/avstring.h"
 #include "internal.h"
+#include "playlist.h"
 
 AVPlaylistContext *av_playlist_alloc(void)
 {
