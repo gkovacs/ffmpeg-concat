@@ -76,20 +76,7 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         return AVERROR_NOMEM;
     } else
         ctx->formatcontext_list = formatcontext_list_tmp;
-    for (i = ctx->pelist_size; i > pos; --i) {
-        ctx->flist[i] = ctx->flist[i - 1];
-        ctx->durations[i] = ctx->durations[i - 1];
-        ctx->nb_streams_list[i] = ctx->nb_streams_list[i - 1];
-        ctx->formatcontext_list[i] = ctx->formatcontext_list[i - 1];
-    }
     ctx->formatcontext_list[pos] = NULL;
-    itempath_len = strlen(itempath);
-    ctx->flist[pos] = av_malloc(itempath_len + 1);
-    if (!ctx->flist[pos]) {
-        av_log(NULL, AV_LOG_ERROR, "av_malloc error in av_playlist_insert_item\n");
-        return AVERROR_NOMEM;
-    }
-    av_strlcpy(ctx->flist[pos], itempath, itempath_len + 1);
     ic = ff_playlist_alloc_formatcontext(itempath);
     if (!ic) {
         av_log(NULL, AV_LOG_ERROR, "failed to allocate and open %s in av_playlist_insert_item\n", itempath);
@@ -103,6 +90,19 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         ctx->nb_streams_list[pos] = ic->nb_streams;
     }
     av_close_input_file(ic);
+    for (i = ctx->pelist_size; i > pos; --i) {
+        ctx->flist[i] = ctx->flist[i - 1];
+        ctx->durations[i] = ctx->durations[i - 1] + ctx->durations[pos];
+        ctx->nb_streams_list[i] = ctx->nb_streams_list[i - 1] + ctx->nb_streams_list[pos];
+        ctx->formatcontext_list[i] = ctx->formatcontext_list[i - 1];
+    }
+    itempath_len = strlen(itempath);
+    ctx->flist[pos] = av_malloc(itempath_len + 1);
+    if (!ctx->flist[pos]) {
+        av_log(NULL, AV_LOG_ERROR, "av_malloc error in av_playlist_insert_item\n");
+        return AVERROR_NOMEM;
+    }
+    av_strlcpy(ctx->flist[pos], itempath, itempath_len + 1);
     return 0;
 }
 
