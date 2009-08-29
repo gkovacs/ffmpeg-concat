@@ -31,6 +31,7 @@
 #include "playlist.h"
 #include "concatgen.h"
 #include "concat.h"
+#include "libavutil/avstring.h"
 
 AVFormatContext *ff_playlist_alloc_formatcontext(char *filename)
 {
