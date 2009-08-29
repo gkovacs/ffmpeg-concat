@@ -140,10 +140,11 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     char **flist_tmp;
     if (pos >= ctx->pelist_size || !ctx->flist || !ctx->durations || !ctx->nb_streams_list)
         return AVERROR_INVALIDDATA;
+    --ctx->pelist_size;
     av_free(ctx->flist[pos]);
     for (i = pos; i < ctx->pelist_size; ++i)
         ctx->flist[i] = ctx->flist[i + 1];
-    flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (--ctx->pelist_size));
+    flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (ctx->pelist_size));
     if (!flist_tmp) {
         av_log(NULL, AV_LOG_ERROR,
                "av_realloc error for flist in av_playlist_remove_item\n");
