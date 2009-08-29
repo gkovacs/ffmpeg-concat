@@ -49,7 +49,8 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
     AVFormatContext **formatcontext_list_tmp;
     char **flist_tmp;
     AVFormatContext *ic;
-    flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (++ctx->pelist_size));
+    ++ctx->pelist_size;
+    flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * ctx->pelist_size);
     if (!flist_tmp) {
         av_log(NULL, AV_LOG_ERROR,
                "av_realloc error for flist in av_playlist_insert_item\n");
@@ -57,7 +58,7 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
     } else
         ctx->flist = flist_tmp;
     durations_tmp = av_realloc(ctx->durations,
-                               sizeof(*(ctx->durations)) * (ctx->pelist_size));
+                               sizeof(*(ctx->durations)) * ctx->pelist_size);
     if (!durations_tmp) {
         av_log(NULL, AV_LOG_ERROR,
                "av_realloc error for durations in av_playlist_insert_item\n");
@@ -65,7 +66,7 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
     } else
         ctx->durations = durations_tmp;
     nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
-                                     sizeof(*(ctx->nb_streams_list)) * (ctx->pelist_size));
+                                     sizeof(*(ctx->nb_streams_list)) * ctx->pelist_size);
     if (!nb_streams_list_tmp) {
         av_log(NULL, AV_LOG_ERROR,
                "av_realloc error for nb_streams_list in av_playlist_insert_item\n");
@@ -73,7 +74,7 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
     } else
         ctx->nb_streams_list = nb_streams_list_tmp;
     formatcontext_list_tmp = av_realloc(ctx->formatcontext_list,
-                                        sizeof(*(ctx->formatcontext_list)) * (ctx->pelist_size));
+                                        sizeof(*(ctx->formatcontext_list)) * ctx->pelist_size);
     if (!formatcontext_list_tmp) {
         av_log(NULL, AV_LOG_ERROR,
                "av_realloc error for formatcontext_list in av_playlist_insert_item\n");
@@ -144,7 +145,7 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     av_free(ctx->flist[pos]);
     for (i = pos; i < ctx->pelist_size; ++i)
         ctx->flist[i] = ctx->flist[i + 1];
-    flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * (ctx->pelist_size));
+    flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * ctx->pelist_size);
     if (!flist_tmp) {
         av_log(NULL, AV_LOG_ERROR,
                "av_realloc error for flist in av_playlist_remove_item\n");
@@ -158,7 +159,7 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     for (i = pos; i < ctx->pelist_size; ++i)
         ctx->durations[i] = ctx->durations[i + 1] - cur_offset;
     durations_tmp = av_realloc(ctx->durations,
-                               sizeof(*(ctx->durations)) * (ctx->pelist_size));
+                               sizeof(*(ctx->durations)) * ctx->pelist_size);
     if (!durations_tmp) {
         av_log(NULL, AV_LOG_ERROR,
                "av_realloc error for durations in av_playlist_remove_item\n");
@@ -172,7 +173,7 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     for (i = pos; i < ctx->pelist_size; ++i)
         ctx->nb_streams_list[i] = ctx->nb_streams_list[i + 1] - cur_offset;
     nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
-                                     sizeof(*(ctx->nb_streams_list)) * (ctx->pelist_size));
+                                     sizeof(*(ctx->nb_streams_list)) * ctx->pelist_size);
     if (!nb_streams_list_tmp) {
         av_log(NULL, AV_LOG_ERROR,
                "av_realloc error for nb_stream_list in av_playlist_remove_item\n");
@@ -188,7 +189,7 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     for (i = pos; i < ctx->pelist_size; ++i)
         ctx->formatcontext_list[i] = ctx->formatcontext_list[i + 1];
     formatcontext_list_tmp = av_realloc(ctx->formatcontext_list,
-                                        sizeof(*(ctx->formatcontext_list)) * (ctx->pelist_size));
+                                        sizeof(*(ctx->formatcontext_list)) * ctx->pelist_size);
     if (!formatcontext_list_tmp) {
         av_log(NULL, AV_LOG_ERROR,
                "av_realloc error for formatcontext_list in av_playlist_remove_item\n");
