@@ -69,15 +69,6 @@ AVFormatContext *ff_playlist_alloc_concat_formatcontext(void)
     return ic;
 }
 
-int ff_playlist_populate_context(AVPlaylistContext *ctx, int pe_curidx)
-{
-    if (!ctx->formatcontext_list[pe_curidx]) {
-        if (!(ctx->formatcontext_list[pe_curidx] = ff_playlist_alloc_formatcontext(ctx->flist[pe_curidx])))
-            return AVERROR_NOFMT;
-    }
-    return 0;
-}
-
 int ff_playlist_set_streams(AVPlaylistContext *ctx)
 {
     unsigned int i;
