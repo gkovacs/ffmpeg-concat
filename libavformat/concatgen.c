@@ -37,7 +37,7 @@
 int ff_concatgen_read_packet(AVFormatContext *s,
                              AVPacket *pkt)
 {
-    int ret, i, stream_index;
+    int ret, stream_index;
     char have_switched_streams = 0;
     AVPlaylistContext *ctx = s->priv_data;
     AVFormatContext *ic;
