@@ -92,10 +92,10 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         ctx->formatcontext_list[i] = ctx->formatcontext_list[i - 1];
     }
     ctx->formatcontext_list[pos] = NULL;
-    ctx->durations[pos] = durations_offset;
-    ctx->nb_streams_list[pos] = nb_streams_offset;
-    itempath_len = strlen(itempath);
-    ctx->flist[pos] = av_malloc(itempath_len + 1);
+    ctx->durations[pos]          = durations_offset;
+    ctx->nb_streams_list[pos]    = nb_streams_offset;
+    itempath_len                 = strlen(itempath);
+    ctx->flist[pos]              = av_malloc(itempath_len + 1);
     if (!ctx->flist[pos]) {
         av_log(ctx, AV_LOG_ERROR,
                "av_malloc error in av_playlist_insert_item\n");
