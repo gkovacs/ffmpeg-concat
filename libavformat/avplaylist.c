@@ -44,8 +44,8 @@ AVPlaylistContext *av_playlist_alloc(void)
 int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int pos)
 {
     int i, itempath_len;
-    int64_t *durations_tmp;
-    unsigned int *nb_streams_list_tmp;
+    int64_t *durations_tmp, durations_offset;
+    unsigned int *nb_streams_list_tmp, nb_streams_offset;
     AVFormatContext **formatcontext_list_tmp;
     char **flist_tmp;
     AVFormatContext *ic;
@@ -81,7 +81,6 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         return AVERROR_NOMEM;
     } else
         ctx->formatcontext_list = formatcontext_list_tmp;
-    ctx->formatcontext_list[pos] = NULL;
     ic = ff_playlist_alloc_formatcontext(itempath);
     if (!ic) {
         av_log(NULL, AV_LOG_ERROR,
@@ -90,19 +89,22 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         return AVERROR_NOMEM;
     }
     if (pos > 0) {
-        ctx->durations[pos] = ic->duration + ctx->durations[pos - 1];
-        ctx->nb_streams_list[pos] = ic->nb_streams + ctx->nb_streams_list[pos - 1];
+        durations_offset = ic->duration + ctx->durations[pos - 1];
+        nb_streams_offset = ic->nb_streams + ctx->nb_streams_list[pos - 1];
     } else {
-        ctx->durations[pos] = ic->duration;
-        ctx->nb_streams_list[pos] = ic->nb_streams;
+        durations_offset = ic->duration;
+        nb_streams_offset = ic->nb_streams;
     }
     av_close_input_file(ic);
     for (i = ctx->pelist_size; i > pos; --i) {
         ctx->flist[i] = ctx->flist[i - 1];
-        ctx->durations[i] = ctx->durations[i - 1] + ctx->durations[pos];
-        ctx->nb_streams_list[i] = ctx->nb_streams_list[i - 1] + ctx->nb_streams_list[pos];
+        ctx->durations[i] = ctx->durations[i - 1] + durations_offset;
+        ctx->nb_streams_list[i] = ctx->nb_streams_list[i - 1] + nb_streams_offset;
         ctx->formatcontext_list[i] = ctx->formatcontext_list[i - 1];
     }
+    ctx->formatcontext_list[pos] = NULL;
+    ctx->durations[pos] = durations_offset;
+    ctx->nb_streams_list[pos] = nb_streams_offset;
     itempath_len = strlen(itempath);
     ctx->flist[pos] = av_malloc(itempath_len + 1);
     if (!ctx->flist[pos]) {
