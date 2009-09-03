@@ -140,41 +140,18 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     av_free(ctx->flist[pos]);
     for (i = pos; i < ctx->pelist_size; ++i)
         ctx->flist[i] = ctx->flist[i + 1];
-    flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * ctx->pelist_size);
-    if (!flist_tmp) {
-        av_log(ctx, AV_LOG_ERROR,
-               "av_realloc error for flist in av_playlist_remove_item\n");
-        return AVERROR_NOMEM;
-    } else
-        ctx->flist = flist_tmp;
     if (pos > 0)
         durations_offset = ctx->durations[pos] - ctx->durations[pos - 1];
     else
         durations_offset = ctx->durations[pos];
     for (i = pos; i < ctx->pelist_size; ++i)
         ctx->durations[i] = ctx->durations[i + 1] - durations_offset;
-    durations_tmp = av_realloc(ctx->durations,
-                               sizeof(*(ctx->durations)) * ctx->pelist_size);
-    if (!durations_tmp) {
-        av_log(ctx, AV_LOG_ERROR,
-               "av_realloc error for durations in av_playlist_remove_item\n");
-        return AVERROR_NOMEM;
-    } else
-        ctx->durations = durations_tmp;
     if (pos > 0)
         nb_streams_offset = ctx->nb_streams_list[pos] - ctx->nb_streams_list[pos - 1];
     else
         nb_streams_offset = ctx->nb_streams_list[pos];
     for (i = pos; i < ctx->pelist_size; ++i)
         ctx->nb_streams_list[i] = ctx->nb_streams_list[i + 1] - nb_streams_offset;
-    nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
-                                     sizeof(*(ctx->nb_streams_list)) * ctx->pelist_size);
-    if (!nb_streams_list_tmp) {
-        av_log(ctx, AV_LOG_ERROR,
-               "av_realloc error for nb_stream_list in av_playlist_remove_item\n");
-        return AVERROR_NOMEM;
-    } else
-        ctx->nb_streams_list = nb_streams_list_tmp;
     if (ctx->formatcontext_list && ctx->formatcontext_list[pos]) {
         av_close_input_file(ctx->formatcontext_list[pos]);
         av_close_input_stream(ctx->formatcontext_list[pos]);
@@ -183,14 +160,26 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     }
     for (i = pos; i < ctx->pelist_size; ++i)
         ctx->formatcontext_list[i] = ctx->formatcontext_list[i + 1];
+    flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * ctx->pelist_size);
+    durations_tmp = av_realloc(ctx->durations,
+                               sizeof(*(ctx->durations)) * ctx->pelist_size);
+    nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
+                                     sizeof(*(ctx->nb_streams_list)) * ctx->pelist_size);
     formatcontext_list_tmp = av_realloc(ctx->formatcontext_list,
                                         sizeof(*(ctx->formatcontext_list)) * ctx->pelist_size);
-    if (!formatcontext_list_tmp) {
+    if (!flist_tmp ||
+        !durations_tmp ||
+        !nb_streams_list_tmp ||
+        !formatcontext_list_tmp) {
         av_log(ctx, AV_LOG_ERROR,
-               "av_realloc error for formatcontext_list in av_playlist_remove_item\n");
+               "av_realloc error in av_playlist_remove_item\n");
         return AVERROR_NOMEM;
-    } else
+    } else {
+        ctx->flist              = flist_tmp;
+        ctx->durations          = durations_tmp;
+        ctx->nb_streams_list    = nb_streams_list_tmp;
         ctx->formatcontext_list = formatcontext_list_tmp;
+    }
     // duration is updated in case it's checked by a parent demuxer (chained concat demuxers)
     if (ctx->master_formatcontext)
         ctx->master_formatcontext->duration = ctx->durations[ctx->pelist_size - 1];
