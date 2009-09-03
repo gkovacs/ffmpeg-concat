@@ -78,10 +78,10 @@ int av_playlist_insert_item(AVPlaylistContext *ctx, const char *itempath, int po
         return AVERROR_NOMEM;
     }
     if (pos > 0) {
-        durations_offset = ic->duration + ctx->durations[pos - 1];
+        durations_offset  = ic->duration + ctx->durations[pos - 1];
         nb_streams_offset = ic->nb_streams + ctx->nb_streams_list[pos - 1];
     } else {
-        durations_offset = ic->duration;
+        durations_offset  = ic->duration;
         nb_streams_offset = ic->nb_streams;
     }
     av_close_input_file(ic);
@@ -139,10 +139,10 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     --ctx->pelist_size;
     av_free(ctx->flist[pos]);
     if (pos > 0) {
-        durations_offset = ctx->durations[pos] - ctx->durations[pos - 1];
+        durations_offset  = ctx->durations[pos] - ctx->durations[pos - 1];
         nb_streams_offset = ctx->nb_streams_list[pos] - ctx->nb_streams_list[pos - 1];
     } else {
-        durations_offset = ctx->durations[pos];
+        durations_offset  = ctx->durations[pos];
         nb_streams_offset = ctx->nb_streams_list[pos];
     }
     if (ctx->formatcontext_list && ctx->formatcontext_list[pos]) {
