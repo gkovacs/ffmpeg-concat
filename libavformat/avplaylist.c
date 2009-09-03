@@ -138,28 +138,25 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     }
     --ctx->pelist_size;
     av_free(ctx->flist[pos]);
-    for (i = pos; i < ctx->pelist_size; ++i)
-        ctx->flist[i] = ctx->flist[i + 1];
-    if (pos > 0)
+    if (pos > 0) {
         durations_offset = ctx->durations[pos] - ctx->durations[pos - 1];
-    else
-        durations_offset = ctx->durations[pos];
-    for (i = pos; i < ctx->pelist_size; ++i)
-        ctx->durations[i] = ctx->durations[i + 1] - durations_offset;
-    if (pos > 0)
         nb_streams_offset = ctx->nb_streams_list[pos] - ctx->nb_streams_list[pos - 1];
-    else
+    } else {
+        durations_offset = ctx->durations[pos];
         nb_streams_offset = ctx->nb_streams_list[pos];
-    for (i = pos; i < ctx->pelist_size; ++i)
-        ctx->nb_streams_list[i] = ctx->nb_streams_list[i + 1] - nb_streams_offset;
+    }
     if (ctx->formatcontext_list && ctx->formatcontext_list[pos]) {
         av_close_input_file(ctx->formatcontext_list[pos]);
         av_close_input_stream(ctx->formatcontext_list[pos]);
         av_free(ctx->formatcontext_list[pos]);
         ctx->formatcontext_list[pos] = NULL;
     }
-    for (i = pos; i < ctx->pelist_size; ++i)
+    for (i = pos; i < ctx->pelist_size; ++i) {
+        ctx->flist[i] = ctx->flist[i + 1];
+        ctx->durations[i] = ctx->durations[i + 1] - durations_offset;
+        ctx->nb_streams_list[i] = ctx->nb_streams_list[i + 1] - nb_streams_offset;
         ctx->formatcontext_list[i] = ctx->formatcontext_list[i + 1];
+    }
     flist_tmp = av_realloc(ctx->flist, sizeof(*(ctx->flist)) * ctx->pelist_size);
     durations_tmp = av_realloc(ctx->durations,
                                sizeof(*(ctx->durations)) * ctx->pelist_size);
