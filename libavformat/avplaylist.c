@@ -125,9 +125,9 @@ int av_playlist_insert_playlist(AVPlaylistContext *ctx, AVPlaylistContext *inser
 
 int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
 {
-    int i, cur_offset;
-    int64_t *durations_tmp;
-    unsigned int *nb_streams_list_tmp;
+    int i;
+    int64_t *durations_tmp, durations_offset;
+    unsigned int *nb_streams_list_tmp, nb_streams_offset;
     AVFormatContext **formatcontext_list_tmp;
     char **flist_tmp;
     if (pos >= ctx->pelist_size || !ctx->flist || !ctx->durations || !ctx->nb_streams_list) {
@@ -148,11 +148,11 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     } else
         ctx->flist = flist_tmp;
     if (pos > 0)
-        cur_offset = ctx->durations[pos] - ctx->durations[pos - 1];
+        durations_offset = ctx->durations[pos] - ctx->durations[pos - 1];
     else
-        cur_offset = ctx->durations[pos];
+        durations_offset = ctx->durations[pos];
     for (i = pos; i < ctx->pelist_size; ++i)
-        ctx->durations[i] = ctx->durations[i + 1] - cur_offset;
+        ctx->durations[i] = ctx->durations[i + 1] - durations_offset;
     durations_tmp = av_realloc(ctx->durations,
                                sizeof(*(ctx->durations)) * ctx->pelist_size);
     if (!durations_tmp) {
@@ -162,11 +162,11 @@ int av_playlist_remove_item(AVPlaylistContext *ctx, int pos)
     } else
         ctx->durations = durations_tmp;
     if (pos > 0)
-        cur_offset = ctx->nb_streams_list[pos] - ctx->nb_streams_list[pos - 1];
+        nb_streams_offset = ctx->nb_streams_list[pos] - ctx->nb_streams_list[pos - 1];
     else
-        cur_offset = ctx->nb_streams_list[pos];
+        nb_streams_offset = ctx->nb_streams_list[pos];
     for (i = pos; i < ctx->pelist_size; ++i)
-        ctx->nb_streams_list[i] = ctx->nb_streams_list[i + 1] - cur_offset;
+        ctx->nb_streams_list[i] = ctx->nb_streams_list[i + 1] - nb_streams_offset;
     nb_streams_list_tmp = av_realloc(ctx->nb_streams_list,
                                      sizeof(*(ctx->nb_streams_list)) * ctx->pelist_size);
     if (!nb_streams_list_tmp) {
